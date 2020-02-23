@@ -4,7 +4,7 @@
 ## Implementation (MosCoW)
 
 |Done|Task|Priority|RP|Completed Date|Note|
-|:---:|:---:|:---:|:---:|:---:|:---:|
+|:---:|:---|:---:|:---:|:---:|:---:|
 |<ul><li>- [x] </li></ul>|User: Register User|Must Have| Richard | 20 Feb 2020||
 |<ul><li>- [x] </li></ul>|User: Adding User|Must Have| Richard | 20 Feb 2020||
 |<ul><li>- [x] </li></ul>|User: Partially Update User|Must Have| Richard | 20 Feb 2020||
