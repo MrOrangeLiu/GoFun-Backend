@@ -22,7 +22,9 @@ namespace DivingApplication.Repositories
             if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _context.Users.SingleOrDefault(x => x.Email == Email);
+            var user = _context.Users.Include(u => u.LikePosts)
+                                     .Include(u => u.SavePosts)
+                                     .SingleOrDefault(x => x.Email == Email);
 
             // check if Email exists
             if (user == null)
@@ -94,7 +96,7 @@ namespace DivingApplication.Repositories
 
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync()) >= 0);  
+            return ((await _context.SaveChangesAsync()) >= 0);
             // if the SaveChanges returns negative int, then it fail to save 
         }
 

@@ -1,5 +1,6 @@
 ﻿using DivingApplication.DbContexts;
 using DivingApplication.Entities;
+using DivingApplication.Entities.ManyToManyEntities;
 using DivingApplication.Helpers;
 using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
@@ -56,6 +57,71 @@ namespace DivingApplication.Repositories
 
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
         }
+
+
+
+        public async Task<UserPostLike> GetCurrentUserPostLike(Guid userId, Guid postId)
+        {
+            if (postId == Guid.Empty) throw new ArgumentNullException(nameof(postId));
+            if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
+
+            return (UserPostLike)await _context.FindAsync(typeof(UserPostLike), userId, postId);
+        }
+
+        public async Task<UserPostLike> UserLikePost(Guid userId, Guid postId)
+        {
+            if (postId == Guid.Empty) throw new ArgumentNullException(nameof(postId));
+            if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
+
+            var userPostLike = new UserPostLike
+            {
+                PostId = postId,
+                UserId = userId,
+            };
+            await _context.AddRangeAsync(userPostLike);
+            return userPostLike;
+
+        }
+
+        public void UserUnlikeAPost(UserPostLike currentUserPostLike)
+        {
+            _context.Remove(currentUserPostLike);
+        }
+
+
+        public async Task<UserPostSave> GetCurrentUserPostSave(Guid userId, Guid postId)
+        {
+            if (postId == Guid.Empty) throw new ArgumentNullException(nameof(postId));
+            if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
+
+            return (UserPostSave)await _context.FindAsync(typeof(UserPostSave), userId, postId);
+        }
+
+        public async Task<UserPostSave> UserSavePost(Guid userId, Guid postId)
+        {
+            if (postId == Guid.Empty) throw new ArgumentNullException(nameof(postId));
+            if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
+
+            var userPostSave = new UserPostSave
+            {
+                PostId = postId,
+                UserId = userId,
+            };
+            await _context.AddRangeAsync(userPostSave);
+            return userPostSave;
+
+        }
+
+        public void UserUnlikeAPost(UserPostSave currentUserPostSave)
+        {
+            _context.Remove(currentUserPostSave);
+        }
+
+        public void UserLikePostExist(Guid userId, Guid postId)
+        {
+
+        }
+
 
         public async Task<Post> GetPost(Guid postId)
         {
