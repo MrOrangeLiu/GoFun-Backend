@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DivingApplication.Entities.ManyToManyEntities;
+using DivingApplication.Validations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,8 +10,12 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Entities
 {
+    [StringContentURLAmountLimit]
     public class Post
     {
+
+        public static readonly string urlSplittor = "{%}";
+
         public enum ContentType
         {
             Image,
@@ -25,29 +31,25 @@ namespace DivingApplication.Entities
         [MaxLength(64)]
 
         public string Title { get; set; }
+        [MaxLength(2048)]
         public string Description { get; set; }
         public ContentType PostContentType { get; set; }
 
-
-        public byte[] Content { get; set; } = Array.Empty<byte>();
-
         [Url]
-        public Uri ContentUri { get; set; }
+        public string ContentURL { get; set; }
 
         [ForeignKey("AuthorId")]
         public User Author { get; set; }
         public Guid AuthorId { get; set; }
 
-        public int NumOfLikes { get; set; } = 0;
-        public int NumOfSaves { get; set; } = 0;
+        public List<UserPostLike> PostLikedBy { get; set; } = new List<UserPostLike>();
+        public List<UserPostSave> PostSavedBy { get; set; } = new List<UserPostSave>();
 
-        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public List<Comment> Comments { get; set; } = new List<Comment>();
 
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
-
-
 
     }
 }

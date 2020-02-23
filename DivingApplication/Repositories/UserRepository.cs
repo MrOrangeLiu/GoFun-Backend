@@ -1,5 +1,6 @@
 ﻿using DivingApplication.DbContexts;
 using DivingApplication.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,8 +51,7 @@ namespace DivingApplication.Repositories
             user.CreatedAt = DateTime.Now;
             user.LastSeen = DateTime.Now;
 
-            _context.Users.AddRange(user);
-            await _context.SaveChangesAsync();
+            await _context.Users.AddRangeAsync();
 
         }
 
@@ -63,10 +63,17 @@ namespace DivingApplication.Repositories
             return await _context.Users.FindAsync(userId);
         }
 
-
-        public async void UpdateUser(User user)
+        public User GetUserForJwt(Guid userId)
         {
-            await _context.SaveChangesAsync();
+            if (userId == null)
+                throw new ArgumentNullException(nameof(userId));
+
+            return _context.Users.Find(userId);
+        }
+
+
+        public async Task UpdateUser(User user)
+        {
         }
 
         public void DeleteUser(User user)
@@ -76,6 +83,19 @@ namespace DivingApplication.Repositories
 
             _context.Users.Remove(user);
 
+        }
+
+        public async Task<bool> UserExists(Guid userId)
+        {
+            if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
+
+            return await _context.Users.AnyAsync(u => u.Id == userId);
+        }
+
+        public async Task<bool> Save()
+        {
+            return ((await _context.SaveChangesAsync()) >= 0);  
+            // if the SaveChanges returns negative int, then it fail to save 
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

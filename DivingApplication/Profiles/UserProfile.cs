@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DivingApplication.Entities;
 using DivingApplication.Models;
+using DivingApplication.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,30 @@ namespace DivingApplication.Profiles
         {
             CreateMap<UserForCreatingDto, User>().ForMember(
                 dest => dest.UserGender,
-                opt => opt.MapFrom(src => src.UserGender == 0 ? Gender.Female : Gender.Male)
+                opt => opt.MapFrom(src => (Gender)Enum.Parse(typeof(Gender), src.UserGender))
                 );
 
+
+            CreateMap<UserUpdatingDto, User>().ForMember(
+                dest => dest.UserGender,
+                opt => opt.MapFrom(src => (Gender)Enum.Parse(typeof(Gender), src.UserGender))
+                );
+
+            CreateMap<User, UserUpdatingDto>().ForMember(
+                dest => dest.UserGender,
+                opt => opt.MapFrom(src => src.UserGender.ToString())
+                );
+
+
+            CreateMap<User, UserOutputDto>()
+                .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.UserRole.ToString()))
+                .ForMember(dest => dest.UserGender, opt => opt.MapFrom(src => src.UserGender.ToString()))
+                .ForMember(dest => dest.Followers, opt => opt.MapFrom(src => src.Followers.Select(f => f.FollowerId).ToList()))
+                .ForMember(dest => dest.Following, opt => opt.MapFrom(src => src.Following.Select(f => f.FollowingId).ToList()))
+                .ForMember(dest => dest.OwningPosts, opt => opt.MapFrom(src => src.OwningPosts.Select(p => p.Id).ToList()))
+                .ForMember(dest => dest.UserChatRooms, opt => opt.MapFrom(src => src.UserChatRooms.Select(c => c.ChatRoomId).ToList()))
+                .ForMember(dest => dest.SavePosts, opt => opt.MapFrom(src => src.SavePosts.Select(p => p.PostId).ToList()))
+                .ForMember(dest => dest.LikePosts, opt => opt.MapFrom(src => src.LikePosts.Select(p => p.PostId).ToList()));
         }
     }
 }

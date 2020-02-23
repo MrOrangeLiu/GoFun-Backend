@@ -54,7 +54,9 @@ namespace DivingApplication.Entities
         public List<UserFollow> Following { get; set; } = new List<UserFollow>();
         public List<Post> OwningPosts { get; set; } = new List<Post>();
         public List<UserChatRoom> UserChatRooms { get; set; } = new List<UserChatRoom>();
-
-
+        public List<UserPostLike> LikePosts { get; set; } = new List<UserPostLike>();
+        public List<UserPostSave> SavePosts { get; set; } = new List<UserPostSave>();
+        public List<UserMessageLike> LikeMessages { get; set; } = new List<UserMessageLike>();
+        public List<UserMessageRead> ReadMessages { get; set; } = new List<UserMessageRead>();
     }
 }

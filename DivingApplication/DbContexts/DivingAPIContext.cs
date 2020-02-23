@@ -32,18 +32,18 @@ namespace DivingApplication.DbContexts
             // Dealing with the Enum Conversion
 
             modelBuilder.Entity<User>().Property(u => u.UserRole).HasConversion(
-                       v => v.ToString(),
+                        v => v.ToString(),
                         v => ((Role)Enum.Parse(typeof(Role), v))
                    );
 
             modelBuilder.Entity<User>().Property(u => u.UserGender).HasConversion(
-                 v => v.ToString(),
-                  v => ((Gender)Enum.Parse(typeof(Gender), v))
+                        v => v.ToString(),
+                        v => ((Gender)Enum.Parse(typeof(Gender), v))
                        );
 
             modelBuilder.Entity<Post>().Property(p => p.PostContentType).HasConversion(
-                    v => v.ToString(),
-                     v => ((ContentType)Enum.Parse(typeof(ContentType), v))
+                        v => v.ToString(),
+                        v => ((ContentType)Enum.Parse(typeof(ContentType), v))
                      );
 
             modelBuilder.Entity<Message>().Property(c => c.MessageType).HasConversion(
@@ -60,13 +60,13 @@ namespace DivingApplication.DbContexts
 
 
             modelBuilder.Entity<UserFollow>()
-                        .HasOne(u => u.Follower)
+                        .HasOne(uf => uf.Follower)
                         .WithMany(u => u.Following)
                         .HasForeignKey(uf => uf.FollowerId)
                         .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserFollow>()
-                        .HasOne(u => u.Following)
+                        .HasOne(uf => uf.Following)
                         .WithMany(u => u.Followers)
                         .HasForeignKey(uf => uf.FollowingId)
                         .OnDelete(DeleteBehavior.Restrict);
@@ -76,14 +76,77 @@ namespace DivingApplication.DbContexts
 
 
             modelBuilder.Entity<UserChatRoom>()
-                        .HasOne(u => u.ChatRoom)
+                        .HasOne(uc => uc.ChatRoom)
                         .WithMany(u => u.UserChatRooms)
                         .HasForeignKey(uc => uc.ChatRoomId);
 
             modelBuilder.Entity<UserChatRoom>()
-                        .HasOne(u => u.User)
+                        .HasOne(uc => uc.User)
                         .WithMany(u => u.UserChatRooms)
                         .HasForeignKey(uc => uc.UserId);
+
+
+            modelBuilder.Entity<UserPostLike>()
+                        .HasKey(upl => new { upl.UserId, upl.PostId });
+
+
+            modelBuilder.Entity<UserPostLike>()
+                        .HasOne(upl => upl.Post)
+                        .WithMany(p => p.PostLikedBy)
+                        .HasForeignKey(upl => upl.PostId).OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserPostLike>()
+                        .HasOne(upl => upl.User)
+                        .WithMany(u => u.LikePosts)
+                        .HasForeignKey(upl => upl.UserId).OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<UserPostSave>()
+            .HasKey(ups => new { ups.UserId, ups.PostId });
+
+
+            modelBuilder.Entity<UserPostSave>()
+                        .HasOne(ups => ups.Post)
+                        .WithMany(p => p.PostSavedBy)
+                        .HasForeignKey(ups => ups.PostId).OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserPostSave>()
+                        .HasOne(ups => ups.User)
+                        .WithMany(u => u.SavePosts)
+                        .HasForeignKey(ups => ups.UserId).OnDelete(DeleteBehavior.NoAction);
+
+
+
+
+            modelBuilder.Entity<UserMessageLike>()
+            .HasKey(uml => new { uml.UserId, uml.MessageId });
+
+
+            modelBuilder.Entity<UserMessageLike>()
+                        .HasOne(uml => uml.Message)
+                        .WithMany(m => m.LikedBy)
+                        .HasForeignKey(uml => uml.MessageId).OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserMessageLike>()
+                        .HasOne(uml => uml.User)
+                        .WithMany(u => u.LikeMessages)
+                        .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.NoAction);
+
+
+
+            modelBuilder.Entity<UserMessageRead>()
+            .HasKey(uml => new { uml.UserId, uml.MessageId });
+
+
+            modelBuilder.Entity<UserMessageRead>()
+                        .HasOne(uml => uml.Message)
+                        .WithMany(m => m.ReadBy)
+                        .HasForeignKey(uml => uml.MessageId).OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserMessageRead>()
+                        .HasOne(uml => uml.User)
+                        .WithMany(u => u.ReadMessages)
+                        .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.NoAction);
 
 
             base.OnModelCreating(modelBuilder);

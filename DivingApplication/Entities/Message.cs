@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DivingApplication.Entities.ManyToManyEntities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -28,9 +29,8 @@ namespace DivingApplication.Entities
 
         public DateTime CreatedAt { get; set; }
 
-        //public List<User> ReadBy { get; set; } = new List<User>();
-
-        //public List<User> LikedBy { get; set; } = new List<User>();
+        public List<UserMessageRead> ReadBy { get; set; } = new List<UserMessageRead>();
+        public List<UserMessageLike> LikedBy { get; set; } = new List<UserMessageLike>();
 
 
     }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DivingApplication.Migrations
 {
     [DbContext(typeof(DivingAPIContext))]
-    [Migration("20200219131439_init")]
-    partial class init
+    [Migration("20200222072319_removingPostUri")]
+    partial class removingPostUri
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -96,6 +96,66 @@ namespace DivingApplication.Migrations
                     b.ToTable("UserFollow");
                 });
 
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserMessageLike", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "MessageId");
+
+                    b.HasIndex("MessageId");
+
+                    b.ToTable("UserMessageLike");
+                });
+
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserMessageRead", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "MessageId");
+
+                    b.HasIndex("MessageId");
+
+                    b.ToTable("UserMessageRead");
+                });
+
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserPostLike", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "PostId");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("UserPostLike");
+                });
+
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserPostSave", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "PostId");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("UserPostSave");
+                });
+
             modelBuilder.Entity("DivingApplication.Entities.Message", b =>
                 {
                     b.Property<Guid>("Id")
@@ -136,10 +196,7 @@ namespace DivingApplication.Migrations
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<byte[]>("Content")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ContentUri")
+                    b.Property<string>("ContentURL")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -147,12 +204,6 @@ namespace DivingApplication.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NumOfLikes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumOfSaves")
-                        .HasColumnType("int");
 
                     b.Property<string>("PostContentType")
                         .IsRequired()
@@ -182,14 +233,24 @@ namespace DivingApplication.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastSeen")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<byte[]>("ProfileImage")
                         .HasColumnType("varbinary(max)");
@@ -256,6 +317,66 @@ namespace DivingApplication.Migrations
                         .WithMany("Followers")
                         .HasForeignKey("FollowingId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserMessageLike", b =>
+                {
+                    b.HasOne("DivingApplication.Entities.Message", "Message")
+                        .WithMany("LikedBy")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DivingApplication.Entities.User", "User")
+                        .WithMany("LikeMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserMessageRead", b =>
+                {
+                    b.HasOne("DivingApplication.Entities.Message", "Message")
+                        .WithMany("ReadBy")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DivingApplication.Entities.User", "User")
+                        .WithMany("ReadMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserPostLike", b =>
+                {
+                    b.HasOne("DivingApplication.Entities.Post", "Post")
+                        .WithMany("PostLikedBy")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DivingApplication.Entities.User", "User")
+                        .WithMany("LikePosts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserPostSave", b =>
+                {
+                    b.HasOne("DivingApplication.Entities.Post", "Post")
+                        .WithMany("PostSavedBy")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DivingApplication.Entities.User", "User")
+                        .WithMany("SavePosts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

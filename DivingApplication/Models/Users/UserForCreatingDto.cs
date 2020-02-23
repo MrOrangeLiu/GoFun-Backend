@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DivingApplication.Models
+namespace DivingApplication.Models.Users
 {
     public class UserForCreatingDto
     {
         public string Name { set; get; }
         public string Email { set; get; }
         public string Password { get; set; }
-        public int UserGender { get; set; } = 0;
-    } 
+        public string UserGender { get; set; }
+    }
 }

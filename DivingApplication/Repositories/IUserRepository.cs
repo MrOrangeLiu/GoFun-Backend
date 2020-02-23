@@ -10,6 +10,9 @@ namespace DivingApplication.Repositories
         User Authenticate(string Email, string password);
         void DeleteUser(User user);
         Task<User> GetUser(Guid userId);
-        void UpdateUser(User user);
+        User GetUserForJwt(Guid userId);
+        Task<bool> Save();
+        Task UpdateUser(User user);
+        Task<bool> UserExists(Guid userId);
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DivingApplication.Migrations
 {
-    public partial class init : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -26,12 +26,15 @@ namespace DivingApplication.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    Email = table.Column<string>(nullable: false),
                     Name = table.Column<string>(maxLength: 64, nullable: false),
                     ProfileImage = table.Column<byte[]>(nullable: true),
-                    Password = table.Column<string>(nullable: false),
+                    PasswordHash = table.Column<byte[]>(nullable: false),
+                    PasswordSalt = table.Column<byte[]>(nullable: true),
                     UserRole = table.Column<string>(nullable: false),
                     UserGender = table.Column<string>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false)
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    LastSeen = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,8 +80,6 @@ namespace DivingApplication.Migrations
                     Content = table.Column<byte[]>(nullable: true),
                     ContentUri = table.Column<string>(nullable: true),
                     AuthorId = table.Column<Guid>(nullable: false),
-                    NumOfLikes = table.Column<int>(nullable: false),
-                    NumOfSaves = table.Column<int>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     UpdatedAt = table.Column<DateTime>(nullable: false)
                 },
@@ -142,6 +143,50 @@ namespace DivingApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserMessageLike",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    MessageId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserMessageLike", x => new { x.UserId, x.MessageId });
+                    table.ForeignKey(
+                        name: "FK_UserMessageLike_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserMessageLike_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserMessageRead",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    MessageId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserMessageRead", x => new { x.UserId, x.MessageId });
+                    table.ForeignKey(
+                        name: "FK_UserMessageRead_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserMessageRead_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -161,6 +206,50 @@ namespace DivingApplication.Migrations
                         principalTable: "Posts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserPostLike",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    PostId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPostLike", x => new { x.UserId, x.PostId });
+                    table.ForeignKey(
+                        name: "FK_UserPostLike_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserPostLike_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserPostSave",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(nullable: false),
+                    PostId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPostSave", x => new { x.UserId, x.PostId });
+                    table.ForeignKey(
+                        name: "FK_UserPostSave_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserPostSave_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -192,6 +281,26 @@ namespace DivingApplication.Migrations
                 name: "IX_UserFollow_FollowingId",
                 table: "UserFollow",
                 column: "FollowingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserMessageLike_MessageId",
+                table: "UserMessageLike",
+                column: "MessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserMessageRead_MessageId",
+                table: "UserMessageRead",
+                column: "MessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPostLike_PostId",
+                table: "UserPostLike",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPostSave_PostId",
+                table: "UserPostSave",
+                column: "PostId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -200,13 +309,25 @@ namespace DivingApplication.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Messages");
-
-            migrationBuilder.DropTable(
                 name: "UserChatRoom");
 
             migrationBuilder.DropTable(
                 name: "UserFollow");
+
+            migrationBuilder.DropTable(
+                name: "UserMessageLike");
+
+            migrationBuilder.DropTable(
+                name: "UserMessageRead");
+
+            migrationBuilder.DropTable(
+                name: "UserPostLike");
+
+            migrationBuilder.DropTable(
+                name: "UserPostSave");
+
+            migrationBuilder.DropTable(
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Posts");
