@@ -5,32 +5,29 @@
 
 |Done|Task|Priority|RP|Completed Date|Note|
 |:---:|:---|:---:|:---:|:---:|:---:|
-|<ul><li>- [x] </li></ul>|User: Register User|Must Have| Richard | 20 Feb 2020||
-|<ul><li>- [x] </li></ul>|User: Adding User|Must Have| Richard | 20 Feb 2020||
-|<ul><li>- [x] </li></ul>|User: Partially Update User|Must Have| Richard | 20 Feb 2020||
-|<ul><li>- [x] </li></ul>|User: Get User by ID|Must Have| Richard | 20 Feb 2020||
-|<ul><li>- [ ] </li></ul>|User: Get all owing Posts|Must Have| Richard |||
-|<ul><li>- [ ] </li></ul>|User: Get all liked Posts|Must Have| Richard |||
-|<ul><li>- [ ] </li></ul>|User: Get all saved Posts|Must Have| Richard |||
-|<ul><li>- [x] </li></ul>|Authorization: JWT Authorization|Must Have| Richard | 21 Feb 2020||
-|<ul><li>- [x] </li></ul>|Authorization Role: Normal User|Must Have| Richard | 21 Feb 2020||
-|<ul><li>- [x] </li></ul>|Authorization Role: Admin |Must Have| Richard | 21 Feb 2020||
-|<ul><li>- [x] </li></ul>|Authorization Policy: NormalAndAdmin |Must Have| Richard | 21 Feb 2020||
-|<ul><li>- [x] </li></ul>|Authorization: User Reaching Test|Must Have| Richard | 22 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Create Post|Must Have| Richard | 22 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Get Post|Must Have| Richard | 22 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Get Post Pagination|Must Have| Richard | 23 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Previous & Next Page Uri|Must Have| Richard | 23 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Get Post Sorting|Must Have| Richard | 23 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Get Post Searching by Title|Must Have| Richard | 23 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Get Post DataShape|Must Have| Richard | 23 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Partially Update Post|Must Have| Richard | 23 Feb 2020||
-|<ul><li>- [x] </li></ul>|Post: Delete Post|Must Have| Richard | 23 Feb 2020||
-|<ul><li>- [ ] </li></ul>|Post: Like a Post|Must Have| Richard |||
-|<ul><li>- [ ] </li></ul>|Post: Save a Post|Must Have| Richard |||
-
-
-
+|<ul><li>- [x] </li></ul>|**User**: Register User|Must Have| Richard | 20 Feb 2020||
+|<ul><li>- [x] </li></ul>|**User**: Adding User|Must Have| Richard | 20 Feb 2020||
+|<ul><li>- [x] </li></ul>|**User**: Partially Update User|Must Have| Richard | 20 Feb 2020||
+|<ul><li>- [x] </li></ul>|**User**: Get User by ID|Must Have| Richard | 20 Feb 2020||
+|<ul><li>- [ ] </li></ul>|**User**: Get all owing Posts|Must Have| Richard |||
+|<ul><li>- [ ] </li></ul>|**User**: Get all liked Posts|Must Have| Richard |||
+|<ul><li>- [ ] </li></ul>|**User**: Get all saved Posts|Must Have| Richard |||
+|<ul><li>- [x] </li></ul>|**Authorization**: JWT Authorization|Must Have| Richard | 21 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Authorization** Role: Normal User|Must Have| Richard | 21 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Authorization** Role: Admin |Must Have| Richard | 21 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Authorization** Policy: NormalAndAdmin |Must Have| Richard | 21 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Authorization**: User Reaching Test|Must Have| Richard | 22 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Create Post|Must Have| Richard | 22 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Get Post|Must Have| Richard | 22 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Get Post Pagination|Must Have| Richard | 23 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Previous & Next Page Uri|Must Have| Richard | 23 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Get Post Sorting|Must Have| Richard | 23 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Get Post Searching by Title|Must Have| Richard | 23 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Get Post DataShape|Must Have| Richard | 23 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Partially Update Post|Must Have| Richard | 23 Feb 2020||
+|<ul><li>- [x] </li></ul>|**Post**: Delete Post|Must Have| Richard | 23 Feb 2020||
+|<ul><li>- [ ] </li></ul>|**Post**: Like a Post|Must Have| Richard |||
+|<ul><li>- [ ] </li></ul>|**Post**: Save a Post|Must Have| Richard |||
 
 
 
