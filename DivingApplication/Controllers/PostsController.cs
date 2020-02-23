@@ -145,6 +145,88 @@ namespace DivingApplication.Controllers
         }
 
 
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpPost("like/{postId}")]
+        public async Task<IActionResult> UserLikePostToggle(Guid postId)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Checking if the post Exist
+
+            var post = await _postRepository.GetPost(postId);
+
+            if (post == null) return NotFound();
+
+            var currentPostLike = await _postRepository.GetCurrentUserPostLike(userId, postId);
+            bool Adding;
+
+            if (currentPostLike == null)
+            {
+                currentPostLike = await _postRepository.UserLikePost(userId, postId);
+                await _postRepository.Save();
+                Adding = true;
+
+            }
+            else
+            {
+                _postRepository.UserUnlikeAPost(currentPostLike);
+                await _postRepository.Save();
+                Adding = false;
+
+            }
+
+            return Ok(
+                new
+                {
+                    Adding,
+                    userId = currentPostLike.UserId,
+                    postId = currentPostLike.PostId,
+                }
+                );
+        }
+
+
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpPost("save/{postId}")]
+        public async Task<IActionResult> UserSavePostToggle(Guid postId)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Checking if the post Exist
+
+            var post = await _postRepository.GetPost(postId);
+
+            if (post == null) return NotFound();
+
+            var currentPostSave = await _postRepository.GetCurrentUserPostSave(userId, postId);
+            bool Adding;
+
+            if (currentPostSave == null)
+            {
+                currentPostSave = await _postRepository.UserSavePost(userId, postId);
+                await _postRepository.Save();
+                Adding = true;
+
+            }
+            else
+            {
+                _postRepository.UserUnlikeAPost(currentPostSave);
+                await _postRepository.Save();
+                Adding = false;
+
+            }
+
+            return Ok(
+                new
+                {
+                    Adding,
+                    userId = currentPostSave.UserId,
+                    postId = currentPostSave.PostId,
+                }
+                );
+        }
+
+
         private string CreatePostsUri(PostResourceParameters postResourceParameters, UriType uriType)
         {
             switch (uriType)
