@@ -44,7 +44,7 @@ namespace DivingApplication.Profiles
                     opt => opt.MapFrom(src => src.ContentURL.Split(new[] { urlSplittor }, StringSplitOptions.RemoveEmptyEntries))
                 );
 
-            CreateMap<Post, PostOutpuDto>().ForMember(
+            CreateMap<Post, PostOutputDto>().ForMember(
                     dest => dest.ContentURL,
                     opt => opt.MapFrom(src => src.ContentURL.Split(new[] { urlSplittor }, StringSplitOptions.RemoveEmptyEntries))
                 ).ForMember(

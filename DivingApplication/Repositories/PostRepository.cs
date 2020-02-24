@@ -51,7 +51,7 @@ namespace DivingApplication.Repositories
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
             {
-                var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutpuDto, Post>();
+                var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
                 collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
             }
 

@@ -22,6 +22,11 @@ using DivingApplication.Helpers;
 using DivingApplication.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
+using DivingApplication.Models.Posts;
+using MimeKit;
+using MimeKit.Text;
+using MailKit.Security;
+using static DivingApplication.Entities.User;
 
 namespace DivingApplication.Controllers
 {
@@ -57,6 +62,8 @@ namespace DivingApplication.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SingupUser([FromBody] UserForCreatingDto userForCreatingDto)
         {
+            if (await _userRepository.UserEmailExists(userForCreatingDto.Email)) return BadRequest("User Already Exist");
+
             var user = _mapper.Map<User>(userForCreatingDto);
 
             await _userRepository.AddUser(user, userForCreatingDto.Password);
@@ -149,6 +156,229 @@ namespace DivingApplication.Controllers
             return Ok(_mapper.Map<UserOutputDto>(userFromRepo));
         }
 
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpPost("follow/{followingUserId}")]
+        public async Task<IActionResult> UserFollowToggle(Guid followingUserId)
+        {
+            var followerUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            if (followerUserId == followingUserId) return BadRequest("Cannot follow yourself");
+
+            // Checking if the user Exist
+
+            var followingUser = await _userRepository.GetUser(followerUserId);
+
+            if (followingUser == null) return NotFound();
+
+            var currentFollowStatus = await _userRepository.GetCurrentUserFollow(followerUserId, followingUserId);
+            bool Adding;
+
+            if (currentFollowStatus == null)
+            {
+                currentFollowStatus = await _userRepository.UserFollowUser(followerUserId, followingUserId);
+                await _userRepository.Save();
+                Adding = true;
+
+            }
+            else
+            {
+                _userRepository.UserUnFollowUser(currentFollowStatus);
+                await _userRepository.Save();
+                Adding = false;
+
+            }
+            return Ok(
+                new
+                {
+                    Adding,
+                    currentFollowStatus.FollowerId,
+                    currentFollowStatus.FollowingId,
+                }
+                );
+        }
+
+
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpGet("follow/followers")]
+        public async Task<IActionResult> GetAllFollowers([FromQuery]Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+
+            var allFollowers = await _userRepository.GetAllFollowers(userId);
+
+            var allFollwersToReturn = _mapper.Map<IEnumerable<UserBriefOutputDto>>(allFollowers);
+
+            return Ok(allFollwersToReturn);
+        }
+
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpGet("follow/following")]
+        public async Task<IActionResult> GetAllFollowing([FromQuery]Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+
+            var allFollowing = await _userRepository.GetAllFollowing(userId);
+
+            var allFollowingToReturn = _mapper.Map<IEnumerable<UserBriefOutputDto>>(allFollowing);
+
+            return Ok(allFollowingToReturn);
+        }
+
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpGet("posts/save")]
+        public async Task<IActionResult> GetAllSavePosts([FromQuery]Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+
+            var userSavePosts = await _userRepository.GetAllSavePosts(userId);
+
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userSavePosts));
+        }
+
+
+
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpGet("posts/like")]
+        public async Task<IActionResult> GetAllLikePosts([FromQuery]Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+
+            var userLikePosts = await _userRepository.GetAllLikePosts(userId);
+
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userLikePosts));
+        }
+
+
+
+
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpGet("posts")]
+        public async Task<IActionResult> GetAllOwningPosts([FromQuery]Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+
+            var userOwningPosts = await _userRepository.GetAllOwningPost(userId);
+
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userOwningPosts));
+        }
+
+
+
+        [Authorize(Roles = "EmailNotVerified")]
+        [HttpPost("email/send")]
+        public async Task<IActionResult> SendingEmailToUserTest()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var userFromRepo = await _userRepository.GetUser(userId);
+
+            if (userFromRepo == null) return NotFound();
+
+            if (userFromRepo.UserRole != Role.EmailNotVerified) return BadRequest();
+
+            // Generate the Verification
+
+            var code = GenerateVerificationString(6);
+
+            // Saving it to Db
+            userFromRepo.EmailVerificationCode = code;
+            userFromRepo.LastSeen = DateTime.Now;
+            _userRepository.UpdateUser(userFromRepo);
+            _userRepository.Save();
+
+            var sendingMessage = new MimeMessage
+            {
+                Sender = new MailboxAddress("DivingApp", "diving_app_2020@outlook.com"),
+                Subject = "Diving App 驗證信",
+            };
+
+
+            sendingMessage.Body = new TextPart(TextFormat.Html)
+            {
+                Text = $"</br></br><center><h1> 使用者 { userFromRepo.Name } 您好 </h1></center></br><center><h3> 您的身分驗證碼為: {code} </ h3></center></br></br><center><p> Diving App 團隊 </p><p> 敬上<p> </center> "
+            };
+
+            sendingMessage.To.Add(new MailboxAddress(userFromRepo.Email));
+
+
+            using (var smtp = new MailKit.Net.Smtp.SmtpClient())
+            {
+                smtp.MessageSent += (sender, args) => { };
+
+                smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls);
+
+                await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword);
+
+                await smtp.SendAsync(sendingMessage);
+
+                await smtp.DisconnectAsync(true);
+
+            }
+
+            return Ok(new
+            {
+                userFromRepo.Email,
+                userFromRepo.Name,
+            });
+        }
+
+        [Authorize(Roles = "EmailNotVerified")]
+        [HttpPost("email/verify")]
+        public async Task<IActionResult> VerifyEmail([FromBody] EmailVerifyInfo emailVerifyInfo)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var userFromRepo = await _userRepository.GetUser(userId);
+
+            if (userFromRepo == null) return NotFound();
+
+            if (userFromRepo.UserRole != Role.EmailNotVerified) return BadRequest();
+
+            if (string.IsNullOrWhiteSpace(emailVerifyInfo.Code)) return BadRequest();
+
+            if (userFromRepo.EmailVerificationCode.ToLower() != emailVerifyInfo.Code.ToLower()) return BadRequest();
+
+            userFromRepo.UserRole = Role.Normal;
+
+            _userRepository.Save();
+
+            return Ok(new
+            {
+                userFromRepo.Email,
+                userFromRepo.Name,
+                userFromRepo.UserRole,
+            });
+
+        }
+
+
+
+        //[AllowAnonymous]
+        //[HttpDelete("follow")]
+        //public async Task<IActionResult> DeleteAllUserFollow()
+        //{
+        //   await _userRepository.RemoveAllUserFollow();
+        //    return Ok();
+        //}
+
+
 
         [AllowAnonymous]
         [HttpGet("reach/notLogin")]
@@ -228,6 +458,22 @@ namespace DivingApplication.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+
+        public string GenerateVerificationString(int length)
+        {
+            string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            for (int i = 0; i < length; i++)
+            {
+                builder.Append(characters[random.Next(characters.Length)]);
+            }
+
+            return builder.ToString();
         }
 
     }

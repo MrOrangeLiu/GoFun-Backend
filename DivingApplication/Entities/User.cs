@@ -16,8 +16,9 @@ namespace DivingApplication.Entities
 
         public enum Role
         {
-            Normal,
             Banned,
+            EmailNotVerified,
+            Normal,
             Admin,
         }
 
@@ -46,10 +47,11 @@ namespace DivingApplication.Entities
         public byte[] PasswordHash { get; set; }
 
         public byte[] PasswordSalt { get; set; }
-        public Role UserRole { get; set; } = Role.Normal;
+        public Role UserRole { get; set; } = Role.EmailNotVerified;
         public Gender UserGender { get; set; } = Gender.Male;
         public DateTime CreatedAt { get; set; }
         public DateTime LastSeen { get; set; }
+        public string EmailVerificationCode { get; set; }
         public List<UserFollow> Followers { get; set; } = new List<UserFollow>();
         public List<UserFollow> Following { get; set; } = new List<UserFollow>();
         public List<Post> OwningPosts { get; set; } = new List<Post>();

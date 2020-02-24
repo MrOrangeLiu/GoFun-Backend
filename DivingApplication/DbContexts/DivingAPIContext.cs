@@ -19,7 +19,6 @@ namespace DivingApplication.DbContexts
         }
 
 
-
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -93,12 +92,12 @@ namespace DivingApplication.DbContexts
             modelBuilder.Entity<UserPostLike>()
                         .HasOne(upl => upl.Post)
                         .WithMany(p => p.PostLikedBy)
-                        .HasForeignKey(upl => upl.PostId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(upl => upl.PostId).OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserPostLike>()
                         .HasOne(upl => upl.User)
                         .WithMany(u => u.LikePosts)
-                        .HasForeignKey(upl => upl.UserId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(upl => upl.UserId).OnDelete(DeleteBehavior.Restrict);
 
 
             modelBuilder.Entity<UserPostSave>()
@@ -108,12 +107,12 @@ namespace DivingApplication.DbContexts
             modelBuilder.Entity<UserPostSave>()
                         .HasOne(ups => ups.Post)
                         .WithMany(p => p.PostSavedBy)
-                        .HasForeignKey(ups => ups.PostId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(ups => ups.PostId).OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserPostSave>()
                         .HasOne(ups => ups.User)
                         .WithMany(u => u.SavePosts)
-                        .HasForeignKey(ups => ups.UserId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(ups => ups.UserId).OnDelete(DeleteBehavior.Restrict);
 
 
 
@@ -125,12 +124,12 @@ namespace DivingApplication.DbContexts
             modelBuilder.Entity<UserMessageLike>()
                         .HasOne(uml => uml.Message)
                         .WithMany(m => m.LikedBy)
-                        .HasForeignKey(uml => uml.MessageId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(uml => uml.MessageId).OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserMessageLike>()
                         .HasOne(uml => uml.User)
                         .WithMany(u => u.LikeMessages)
-                        .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.Restrict);
 
 
 
@@ -141,12 +140,12 @@ namespace DivingApplication.DbContexts
             modelBuilder.Entity<UserMessageRead>()
                         .HasOne(uml => uml.Message)
                         .WithMany(m => m.ReadBy)
-                        .HasForeignKey(uml => uml.MessageId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(uml => uml.MessageId).OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserMessageRead>()
                         .HasOne(uml => uml.User)
                         .WithMany(u => u.ReadMessages)
-                        .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.Restrict);
 
 
             base.OnModelCreating(modelBuilder);
