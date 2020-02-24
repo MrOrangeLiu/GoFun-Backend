@@ -29,11 +29,12 @@ namespace DivingApplication.Controllers
         private readonly IPropertyValidationService _propertyValidation;
 
 
-        public PostsController(IPostRepository postRepository, IMapper mapper, IPropertyMappingService propertyMapping)
+        public PostsController(IPostRepository postRepository, IMapper mapper, IPropertyMappingService propertyMapping, IPropertyValidationService propertyValidation)
         {
-            _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _propertyMapping = propertyMapping ?? throw new ArgumentNullException(nameof(propertyMapping));
+            _propertyValidation = propertyValidation ?? throw new ArgumentNullException(nameof(propertyValidation));
         }
 
         [AllowAnonymous]
@@ -46,8 +47,8 @@ namespace DivingApplication.Controllers
 
             var postsFromRepo = _postRepository.GetPosts(postResourceParameters);
 
-            var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage) : null;
-            var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage) : null;
+            var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetPosts") : null;
+            var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetPosts") : null;
 
             var metaData = new
             {
@@ -62,6 +63,38 @@ namespace DivingApplication.Controllers
             Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
 
             return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+        }
+
+        [Authorize(Policy = "NormalAndAdmin")]
+        [HttpGet("/following", Name = "GetFollowingPosts")]
+        public async Task<IActionResult> GetAllFollowingPosts([FromQuery] PostResourceParameters postResourceParameters)
+        {
+            if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return Ok();
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return Ok();
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+            var postsFromRepo = await _postRepository.GetAllFollowingPosts(userId, postResourceParameters);
+
+            var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetFollowingPosts") : null;
+            var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetFollowingPosts") : null;
+
+            var metaData = new
+            {
+                totalCount = postsFromRepo.TotalCount,
+                pageSize = postsFromRepo.PageSize,
+                currentPage = postsFromRepo.CurrentPage,
+                totalPages = postsFromRepo.TotalPages,
+                previousPageLink,
+                nextPageLink,
+            };
+
+            Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
+
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+
+
         }
 
         [AllowAnonymous]
@@ -227,12 +260,12 @@ namespace DivingApplication.Controllers
         }
 
 
-        private string CreatePostsUri(PostResourceParameters postResourceParameters, UriType uriType)
+        private string CreatePostsUri(PostResourceParameters postResourceParameters, UriType uriType, string routeName)
         {
             switch (uriType)
             {
                 case UriType.PreviousPage:
-                    return Url.Link("GetPosts", new
+                    return Url.Link(routeName, new
                     {
                         pageNumber = postResourceParameters.PageNumber - 1,
                         postResourceParameters.PageSize,
@@ -241,7 +274,7 @@ namespace DivingApplication.Controllers
                         postResourceParameters.Fields
                     });
                 case UriType.NextPage:
-                    return Url.Link("GetPosts", new
+                    return Url.Link(routeName, new
                     {
                         pageNumber = postResourceParameters.PageNumber + 1,
                         postResourceParameters.PageSize,
@@ -250,7 +283,7 @@ namespace DivingApplication.Controllers
                         postResourceParameters.Fields
                     });
                 default:
-                    return Url.Link("GetPosts", new
+                    return Url.Link(routeName, new
                     {
                         postResourceParameters.PageNumber,
                         postResourceParameters.PageSize,

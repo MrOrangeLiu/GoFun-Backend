@@ -58,6 +58,32 @@ namespace DivingApplication.Repositories
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
         }
 
+        public async Task<PageList<Post>> GetAllFollowingPosts(Guid userId, PostResourceParameters postResourceParameters)
+        {
+            if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
+
+            var user = await _context.Users.FindAsync(userId);
+
+            List<Guid> allFollowingIds = user.Following.Select(uf => uf.FollowingId).ToList();
+
+            var collection = _context.Posts as IQueryable<Post>;
+
+            collection = collection.Where(p => allFollowingIds.Contains(p.AuthorId));
+
+            if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
+            {
+                var searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
+                collection = collection.Where(p => p.Title.ToLower().Contains(searchinQuery));
+            }
+
+            if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
+            {
+                var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
+                collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
+            }
+
+            return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
+        }
 
 
         public async Task<UserPostLike> GetCurrentUserPostLike(Guid userId, Guid postId)

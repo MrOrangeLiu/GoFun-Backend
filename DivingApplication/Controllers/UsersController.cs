@@ -27,6 +27,8 @@ using MimeKit;
 using MimeKit.Text;
 using MailKit.Security;
 using static DivingApplication.Entities.User;
+using DivingApplication.Helpers.ResourceParameters;
+using DivingApplication.Services.PropertyServices;
 
 namespace DivingApplication.Controllers
 {
@@ -39,7 +41,11 @@ namespace DivingApplication.Controllers
         private readonly AppSettingsService _appSettings;
 
 
-        public UsersController(IUserRepository userRepository, IMapper mapper, IOptions<AppSettingsService> appSettings)
+        public UsersController(IUserRepository userRepository,
+                               IMapper mapper,
+                               IOptions<AppSettingsService> appSettings,
+                               IPropertyMappingService propertyMapping,
+                               IPropertyValidationService propertyValidation)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -279,6 +285,8 @@ namespace DivingApplication.Controllers
 
 
 
+
+
         [Authorize(Roles = "EmailNotVerified")]
         [HttpPost("email/send")]
         public async Task<IActionResult> SendingEmailToUserTest()
@@ -359,14 +367,14 @@ namespace DivingApplication.Controllers
 
             _userRepository.Save();
 
-            return Ok(new
-            {
-                userFromRepo.Email,
-                userFromRepo.Name,
-                userFromRepo.UserRole,
-            });
+            var userToReturn = _mapper.Map<UserOutputDto>(userFromRepo);
+
+            return Ok(userToReturn);
 
         }
+
+
+
 
 
 

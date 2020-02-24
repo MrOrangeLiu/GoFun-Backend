@@ -3,6 +3,7 @@ using DivingApplication.Entities.ManyToManyEntities;
 using DivingApplication.Helpers;
 using DivingApplication.Helpers.ResourceParameters;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DivingApplication.Repositories
@@ -11,6 +12,7 @@ namespace DivingApplication.Repositories
     {
         Task AddPost(Post post, Guid authorId);
         void DeletePost(Post post);
+        Task<PageList<Post>> GetAllFollowingPosts(Guid userId, PostResourceParameters postResourceParameters);
         Task<UserPostLike> GetCurrentUserPostLike(Guid userId, Guid postId);
         Task<UserPostSave> GetCurrentUserPostSave(Guid userId, Guid postId);
         Task<Post> GetPost(Guid postId);

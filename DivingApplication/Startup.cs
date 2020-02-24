@@ -72,6 +72,12 @@ namespace DivingApplication
                      var userService = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
                      var userId = Guid.Parse(context.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
                      var user = userService.GetUserForJwt(userId);
+
+                     // Update the LastSeen
+                     user.LastSeen = DateTime.Now;
+                     userService.UpdateUser(user);
+                     userService.Save();
+
                      if (user == null)
                      {
                          // return unauthorized if user no longer exists

@@ -1,7 +1,11 @@
 ﻿using DivingApplication.DbContexts;
 using DivingApplication.Entities;
 using DivingApplication.Entities.ManyToManyEntities;
+using DivingApplication.Helpers;
+using DivingApplication.Helpers.Extensions;
+using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Models.Posts;
+using DivingApplication.Services.PropertyServices;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,10 +17,13 @@ namespace DivingApplication.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly DivingAPIContext _context;
+        private readonly IPropertyMappingService _propertyMapping;
 
-        public UserRepository(DivingAPIContext context)
+
+        public UserRepository(DivingAPIContext context, IPropertyMappingService propertyMapping)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _propertyMapping = propertyMapping ?? throw new ArgumentNullException(nameof(propertyMapping));
         }
 
         public User Authenticate(string Email, string password)
@@ -177,8 +184,7 @@ namespace DivingApplication.Repositories
             return user.OwningPosts;
         }
 
-
-
+       
 
 
         //public async Task RemoveAllUserFollow()
