@@ -17,6 +17,8 @@
 |<ul><li>- [x] </li></ul>|**User**: Following & Followers|Must Have| Richard | 24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Get all Following|Must Have| Richard |24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Get all Follwers|Must Have| Richard |24 Feb 2020||
+|<ul><li>- [ ] </li></ul>|**User**: Has a Coach Role|Must Have| Richard |||
+|<ul><li>- [ ] </li></ul>|**User**: Subsribe User|Must Have| Richard |||
 |<ul><li>- [x] </li></ul>|**Authorization**: JWT Authorization|Must Have| Richard | 21 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Authorization** Role: Normal User|Must Have| Richard | 21 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Authorization** Role: Admin |Must Have| Richard | 21 Feb 2020||
@@ -33,6 +35,18 @@
 |<ul><li>- [x] </li></ul>|**Post**: Delete Post|Must Have| Richard | 23 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Post**: Like a Post|Must Have| Richard | 24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Post**: Save a Post|Must Have| Richard | 24 Feb 2020||
+|<ul><li>- [ ] </li></ul>|**Post**: Get Posts From Following Users |Must Have| Richard | ||
+|<ul><li>- [ ] </li></ul>|**Post**: Post should have a Location (longitude, latitude) |Must Have| Richard | ||
+|<ul><li>- [ ] </li></ul>|**Comment**: Create Comment |Must Have| Richard | ||
+|<ul><li>- [ ] </li></ul>|**Comment**: Partially Update Comment |Must Have| Richard | ||
+|<ul><li>- [ ] </li></ul>|**Comment**: Find Comment |Must Have| Richard | ||
+|<ul><li>- [ ] </li></ul>|**Comment**: Find Comments for Post |Must Have| Richard | ||
+|<ul><li>- [ ] </li></ul>|**Comment**: Delete Comment |Must Have| Richard | ||
+|<ul><li>- [ ] </li></ul>|**Comment**: Like Comment |Must Have| Richard | ||
+
+
+
+
 
 
 
