@@ -29,7 +29,7 @@ namespace DivingApplication.Services.PropertyServices
 
         public PropertyMappingService()
         {
-            _propertyMappings.Add(new PropertyMapping<PostOutpuDto, Post>(_postPropertyMapping));
+            _propertyMappings.Add(new PropertyMapping<PostOutputDto, Post>(_postPropertyMapping));
         }
 
         public Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>()

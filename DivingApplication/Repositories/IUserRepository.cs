@@ -1,5 +1,7 @@
 ﻿using DivingApplication.Entities;
+using DivingApplication.Entities.ManyToManyEntities;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DivingApplication.Repositories
@@ -9,10 +11,19 @@ namespace DivingApplication.Repositories
         Task AddUser(User user, string password);
         User Authenticate(string Email, string password);
         void DeleteUser(User user);
+        Task<IEnumerable<User>> GetAllFollowers(Guid userId);
+        Task<IEnumerable<User>> GetAllFollowing(Guid userId);
+        Task<IEnumerable<Post>> GetAllLikePosts(Guid userId);
+        Task<IEnumerable<Post>> GetAllOwningPost(Guid userId);
+        Task<IEnumerable<Post>> GetAllSavePosts(Guid userId);
+        Task<UserFollow> GetCurrentUserFollow(Guid followerId, Guid followingId);
         Task<User> GetUser(Guid userId);
         User GetUserForJwt(Guid userId);
         Task<bool> Save();
         Task UpdateUser(User user);
+        Task<bool> UserEmailExists(string email);
         Task<bool> UserExists(Guid userId);
+        Task<UserFollow> UserFollowUser(Guid followerId, Guid followingId);
+        void UserUnFollowUser(UserFollow currentUserFollow);
     }
 }

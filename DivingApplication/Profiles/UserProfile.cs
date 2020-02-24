@@ -40,6 +40,15 @@ namespace DivingApplication.Profiles
                 .ForMember(dest => dest.UserChatRooms, opt => opt.MapFrom(src => src.UserChatRooms.Select(c => c.ChatRoomId).ToList()))
                 .ForMember(dest => dest.SavePosts, opt => opt.MapFrom(src => src.SavePosts.Select(p => p.PostId).ToList()))
                 .ForMember(dest => dest.LikePosts, opt => opt.MapFrom(src => src.LikePosts.Select(p => p.PostId).ToList()));
+
+
+            CreateMap<User, UserBriefOutputDto>()
+              .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.UserRole.ToString()))
+              .ForMember(dest => dest.UserGender, opt => opt.MapFrom(src => src.UserGender.ToString()))
+              .ForMember(dest => dest.NumOfFollowers, opt => opt.MapFrom(src => src.Followers.Count))
+              .ForMember(dest => dest.NumOfFollowing, opt => opt.MapFrom(src => src.Following.Count))
+              .ForMember(dest => dest.NumOfOwningPosts, opt => opt.MapFrom(src => src.OwningPosts.Count));
+
         }
     }
 }

@@ -41,8 +41,8 @@ namespace DivingApplication.Controllers
         public IActionResult GetPosts([FromQuery] PostResourceParameters postResourceParameters)
         {
 
-            if (!_propertyMapping.ValidMappingExist<PostOutpuDto, Post>(postResourceParameters.OrderBy)) return Ok();
-            if (!_propertyValidation.HasValidProperties<PostOutpuDto>(postResourceParameters.Fields)) return Ok();
+            if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return Ok();
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return Ok();
 
             var postsFromRepo = _postRepository.GetPosts(postResourceParameters);
 
@@ -61,20 +61,20 @@ namespace DivingApplication.Controllers
 
             Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
 
-            return Ok(_mapper.Map<IEnumerable<PostOutpuDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
         }
 
         [AllowAnonymous]
         [HttpGet("{postId}", Name = "GetPost")]
         public async Task<IActionResult> GetBand(Guid postId, [FromQuery]string fields)
         {
-            if (!_propertyValidation.HasValidProperties<PostOutpuDto>(fields)) return BadRequest();
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(fields)) return BadRequest();
 
             var postFromRepo = await _postRepository.GetPost(postId);
 
             if (postFromRepo == null) return NotFound();
 
-            return Ok(_mapper.Map<PostOutpuDto>(postFromRepo).ShapeData(fields));
+            return Ok(_mapper.Map<PostOutputDto>(postFromRepo).ShapeData(fields));
         }
 
 
@@ -87,7 +87,7 @@ namespace DivingApplication.Controllers
             await _postRepository.AddPost(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
             await _postRepository.Save();
 
-            var postToReturn = _mapper.Map<PostOutpuDto>(postEntity);
+            var postToReturn = _mapper.Map<PostOutputDto>(postEntity);
 
             return CreatedAtRoute("GetPost", new { postId = postToReturn.Id, fields }, postToReturn.ShapeData(fields));
         }
@@ -116,7 +116,7 @@ namespace DivingApplication.Controllers
 
             await _postRepository.Save();
 
-            var postToReturn = _mapper.Map<PostOutpuDto>(postFromRepo);
+            var postToReturn = _mapper.Map<PostOutputDto>(postFromRepo);
 
             return CreatedAtRoute(
                     "GetPost",
@@ -141,7 +141,7 @@ namespace DivingApplication.Controllers
             _postRepository.DeletePost(postFromRepo);
             await _postRepository.Save();
 
-            return Ok(_mapper.Map<PostOutpuDto>(postFromRepo).ShapeData(fields));
+            return Ok(_mapper.Map<PostOutputDto>(postFromRepo).ShapeData(fields));
         }
 
 
@@ -179,8 +179,8 @@ namespace DivingApplication.Controllers
                 new
                 {
                     Adding,
-                    userId = currentPostLike.UserId,
-                    postId = currentPostLike.PostId,
+                    currentPostLike.UserId,
+                    currentPostLike.PostId,
                 }
                 );
         }
@@ -220,8 +220,8 @@ namespace DivingApplication.Controllers
                 new
                 {
                     Adding,
-                    userId = currentPostSave.UserId,
-                    postId = currentPostSave.PostId,
+                    currentPostSave.UserId,
+                    currentPostSave.PostId,
                 }
                 );
         }
@@ -235,28 +235,28 @@ namespace DivingApplication.Controllers
                     return Url.Link("GetPosts", new
                     {
                         pageNumber = postResourceParameters.PageNumber - 1,
-                        pageSize = postResourceParameters.PageSize,
-                        searchQuery = postResourceParameters.SearchQuery,
-                        OrderBy = postResourceParameters.OrderBy,
-                        Fields = postResourceParameters.Fields
+                        postResourceParameters.PageSize,
+                        postResourceParameters.SearchQuery,
+                        postResourceParameters.OrderBy,
+                        postResourceParameters.Fields
                     });
                 case UriType.NextPage:
                     return Url.Link("GetPosts", new
                     {
                         pageNumber = postResourceParameters.PageNumber + 1,
-                        pageSize = postResourceParameters.PageSize,
+                        postResourceParameters.PageSize,
                         searchQuery = postResourceParameters.SearchQuery,
-                        OrderBy = postResourceParameters.OrderBy,
-                        Fields = postResourceParameters.Fields
+                        postResourceParameters.OrderBy,
+                        postResourceParameters.Fields
                     });
                 default:
                     return Url.Link("GetPosts", new
                     {
-                        pageNumber = postResourceParameters.PageNumber,
-                        pageSize = postResourceParameters.PageSize,
-                        searchQuery = postResourceParameters.SearchQuery,
-                        OrderBy = postResourceParameters.OrderBy,
-                        Fields = postResourceParameters.Fields
+                        postResourceParameters.PageNumber,
+                        postResourceParameters.PageSize,
+                        postResourceParameters.SearchQuery,
+                        postResourceParameters.OrderBy,
+                        postResourceParameters.Fields
                     });
 
             }

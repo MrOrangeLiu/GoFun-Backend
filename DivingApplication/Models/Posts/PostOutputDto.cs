@@ -10,7 +10,7 @@ using static DivingApplication.Entities.Post;
 
 namespace DivingApplication.Models.Posts
 {
-    public class PostOutpuDto
+    public class PostOutputDto
     {
         [Key]
         public Guid Id { get; set; }

@@ -1,5 +1,7 @@
 ﻿using DivingApplication.DbContexts;
 using DivingApplication.Entities;
+using DivingApplication.Entities.ManyToManyEntities;
+using DivingApplication.Models.Posts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,8 @@ namespace DivingApplication.Repositories
 
             var user = _context.Users.Include(u => u.LikePosts)
                                      .Include(u => u.SavePosts)
+                                     .Include(u => u.Followers)
+                                     .Include(u => u.Following)
                                      .SingleOrDefault(x => x.Email == Email);
 
             // check if Email exists
@@ -53,7 +57,7 @@ namespace DivingApplication.Repositories
             user.CreatedAt = DateTime.Now;
             user.LastSeen = DateTime.Now;
 
-            await _context.Users.AddRangeAsync();
+            await _context.Users.AddRangeAsync(user);
 
         }
 
@@ -64,6 +68,7 @@ namespace DivingApplication.Repositories
 
             return await _context.Users.FindAsync(userId);
         }
+
 
         public User GetUserForJwt(Guid userId)
         {
@@ -94,11 +99,120 @@ namespace DivingApplication.Repositories
             return await _context.Users.AnyAsync(u => u.Id == userId);
         }
 
+
+        public async Task<bool> UserEmailExists(string email)
+        {
+            if (email == null) throw new ArgumentNullException(nameof(email));
+
+            return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+
         public async Task<bool> Save()
         {
             return ((await _context.SaveChangesAsync()) >= 0);
             // if the SaveChanges returns negative int, then it fail to save 
         }
+
+
+        public async Task<UserFollow> GetCurrentUserFollow(Guid followerId, Guid followingId)
+        {
+            if (followerId == Guid.Empty) throw new ArgumentNullException(nameof(followerId));
+            if (followingId == Guid.Empty) throw new ArgumentNullException(nameof(followingId));
+
+            return (UserFollow)await _context.FindAsync(typeof(UserFollow), followerId, followingId);
+        }
+
+        public async Task<UserFollow> UserFollowUser(Guid followerId, Guid followingId)
+        {
+            if (followerId == Guid.Empty) throw new ArgumentNullException(nameof(followerId));
+            if (followingId == Guid.Empty) throw new ArgumentNullException(nameof(followingId));
+
+            var userFollow = new UserFollow
+            {
+                FollowerId = followerId,
+                FollowingId = followingId,
+            };
+
+            await _context.AddRangeAsync(userFollow);
+            return userFollow;
+        }
+
+        public void UserUnFollowUser(UserFollow currentUserFollow)
+        {
+            _context.Remove(currentUserFollow);
+        }
+
+        public async Task<IEnumerable<User>> GetAllFollowers(Guid userId)
+        {
+            var user = await _context.Users.Include(u => u.Followers).SingleOrDefaultAsync(u => u.Id == userId);
+            return user.Followers.Select(uf => uf.Follower).ToList();
+        }
+
+
+        public async Task<IEnumerable<User>> GetAllFollowing(Guid userId)
+        {
+            var user = await _context.Users.Include(u => u.Following).SingleOrDefaultAsync(u => u.Id == userId);
+            return user.Following.Select(uf => uf.Following).ToList();
+        }
+
+        public async Task<IEnumerable<Post>> GetAllSavePosts(Guid userId)
+        {
+            var user = await _context.Users.Include(u => u.SavePosts).SingleOrDefaultAsync(u => u.Id == userId);
+            var allPostId = user.SavePosts.Select(sp => sp.PostId).ToList();
+            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync();
+        }
+
+
+        public async Task<IEnumerable<Post>> GetAllLikePosts(Guid userId)
+        {
+            var user = await _context.Users.Include(u => u.LikePosts).SingleOrDefaultAsync(u => u.Id == userId);
+            var allPostId = user.LikePosts.Select(sp => sp.PostId).ToList();
+            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync();
+
+        }
+
+        public async Task<IEnumerable<Post>> GetAllOwningPost(Guid userId)
+        {
+            var user = await _context.Users.Include(u => u.OwningPosts).SingleOrDefaultAsync(u => u.Id == userId);
+            return user.OwningPosts;
+        }
+
+
+
+
+
+        //public async Task RemoveAllUserFollow()
+        //{
+        //    var users = await _context.Users.Include(u => u.Followers).ToListAsync();
+
+        //    foreach (var u in users)
+        //    {
+        //        foreach (var f in u.Followers)
+        //        {
+        //            var uf = (UserFollow)await _context.FindAsync(typeof(UserFollow), f.FollowerId, f.FollowingId);
+
+        //            if (uf != null)
+        //            {
+        //                _context.Remove(uf);
+        //            }
+
+        //        }
+
+        //        foreach (var f in u.Following)
+        //        {
+        //            var uf = (UserFollow)await _context.FindAsync(typeof(UserFollow), f.FollowerId, f.FollowingId);
+
+        //            if (uf != null)
+        //            {
+        //                _context.Remove(uf);
+        //            }
+
+        //        }
+        //    }
+
+        //    await _context.SaveChangesAsync();
+        //}
+
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
