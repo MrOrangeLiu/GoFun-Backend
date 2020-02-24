@@ -6,6 +6,7 @@
 |Done|Task|Priority|RP|Completed Date|Note|
 |:---:|:---|:---:|:---:|:---:|:---:|
 |<ul><li>- [x] </li></ul>|**User**: Register User|Must Have| Richard | 20 Feb 2020||
+|<ul><li>- [ ] </li></ul>|**User**: Email Verification|Must Have| Richard |||
 |<ul><li>- [x] </li></ul>|**User**: Adding User|Must Have| Richard | 20 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Partially Update User|Must Have| Richard | 20 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Get User by ID|Must Have| Richard | 20 Feb 2020||
