@@ -35,7 +35,7 @@
 |<ul><li>- [x] </li></ul>|**Post**: Delete Post|Must | Richard | 23 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Post**: Like a Post|Must | Richard | 24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Post**: Save a Post|Must | Richard | 24 Feb 2020||
-|<ul><li>- [] </li></ul>|**Post**: Get Posts From Following Users |Must | Richard | ||
+|<ul><li>- [x] </li></ul>|**Post**: Get Posts From Following Users |Must | Richard |25 Feb 2020 ||
 |<ul><li>- [ ] </li></ul>|**Post**: Post should have a Location (longitude, latitude) |Must | Richard | ||
 |<ul><li>- [ ] </li></ul>|**Comment**: Create Comment |Must | Richard | ||
 |<ul><li>- [ ] </li></ul>|**Comment**: Partially Update Comment |Must | Richard | ||
