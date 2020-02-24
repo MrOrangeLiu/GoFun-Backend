@@ -10,9 +10,9 @@
 |<ul><li>- [x] </li></ul>|**User**: Adding User|Must Have| Richard | 20 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Partially Update User|Must Have| Richard | 20 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Get User by ID|Must Have| Richard | 20 Feb 2020||
-|<ul><li>- [ ] </li></ul>|**User**: Get all owing Posts|Must Have| Richard |||
-|<ul><li>- [ ] </li></ul>|**User**: Get all liked Posts|Must Have| Richard |||
-|<ul><li>- [ ] </li></ul>|**User**: Get all saved Posts|Must Have| Richard |||
+|<ul><li>- [x] </li></ul>|**User**: Get all owing Posts|Must Have| Richard |||
+|<ul><li>- [x] </li></ul>|**User**: Get all liked Posts|Must Have| Richard |||
+|<ul><li>- [x] </li></ul>|**User**: Get all saved Posts|Must Have| Richard |||
 |<ul><li>- [x] </li></ul>|**User**: Following & Followers|Must Have| Richard | 24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Get all Following|Must Have| Richard |||
 |<ul><li>- [x] </li></ul>|**User**: Get all Follwers|Must Have| Richard |||
