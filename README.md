@@ -42,7 +42,21 @@
 |<ul><li>- [x] </li></ul>|**Comment**: Find Comment |Must | Richard | 24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Comment**: Find Comments for Post |Must | Richard | 24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Comment**: Delete Comment |Must | Richard | 24 Feb 2020||
-|<ul><li>- [ ] </li></ul>|**Comment**: Like Comment |Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**Comment**: Like Comment |Could | Richard | ||
+|<ul><li>- [ ] </li></ul>|**CoachInfo**: Create CoachInfo |Must | Richard | | For storing the info of certain coach user|
+|<ul><li>- [ ] </li></ul>|**CoachInfo**: Get CoachInfo by ID|Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**CoachInfo**: Get CoachInfo by Location|Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**CoachInfo**: Get CoachInfo by FollowersCount|Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**CoachInfo**: Partially Update Coach Info |Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**CoachInfo**: Delete Coach Info |Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Create ServiceInfo |Must | Richard | | Storing the service you provide|
+|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Partially Update ServiceInfo |Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Get ServiceInfo by Location |Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Get ServiceInfo by Id |Must | Richard | ||
+|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Get ServiceInfo by FollowersCount |Must | Richard | ||
+
+
+
 
 
 
