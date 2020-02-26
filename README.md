@@ -17,7 +17,7 @@
 |<ul><li>- [x] </li></ul>|**User**: Following & Followers|Must | Richard | 24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Get all Following|Must | Richard |24 Feb 2020||
 |<ul><li>- [x] </li></ul>|**User**: Get all Follwers|Must | Richard |24 Feb 2020||
-|<ul><li>- [ ] </li></ul>|**User**: Has a Coach Role|Must | Richard |||
+|<ul><li>- [x] </li></ul>|**User**: Has a Coach Role|Must | Richard |26 Feb 2020||
 |<ul><li>- [ ] </li></ul>|**User**: Subsribe User|Must | Could ||Can be implemented in frontend |
 |<ul><li>- [x] </li></ul>|**Authorization**: JWT Authorization|Must | Richard | 21 Feb 2020||
 |<ul><li>- [x] </li></ul>|**Authorization** Role: Normal User|Must | Richard | 21 Feb 2020||
