@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using DivingApplication.Entities;
+using DivingApplication.Helpers;
 using DivingApplication.Helpers.Extensions;
+using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Models.CoachInfo;
 using DivingApplication.Repositories.CoachInfos;
 using DivingApplication.Services.PropertyServices;
@@ -115,7 +118,70 @@ namespace DivingApplication.Controllers
         // Get
 
 
+        [AllowAnonymous]
+        [HttpGet(Name = "GetCoachInfos")]
+        public IActionResult GetPosts([FromQuery] CoachInfoResourceParameters coachInfoReposrceParameters)
+        {
 
+            if (!_propertyMapping.ValidMappingExist<CoachInfoOutputDto, CoachInfo>(coachInfoReposrceParameters.OrderBy)) return BadRequest();
+            if (!_propertyValidation.HasValidProperties<CoachInfoOutputDto>(coachInfoReposrceParameters.Fields)) return BadRequest();
+
+            var coachInfoFromRepo = _coachInfosRepository.GetCoachInfos(coachInfoReposrceParameters);
+
+            var previousPageLink = coachInfoFromRepo.HasPrevious ? CreatePostsUri(coachInfoReposrceParameters, UriType.PreviousPage, "GetCoachInfos") : null;
+            var nextPageLink = coachInfoFromRepo.HasNext ? CreatePostsUri(coachInfoReposrceParameters, UriType.NextPage, "GetCoachInfos") : null;
+
+            var metaData = new
+            {
+                totalCount = coachInfoFromRepo.TotalCount,
+                pageSize = coachInfoFromRepo.PageSize,
+                currentPage = coachInfoFromRepo.CurrentPage,
+                totalPages = coachInfoFromRepo.TotalPages,
+                previousPageLink,
+                nextPageLink,
+            };
+
+            Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
+
+            return Ok(_mapper.Map<IEnumerable<CoachInfoOutputDto>>(coachInfoFromRepo).ShapeData(coachInfoReposrceParameters.Fields));
+        }
+
+
+        // Generic
+        private string CreatePostsUri(CoachInfoResourceParameters coachInfoResourceParameters, UriType uriType, string routeName)
+        {
+            switch (uriType)
+            {
+                case UriType.PreviousPage:
+                    return Url.Link(routeName, new
+                    {
+                        pageNumber = coachInfoResourceParameters.PageNumber - 1,
+                        coachInfoResourceParameters.PageSize,
+                        coachInfoResourceParameters.SearchQuery,
+                        coachInfoResourceParameters.OrderBy,
+                        coachInfoResourceParameters.Fields
+                    });
+                case UriType.NextPage:
+                    return Url.Link(routeName, new
+                    {
+                        pageNumber = coachInfoResourceParameters.PageNumber + 1,
+                        coachInfoResourceParameters.PageSize,
+                        searchQuery = coachInfoResourceParameters.SearchQuery,
+                        coachInfoResourceParameters.OrderBy,
+                        coachInfoResourceParameters.Fields
+                    });
+                default:
+                    return Url.Link(routeName, new
+                    {
+                        coachInfoResourceParameters.PageNumber,
+                        coachInfoResourceParameters.PageSize,
+                        coachInfoResourceParameters.SearchQuery,
+                        coachInfoResourceParameters.OrderBy,
+                        coachInfoResourceParameters.Fields
+                    });
+
+            }
+        }
 
     }
 }
