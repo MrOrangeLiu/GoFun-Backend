@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DivingApplication.DbContexts;
 using DivingApplication.Entities;
-using DivingApplication.Repositories;
-using DivingApplication.Models;
+using DivingApplication.Repositories.Users;
 using AutoMapper;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using DivingApplication.Services;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,7 +20,6 @@ using MimeKit;
 using MimeKit.Text;
 using MailKit.Security;
 using static DivingApplication.Entities.User;
-using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Services.PropertyServices;
 
 namespace DivingApplication.Controllers
@@ -116,7 +108,7 @@ namespace DivingApplication.Controllers
                 });
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPatch("{userId}")]
         public async Task<ActionResult> PartiallyUpdateUser(Guid userId, [FromBody] JsonPatchDocument<UserUpdatingDto> patchDocument)
         {
@@ -162,7 +154,7 @@ namespace DivingApplication.Controllers
             return Ok(_mapper.Map<UserOutputDto>(userFromRepo));
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPost("follow/{followingUserId}")]
         public async Task<IActionResult> UserFollowToggle(Guid followingUserId)
         {
@@ -204,7 +196,7 @@ namespace DivingApplication.Controllers
         }
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("follow/followers")]
         public async Task<IActionResult> GetAllFollowers([FromQuery]Guid userId)
         {
@@ -220,7 +212,7 @@ namespace DivingApplication.Controllers
             return Ok(allFollwersToReturn);
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("follow/following")]
         public async Task<IActionResult> GetAllFollowing([FromQuery]Guid userId)
         {
@@ -236,7 +228,7 @@ namespace DivingApplication.Controllers
             return Ok(allFollowingToReturn);
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("posts/save")]
         public async Task<IActionResult> GetAllSavePosts([FromQuery]Guid userId)
         {
@@ -252,7 +244,7 @@ namespace DivingApplication.Controllers
 
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("posts/like")]
         public async Task<IActionResult> GetAllLikePosts([FromQuery]Guid userId)
         {
@@ -269,7 +261,7 @@ namespace DivingApplication.Controllers
 
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("posts")]
         public async Task<IActionResult> GetAllOwningPosts([FromQuery]Guid userId)
         {
@@ -412,6 +404,18 @@ namespace DivingApplication.Controllers
                 );
         }
 
+        [Authorize(Roles = "Coach")]
+        [HttpGet("reach/normal")]
+        public IActionResult CoachReachTest()
+        {
+            return Ok(
+                new
+                {
+                    msg = "Reach Coach"
+                }
+                );
+        }
+
 
         [Authorize(Roles = "Admin")]
         [HttpGet("reach/admin")]
@@ -425,14 +429,14 @@ namespace DivingApplication.Controllers
                 );
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
-        [HttpGet("reach/policy/normalAndAdmin")]
-        public IActionResult NormalAndAdminReachTest()
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("reach/policy/VerifiedUsers")]
+        public IActionResult VerifiedUsersReachTest()
         {
             return Ok(
                 new
                 {
-                    msg = "Reach NormalAndAdminPolicy"
+                    msg = "Reach VerifiedUsersPolicy"
                 }
                 );
         }

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DivingApplication.Repositories
+namespace DivingApplication.Repositories.Users
 {
     public interface IUserRepository
     {
@@ -17,6 +17,7 @@ namespace DivingApplication.Repositories
         Task<IEnumerable<Post>> GetAllOwningPost(Guid userId);
         Task<IEnumerable<Post>> GetAllSavePosts(Guid userId);
         Task<UserFollow> GetCurrentUserFollow(Guid followerId, Guid followingId);
+        Task<List<ServiceInfo>> GetServiceInfosForUser(Guid userId);
         Task<User> GetUser(Guid userId);
         User GetUserForJwt(Guid userId);
         Task<bool> Save();

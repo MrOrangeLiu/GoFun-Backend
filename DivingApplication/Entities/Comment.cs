@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DivingApplication.Entities
 {
@@ -18,9 +15,11 @@ namespace DivingApplication.Entities
         public Post BelongPost { get; set; }
         public Guid BelongPostId { get; set; }
 
-        public int NumOfLiks { get; set; }
+        [ForeignKey("AuthorId")]
+        public User Author { get; set; }
+        public Guid AuthorId { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime UpdatedAt { get; set; }
 

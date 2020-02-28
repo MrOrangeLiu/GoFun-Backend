@@ -25,5 +25,6 @@ namespace DivingApplication.Models.Users
         public List<Guid> UserChatRooms { get; set; } = new List<Guid>();
         public List<Guid> LikePosts { get; set; } = new List<Guid>();
         public List<Guid> SavePosts { get; set; } = new List<Guid>();
+        public List<Guid> OwingServiceInfos { get; set; } = new List<Guid>();
     }
 }

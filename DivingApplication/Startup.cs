@@ -1,27 +1,27 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using DivingApplication.DbContexts;
-using DivingApplication.Repositories;
+using DivingApplication.Repositories.CoachInfos;
+using DivingApplication.Repositories.Comments;
+using DivingApplication.Repositories.Posts;
+using DivingApplication.Repositories.ServiceInfos;
+using DivingApplication.Repositories.Users;
 using DivingApplication.Services;
 using DivingApplication.Services.PropertyServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
+using static DivingApplication.Entities.User;
 
 namespace DivingApplication
 {
@@ -99,7 +99,8 @@ namespace DivingApplication
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("NormalAndAdmin", policy => policy.RequireRole("Admin", "Normal"));
+                options.AddPolicy("VerifiedUsers", policy => policy.RequireRole(Role.Admin.ToString(), Role.Coach.ToString(), Role.Normal.ToString()));
+                options.AddPolicy("CoachAndAdmin", policy => policy.RequireRole(Role.Admin.ToString(), Role.Coach.ToString()));
             });
 
 
@@ -109,6 +110,9 @@ namespace DivingApplication
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
+            services.AddScoped<ICoachInfosRepository, CoachInfosRepository>();
+            services.AddScoped<IServiceInfosRepository, ServiceInfosRepository>();
 
             services.AddScoped<IPropertyMappingService, PropertyMappingService>();
             services.AddScoped<IPropertyValidationService, PropertyValidationService>();

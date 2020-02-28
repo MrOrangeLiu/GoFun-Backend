@@ -9,10 +9,11 @@ using DivingApplication.Services.PropertyServices;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DivingApplication.Repositories
+namespace DivingApplication.Repositories.Posts
 {
     public class PostRepository : IPostRepository
     {
@@ -34,7 +35,7 @@ namespace DivingApplication.Repositories
             post.CreatedAt = DateTime.Now;
             post.UpdatedAt = DateTime.Now;
 
-            await _context.Posts.AddRangeAsync(post);
+            await _context.Posts.AddRangeAsync(post).ConfigureAwait(false);
         }
 
         public PageList<Post> GetPosts(PostResourceParameters postResourceParameters)
@@ -45,7 +46,7 @@ namespace DivingApplication.Repositories
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
-                var searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
+                string searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
                 collection = collection.Where(p => p.Title.ToLower().Contains(searchinQuery));
             }
 
@@ -104,7 +105,7 @@ namespace DivingApplication.Repositories
                 PostId = postId,
                 UserId = userId,
             };
-            await _context.AddRangeAsync(userPostLike);
+            await _context.AddRangeAsync(userPostLike).ConfigureAwait(false);
             return userPostLike;
 
         }
@@ -133,7 +134,7 @@ namespace DivingApplication.Repositories
                 PostId = postId,
                 UserId = userId,
             };
-            await _context.AddRangeAsync(userPostSave);
+            await _context.AddRangeAsync(userPostSave).ConfigureAwait(false);
             return userPostSave;
 
         }
@@ -162,7 +163,7 @@ namespace DivingApplication.Repositories
 
         public void DeletePost(Post post)
         {
-            if (post == null) throw new ArgumentNullException();
+            if (post == null) throw new ArgumentNullException(nameof(post));
 
             _context.Posts.Remove(post);
         }
@@ -171,11 +172,11 @@ namespace DivingApplication.Repositories
         {
             if (postId == Guid.Empty) throw new ArgumentNullException(nameof(postId));
 
-            return await _context.Posts.AnyAsync(u => u.Id == postId);
+            return await _context.Posts.AnyAsync(u => u.Id == postId).ConfigureAwait(false);
         }
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync()) >= 0);
+            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
         }
 
 

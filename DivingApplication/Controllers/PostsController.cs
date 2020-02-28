@@ -4,7 +4,7 @@ using DivingApplication.Helpers;
 using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Models.Posts;
-using DivingApplication.Repositories;
+using DivingApplication.Repositories.Posts;
 using DivingApplication.Services.PropertyServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -42,8 +42,8 @@ namespace DivingApplication.Controllers
         public IActionResult GetPosts([FromQuery] PostResourceParameters postResourceParameters)
         {
 
-            if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return Ok();
-            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return Ok();
+            if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return BadRequest();
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
 
             var postsFromRepo = _postRepository.GetPosts(postResourceParameters);
 
@@ -65,12 +65,12 @@ namespace DivingApplication.Controllers
             return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("/following", Name = "GetFollowingPosts")]
         public async Task<IActionResult> GetAllFollowingPosts([FromQuery] PostResourceParameters postResourceParameters)
         {
-            if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return Ok();
-            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return Ok();
+            if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return BadRequest();
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
 
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
@@ -99,7 +99,7 @@ namespace DivingApplication.Controllers
 
         [AllowAnonymous]
         [HttpGet("{postId}", Name = "GetPost")]
-        public async Task<IActionResult> GetBand(Guid postId, [FromQuery]string fields)
+        public async Task<IActionResult> GetPost(Guid postId, [FromQuery]string fields)
         {
             if (!_propertyValidation.HasValidProperties<PostOutputDto>(fields)) return BadRequest();
 
@@ -111,10 +111,12 @@ namespace DivingApplication.Controllers
         }
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] PostForCreatingDto post, [FromQuery] string fields)
         {
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(fields)) return BadRequest();
+
             var postEntity = _mapper.Map<Post>(post);
 
             await _postRepository.AddPost(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
@@ -125,7 +127,7 @@ namespace DivingApplication.Controllers
             return CreatedAtRoute("GetPost", new { postId = postToReturn.Id, fields }, postToReturn.ShapeData(fields));
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPatch("{postId}")]
         public async Task<IActionResult> PartiallyUpdatePost(Guid postId, [FromBody] JsonPatchDocument<PostUpdatingDto> patchDocument, [FromQuery] string fields)
         {
@@ -136,7 +138,7 @@ namespace DivingApplication.Controllers
 
             if (postFromRepo == null) return NotFound();
 
-            if (logginUserId != postFromRepo.AuthorId && userRole.ToLower() != Role.Admin.ToString().ToLower()) return Unauthorized();
+            if (logginUserId != postFromRepo.AuthorId && (Role)Enum.Parse(typeof(Role), userRole) != Role.Admin) return Unauthorized();
 
             var postToPatch = _mapper.Map<PostUpdatingDto>(postFromRepo);
             patchDocument.ApplyTo(postToPatch, ModelState);
@@ -158,18 +160,18 @@ namespace DivingApplication.Controllers
                 );
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpDelete("{postId}")]
         public async Task<IActionResult> DeletePost(Guid postId, [FromQuery] string fields)
         {
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var postFromRepo = await _postRepository.GetPost(postId);
+            var postFromRepo = await _postRepository.GetPost(postId).ConfigureAwait(false);
 
             if (postFromRepo == null) return NotFound();
 
-            if (logginUserId != postFromRepo.AuthorId && userRole.ToLower() != Role.Admin.ToString().ToLower()) return Unauthorized();
+            if (logginUserId != postFromRepo.AuthorId && (Role)Enum.Parse(typeof(Role), userRole) != Role.Admin) return Unauthorized();
 
             _postRepository.DeletePost(postFromRepo);
             await _postRepository.Save();
@@ -178,7 +180,7 @@ namespace DivingApplication.Controllers
         }
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPost("like/{postId}")]
         public async Task<IActionResult> UserLikePostToggle(Guid postId)
         {
@@ -219,7 +221,7 @@ namespace DivingApplication.Controllers
         }
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPost("save/{postId}")]
         public async Task<IActionResult> UserSavePostToggle(Guid postId)
         {

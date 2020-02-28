@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DivingApplication.Repositories
+namespace DivingApplication.Repositories.Users
 {
     public class UserRepository : IUserRepository
     {
@@ -31,10 +31,13 @@ namespace DivingApplication.Repositories
             if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _context.Users.Include(u => u.LikePosts)
+            var user = _context.Users.Include(u => u.LikePosts) // What will happend?
                                      .Include(u => u.SavePosts)
                                      .Include(u => u.Followers)
                                      .Include(u => u.Following)
+                                     .Include(u => u.OwingComments)
+                                     .Include(u => u.OwningPosts)
+                                     .Include(u => u.OwningServiceInfos)
                                      .SingleOrDefault(x => x.Email == Email);
 
             // check if Email exists
@@ -64,7 +67,7 @@ namespace DivingApplication.Repositories
             user.CreatedAt = DateTime.Now;
             user.LastSeen = DateTime.Now;
 
-            await _context.Users.AddRangeAsync(user);
+            await _context.Users.AddRangeAsync(user).ConfigureAwait(false);
 
         }
 
@@ -85,6 +88,15 @@ namespace DivingApplication.Repositories
             return _context.Users.Find(userId);
         }
 
+        public async Task<List<ServiceInfo>> GetServiceInfosForUser(Guid userId)
+        {
+            if (userId == null) throw new ArgumentNullException(nameof(userId));
+
+            var user = await _context.Users.Include(u => u.OwningServiceInfos).FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+
+            return user.OwningServiceInfos;
+        }
+
 
         public async Task UpdateUser(User user)
         {
@@ -103,7 +115,7 @@ namespace DivingApplication.Repositories
         {
             if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
 
-            return await _context.Users.AnyAsync(u => u.Id == userId);
+            return await _context.Users.AnyAsync(u => u.Id == userId).ConfigureAwait(false);
         }
 
 
@@ -111,12 +123,12 @@ namespace DivingApplication.Repositories
         {
             if (email == null) throw new ArgumentNullException(nameof(email));
 
-            return await _context.Users.AnyAsync(u => u.Email == email);
+            return await _context.Users.AnyAsync(u => u.Email == email).ConfigureAwait(false);
         }
 
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync()) >= 0);
+            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
             // if the SaveChanges returns negative int, then it fail to save 
         }
 
@@ -140,7 +152,7 @@ namespace DivingApplication.Repositories
                 FollowingId = followingId,
             };
 
-            await _context.AddRangeAsync(userFollow);
+            await _context.AddRangeAsync(userFollow).ConfigureAwait(false);
             return userFollow;
         }
 
@@ -151,40 +163,40 @@ namespace DivingApplication.Repositories
 
         public async Task<IEnumerable<User>> GetAllFollowers(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.Followers).SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.Followers).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
             return user.Followers.Select(uf => uf.Follower).ToList();
         }
 
 
         public async Task<IEnumerable<User>> GetAllFollowing(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.Following).SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.Following).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
             return user.Following.Select(uf => uf.Following).ToList();
         }
 
         public async Task<IEnumerable<Post>> GetAllSavePosts(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.SavePosts).SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.SavePosts).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
             var allPostId = user.SavePosts.Select(sp => sp.PostId).ToList();
-            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync();
+            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync().ConfigureAwait(false);
         }
 
 
         public async Task<IEnumerable<Post>> GetAllLikePosts(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.LikePosts).SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.LikePosts).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
             var allPostId = user.LikePosts.Select(sp => sp.PostId).ToList();
-            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync();
+            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync().ConfigureAwait(false);
 
         }
 
         public async Task<IEnumerable<Post>> GetAllOwningPost(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.OwningPosts).SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.OwningPosts).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
             return user.OwningPosts;
         }
 
-       
+
 
 
         //public async Task RemoveAllUserFollow()
@@ -223,7 +235,7 @@ namespace DivingApplication.Repositories
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", nameof(password));
 
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
             {
