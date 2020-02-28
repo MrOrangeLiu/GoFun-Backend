@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Helpers.ResourceParameters
 {
-    public class PostResourceParameters
+    public class PostResourceParameters 
     {
         // Searching
         public string SearchQuery { get; set; } // Used for searching the title

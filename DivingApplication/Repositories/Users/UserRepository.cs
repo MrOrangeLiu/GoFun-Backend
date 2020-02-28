@@ -196,8 +196,18 @@ namespace DivingApplication.Repositories.Users
             return user.OwningPosts;
         }
 
+        public async Task<CoachInfo> GetCoachInfoForUser(Guid userId)
+        {
+            var user = await _context.Users.Include(u => u.CoachInfo).FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            return user.CoachInfo;
+        }
 
 
+        public async Task<IEnumerable<ServiceInfo>> GetServiceInfoForUser(Guid userId)
+        {
+            var user = await _context.Users.Include(u => u.OwningServiceInfos).FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            return user.OwningServiceInfos;
+        }
 
         //public async Task RemoveAllUserFollow()
         //{

@@ -128,8 +128,8 @@ namespace DivingApplication.Controllers
 
             var coachInfoFromRepo = _coachInfosRepository.GetCoachInfos(coachInfoReposrceParameters);
 
-            var previousPageLink = coachInfoFromRepo.HasPrevious ? CreatePostsUri(coachInfoReposrceParameters, UriType.PreviousPage, "GetCoachInfos") : null;
-            var nextPageLink = coachInfoFromRepo.HasNext ? CreatePostsUri(coachInfoReposrceParameters, UriType.NextPage, "GetCoachInfos") : null;
+            var previousPageLink = coachInfoFromRepo.HasPrevious ? CreateCoachInfoUri(coachInfoReposrceParameters, UriType.PreviousPage, "GetCoachInfos") : null;
+            var nextPageLink = coachInfoFromRepo.HasNext ? CreateCoachInfoUri(coachInfoReposrceParameters, UriType.NextPage, "GetCoachInfos") : null;
 
             var metaData = new
             {
@@ -147,8 +147,8 @@ namespace DivingApplication.Controllers
         }
 
 
-        // Generic
-        private string CreatePostsUri(CoachInfoResourceParameters coachInfoResourceParameters, UriType uriType, string routeName)
+
+        private string CreateCoachInfoUri(CoachInfoResourceParameters coachInfoResourceParameters, UriType uriType, string routeName)
         {
             switch (uriType)
             {

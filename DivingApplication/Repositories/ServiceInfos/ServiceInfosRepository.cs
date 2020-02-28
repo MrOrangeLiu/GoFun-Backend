@@ -66,7 +66,7 @@ namespace DivingApplication.Repositories.ServiceInfos
         {
         }
 
-        public void DeletePost(ServiceInfo serviceInfo)
+        public void DeleteServiceInfo(ServiceInfo serviceInfo)
         {
             if (serviceInfo == null) throw new ArgumentNullException(nameof(serviceInfo));
             _context.ServiceInfos.Remove(serviceInfo);

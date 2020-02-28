@@ -16,7 +16,9 @@ namespace DivingApplication.Repositories.Users
         Task<IEnumerable<Post>> GetAllLikePosts(Guid userId);
         Task<IEnumerable<Post>> GetAllOwningPost(Guid userId);
         Task<IEnumerable<Post>> GetAllSavePosts(Guid userId);
+        Task<CoachInfo> GetCoachInfoForUser(Guid userId);
         Task<UserFollow> GetCurrentUserFollow(Guid followerId, Guid followingId);
+        Task<IEnumerable<ServiceInfo>> GetServiceInfoForUser(Guid userId);
         Task<List<ServiceInfo>> GetServiceInfosForUser(Guid userId);
         Task<User> GetUser(Guid userId);
         User GetUserForJwt(Guid userId);

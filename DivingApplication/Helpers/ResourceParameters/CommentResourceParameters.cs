@@ -7,6 +7,7 @@ namespace DivingApplication.Helpers.ResourceParameters
 {
     public class CommentResourceParameters
     {
+
         // Pagination
         const int maxPageSize = 50;
         public int PageNumber { get; set; } = 1;

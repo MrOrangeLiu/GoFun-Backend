@@ -9,7 +9,7 @@ namespace DivingApplication.Repositories.ServiceInfos
     public interface IServiceInfosRepository
     {
         Task AddServiceInfo(ServiceInfo serviceInfo, Guid ownerId);
-        void DeletePost(ServiceInfo serviceInfo);
+        void DeleteServiceInfo(ServiceInfo serviceInfo);
         Task<ServiceInfo> GetServiceInfo(Guid serviceInfoId);
         PageList<ServiceInfo> GetServiceInfos(ServiceInfoResourceParameters serviceInfoResourceParameters);
         Task<bool> Save();
