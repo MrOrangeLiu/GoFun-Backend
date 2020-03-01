@@ -22,7 +22,6 @@ namespace DivingApplication.Helpers.Extensions
             }
             else
             {
-
                 var fieldsAfterSplit = fields.Split(",");
 
                 foreach (var field in fieldsAfterSplit)
@@ -34,7 +33,6 @@ namespace DivingApplication.Helpers.Extensions
 
                     propertyInfoList.Add(propertyInfos);
                 }
-
             }
 
             var objectList = new List<ExpandoObject>();

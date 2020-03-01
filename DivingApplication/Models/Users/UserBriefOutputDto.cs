@@ -18,8 +18,9 @@ namespace DivingApplication.Models.Users
         public string UserRole { get; set; }
         public string UserGender { get; set; }
         public DateTime LastSeen { get; set; }
-        public int NumOfFollowers { get; set; }
-        public int NumOfFollowing { get; set; }
-        public int NumOfOwningPosts { get; set; }
+        public int FollowersCount { get; set; }
+        public int FollowingCount { get; set; }
+        public int OwningPostsCount { get; set; }
+        public int OwningServiceInfosCount { get; set; }
     }
 }

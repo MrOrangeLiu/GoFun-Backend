@@ -4,14 +4,16 @@ using DivingApplication.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DivingApplication.Migrations
 {
     [DbContext(typeof(DivingAPIContext))]
-    partial class DivingAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20200225121448_comment")]
+    partial class comment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,42 +36,6 @@ namespace DivingApplication.Migrations
                     b.ToTable("ChatRooms");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("ChatRoom");
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.CoachInfo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(2048)")
-                        .HasMaxLength(2048);
-
-                    b.Property<string>("InsturctingLocation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LocationImageUrls")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SelfieUrls")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId")
-                        .IsUnique();
-
-                    b.ToTable("CoachInfos");
                 });
 
             modelBuilder.Entity("DivingApplication.Entities.Comment", b =>
@@ -261,95 +227,6 @@ namespace DivingApplication.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("DivingApplication.Entities.ServiceInfo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CenterDescription")
-                        .HasColumnType("nvarchar(1024)")
-                        .HasMaxLength(1024);
-
-                    b.Property<string>("CenterFacilites")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CenterName")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
-
-                    b.Property<DateTime>("CenterOpeningDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DetailedAddress")
-                        .HasColumnType("nvarchar(2048)")
-                        .HasMaxLength(2048);
-
-                    b.Property<string>("DiveAssociations")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("LocalCenterName")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("Location")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
-
-                    b.Property<string>("ProvidServices")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("ProvideAccommodation")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ServiceCenterType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ServiceImageUrls")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SocailMedia")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("SocialMediaAccount")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("SupportedLanguages")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SupportedPayment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Website")
-                        .HasColumnType("nvarchar(2048)")
-                        .HasMaxLength(2048);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
-
-                    b.ToTable("ServiceInfos");
-                });
-
             modelBuilder.Entity("DivingApplication.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -410,27 +287,18 @@ namespace DivingApplication.Migrations
                     b.HasDiscriminator().HasValue("GroupChatRoom");
                 });
 
-            modelBuilder.Entity("DivingApplication.Entities.CoachInfo", b =>
-                {
-                    b.HasOne("DivingApplication.Entities.User", "Author")
-                        .WithOne("CoachInfo")
-                        .HasForeignKey("DivingApplication.Entities.CoachInfo", "AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("DivingApplication.Entities.Comment", b =>
                 {
                     b.HasOne("DivingApplication.Entities.User", "Author")
                         .WithMany("OwingComments")
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("DivingApplication.Entities.Post", "BelongPost")
                         .WithMany("Comments")
                         .HasForeignKey("BelongPostId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -542,15 +410,6 @@ namespace DivingApplication.Migrations
                     b.HasOne("DivingApplication.Entities.User", "Author")
                         .WithMany("OwningPosts")
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.ServiceInfo", b =>
-                {
-                    b.HasOne("DivingApplication.Entities.User", "Owner")
-                        .WithMany("OwningServiceInfos")
-                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

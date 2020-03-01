@@ -5,12 +5,8 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Helpers.ResourceParameters
 {
-    public class PostResourceParameters 
+    public class CommentResourceParameters
     {
-        // Searching
-        public string SearchQuery { get; set; } // Used for searching the title
-
-
 
         // Pagination
         const int maxPageSize = 50;
@@ -26,6 +22,5 @@ namespace DivingApplication.Helpers.ResourceParameters
         // Sorting and Population
         public string OrderBy { get; set; } = "CreatedAt";
         public string Fields { get; set; }
-
     }
 }

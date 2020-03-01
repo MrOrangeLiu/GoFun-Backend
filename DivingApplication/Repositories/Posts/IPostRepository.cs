@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DivingApplication.Repositories
+namespace DivingApplication.Repositories.Posts
 {
     public interface IPostRepository
     {
@@ -17,6 +17,7 @@ namespace DivingApplication.Repositories
         Task<UserPostSave> GetCurrentUserPostSave(Guid userId, Guid postId);
         Task<Post> GetPost(Guid postId);
         PageList<Post> GetPosts(PostResourceParameters postResourceParameters);
+
         Task<bool> PostExists(Guid postId);
         Task<bool> Save();
         Task UpdatePost(Post post);

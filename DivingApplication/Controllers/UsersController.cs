@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DivingApplication.DbContexts;
 using DivingApplication.Entities;
-using DivingApplication.Repositories;
-using DivingApplication.Models;
+using DivingApplication.Repositories.Users;
 using AutoMapper;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using DivingApplication.Services;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,8 +20,10 @@ using MimeKit;
 using MimeKit.Text;
 using MailKit.Security;
 using static DivingApplication.Entities.User;
-using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Services.PropertyServices;
+using DivingApplication.Helpers.Extensions;
+using DivingApplication.Models.CoachInfo;
+using DivingApplication.Models.ServiceInfo;
 
 namespace DivingApplication.Controllers
 {
@@ -39,6 +34,9 @@ namespace DivingApplication.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly AppSettingsService _appSettings;
+        private readonly IPropertyMappingService _propertyMapping;
+        private readonly IPropertyValidationService _propertyValidation;
+
 
 
         public UsersController(IUserRepository userRepository,
@@ -50,6 +48,8 @@ namespace DivingApplication.Controllers
             _userRepository = userRepository;
             _mapper = mapper;
             _appSettings = appSettings.Value;
+            _propertyMapping = propertyMapping;
+            _propertyValidation = propertyValidation;
         }
 
         // Success : http://localhost:65000/api/users/test
@@ -68,12 +68,12 @@ namespace DivingApplication.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SingupUser([FromBody] UserForCreatingDto userForCreatingDto)
         {
-            if (await _userRepository.UserEmailExists(userForCreatingDto.Email)) return BadRequest("User Already Exist");
+            if (await _userRepository.UserEmailExists(userForCreatingDto.Email).ConfigureAwait(false)) return BadRequest("User Already Exist");
 
             var user = _mapper.Map<User>(userForCreatingDto);
 
-            await _userRepository.AddUser(user, userForCreatingDto.Password);
-            await _userRepository.Save();
+            await _userRepository.AddUser(user, userForCreatingDto.Password).ConfigureAwait(false);
+            await _userRepository.Save().ConfigureAwait(false);
 
             // Generating JWT Token
             var token = GenerateTokenForUser(user);
@@ -103,8 +103,8 @@ namespace DivingApplication.Controllers
 
             // Updating LastSeen
             user.LastSeen = DateTime.Now;
-            await _userRepository.UpdateUser(user);
-            await _userRepository.Save();
+            await _userRepository.UpdateUser(user).ConfigureAwait(false);
+            await _userRepository.Save().ConfigureAwait(false);
 
             var userToReturn = _mapper.Map<UserOutputDto>(user);
 
@@ -116,7 +116,7 @@ namespace DivingApplication.Controllers
                 });
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPatch("{userId}")]
         public async Task<ActionResult> PartiallyUpdateUser(Guid userId, [FromBody] JsonPatchDocument<UserUpdatingDto> patchDocument)
         {
@@ -125,7 +125,7 @@ namespace DivingApplication.Controllers
             // Check if the updating user and the current user is the same one.
             if (Guid.Parse(logginUserId) != userId) return BadRequest();
 
-            var userFromRepo = await _userRepository.GetUser(userId);
+            var userFromRepo = await _userRepository.GetUser(userId).ConfigureAwait(false);
 
             if (userFromRepo == null) return NotFound();
 
@@ -137,8 +137,8 @@ namespace DivingApplication.Controllers
 
             _mapper.Map(userToPatch, userFromRepo); // Overriding 
             userFromRepo.LastSeen = DateTime.Now;
-            await _userRepository.UpdateUser(userFromRepo); //Faking
-            await _userRepository.Save();
+            await _userRepository.UpdateUser(userFromRepo).ConfigureAwait(false); //Faking
+            await _userRepository.Save().ConfigureAwait(false);
 
             var userToReturn = _mapper.Map<UserOutputDto>(userFromRepo);
 
@@ -156,13 +156,13 @@ namespace DivingApplication.Controllers
         [HttpGet("{userId}", Name = "GetUserById")]
         public async Task<ActionResult<UserOutputDto>> GetUser(Guid userId)
         {
-            var userFromRepo = await _userRepository.GetUser(userId);
+            var userFromRepo = await _userRepository.GetUser(userId).ConfigureAwait(false);
             if (userFromRepo == null) return NotFound();
 
             return Ok(_mapper.Map<UserOutputDto>(userFromRepo));
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpPost("follow/{followingUserId}")]
         public async Task<IActionResult> UserFollowToggle(Guid followingUserId)
         {
@@ -172,24 +172,24 @@ namespace DivingApplication.Controllers
 
             // Checking if the user Exist
 
-            var followingUser = await _userRepository.GetUser(followerUserId);
+            var followingUser = await _userRepository.GetUser(followerUserId).ConfigureAwait(false);
 
             if (followingUser == null) return NotFound();
 
-            var currentFollowStatus = await _userRepository.GetCurrentUserFollow(followerUserId, followingUserId);
+            var currentFollowStatus = await _userRepository.GetCurrentUserFollow(followerUserId, followingUserId).ConfigureAwait(false);
             bool Adding;
 
             if (currentFollowStatus == null)
             {
-                currentFollowStatus = await _userRepository.UserFollowUser(followerUserId, followingUserId);
-                await _userRepository.Save();
+                currentFollowStatus = await _userRepository.UserFollowUser(followerUserId, followingUserId).ConfigureAwait(false);
+                await _userRepository.Save().ConfigureAwait(false);
                 Adding = true;
 
             }
             else
             {
                 _userRepository.UserUnFollowUser(currentFollowStatus);
-                await _userRepository.Save();
+                await _userRepository.Save().ConfigureAwait(false);
                 Adding = false;
 
             }
@@ -204,86 +204,129 @@ namespace DivingApplication.Controllers
         }
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
-        [HttpGet("follow/followers")]
-        public async Task<IActionResult> GetAllFollowers([FromQuery]Guid userId)
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("follow/followers/{userId}")]
+        public async Task<IActionResult> GetAllFollowers(Guid userId, [FromQuery]string fields)
         {
+            if (!_propertyValidation.HasValidProperties<UserBriefOutputDto>(fields)) return BadRequest();
+
             if (userId == Guid.Empty)
             {
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var allFollowers = await _userRepository.GetAllFollowers(userId);
+            var allFollowers = await _userRepository.GetAllFollowers(userId).ConfigureAwait(false);
 
             var allFollwersToReturn = _mapper.Map<IEnumerable<UserBriefOutputDto>>(allFollowers);
 
-            return Ok(allFollwersToReturn);
+            return Ok(allFollwersToReturn.ShapeData(fields));
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
-        [HttpGet("follow/following")]
-        public async Task<IActionResult> GetAllFollowing([FromQuery]Guid userId)
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("follow/following/{userId}")]
+        public async Task<IActionResult> GetAllFollowing(Guid userId, [FromQuery] string fields)
         {
+            if (!_propertyValidation.HasValidProperties<UserBriefOutputDto>(fields)) return BadRequest();
+
             if (userId == Guid.Empty)
             {
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var allFollowing = await _userRepository.GetAllFollowing(userId);
+
+            var allFollowing = await _userRepository.GetAllFollowing(userId).ConfigureAwait(false);
 
             var allFollowingToReturn = _mapper.Map<IEnumerable<UserBriefOutputDto>>(allFollowing);
 
-            return Ok(allFollowingToReturn);
+            return Ok(allFollowingToReturn.ShapeData(fields));
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
-        [HttpGet("posts/save")]
-        public async Task<IActionResult> GetAllSavePosts([FromQuery]Guid userId)
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("posts/save/{userId}")]
+        public async Task<IActionResult> GetAllSavePosts(Guid userId, [FromQuery] string fields)
         {
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(fields)) return BadRequest();
+
             if (userId == Guid.Empty)
             {
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var userSavePosts = await _userRepository.GetAllSavePosts(userId);
+            var userSavePosts = await _userRepository.GetAllSavePosts(userId).ConfigureAwait(false);
 
-            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userSavePosts));
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userSavePosts.ShapeData(fields)));
         }
 
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
-        [HttpGet("posts/like")]
-        public async Task<IActionResult> GetAllLikePosts([FromQuery]Guid userId)
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("posts/like/{userId}")]
+        public async Task<IActionResult> GetAllLikePosts(Guid userId, [FromQuery] string fields)
         {
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(fields)) return BadRequest();
+
             if (userId == Guid.Empty)
             {
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var userLikePosts = await _userRepository.GetAllLikePosts(userId);
+            var userLikePosts = await _userRepository.GetAllLikePosts(userId).ConfigureAwait(false);
 
-            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userLikePosts));
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userLikePosts.ShapeData(fields)));
         }
 
 
 
 
-        [Authorize(Policy = "NormalAndAdmin")]
-        [HttpGet("posts")]
-        public async Task<IActionResult> GetAllOwningPosts([FromQuery]Guid userId)
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("posts/{userId}")]
+        public async Task<IActionResult> GetAllOwningPosts(Guid userId, [FromQuery] string fields)
         {
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(fields)) return BadRequest();
+
             if (userId == Guid.Empty)
             {
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var userOwningPosts = await _userRepository.GetAllOwningPost(userId);
+            var userOwningPosts = await _userRepository.GetAllOwningPost(userId).ConfigureAwait(false);
 
-            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userOwningPosts));
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userOwningPosts.ShapeData(fields)));
+        }
+
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("coachInfo/{userId}")]
+        public async Task<IActionResult> GetCoachInfoForUser(Guid userId, [FromQuery] string fields)
+        {
+            if (!_propertyValidation.HasValidProperties<CoachInfoOutputDto>(fields)) return BadRequest();
+
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+
+
+            var userCoachInfo = await _userRepository.GetCoachInfoForUser(userId).ConfigureAwait(false);
+
+            return Ok(_mapper.Map<IEnumerable<CoachInfoOutputDto>>(userCoachInfo.ShapeData(fields)));
         }
 
 
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("serviceInfo/{userId}")]
+        public async Task<IActionResult> GetServiceInfoForUser(Guid userId, [FromQuery] string fields)
+        {
+            if (!_propertyValidation.HasValidProperties<ServiceInfoOutputDto>(fields)) return BadRequest();
+
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+
+            var userServiceInfo = await _userRepository.GetServiceInfoForUser(userId).ConfigureAwait(false);
+
+            return Ok(_mapper.Map<IEnumerable<ServiceInfoOutputDto>>(userServiceInfo.ShapeData(fields)));
+        }
 
 
 
@@ -306,8 +349,8 @@ namespace DivingApplication.Controllers
             // Saving it to Db
             userFromRepo.EmailVerificationCode = code;
             userFromRepo.LastSeen = DateTime.Now;
-            _userRepository.UpdateUser(userFromRepo);
-            _userRepository.Save();
+            await _userRepository.UpdateUser(userFromRepo).ConfigureAwait(false);
+            await _userRepository.Save().ConfigureAwait(false);
 
             var sendingMessage = new MimeMessage
             {
@@ -330,13 +373,13 @@ namespace DivingApplication.Controllers
 
                 smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls);
+                await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls).ConfigureAwait(false);
 
-                await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword);
+                await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword).ConfigureAwait(false);
 
-                await smtp.SendAsync(sendingMessage);
+                await smtp.SendAsync(sendingMessage).ConfigureAwait(false);
 
-                await smtp.DisconnectAsync(true);
+                await smtp.DisconnectAsync(true).ConfigureAwait(false);
 
             }
 
@@ -353,7 +396,7 @@ namespace DivingApplication.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var userFromRepo = await _userRepository.GetUser(userId);
+            var userFromRepo = await _userRepository.GetUser(userId).ConfigureAwait(false);
 
             if (userFromRepo == null) return NotFound();
 
@@ -365,7 +408,7 @@ namespace DivingApplication.Controllers
 
             userFromRepo.UserRole = Role.Normal;
 
-            _userRepository.Save();
+            _userRepository.Save().ConfigureAwait(false);
 
             var userToReturn = _mapper.Map<UserOutputDto>(userFromRepo);
 
@@ -412,6 +455,18 @@ namespace DivingApplication.Controllers
                 );
         }
 
+        [Authorize(Roles = "Coach")]
+        [HttpGet("reach/normal")]
+        public IActionResult CoachReachTest()
+        {
+            return Ok(
+                new
+                {
+                    msg = "Reach Coach"
+                }
+                );
+        }
+
 
         [Authorize(Roles = "Admin")]
         [HttpGet("reach/admin")]
@@ -425,14 +480,14 @@ namespace DivingApplication.Controllers
                 );
         }
 
-        [Authorize(Policy = "NormalAndAdmin")]
-        [HttpGet("reach/policy/normalAndAdmin")]
-        public IActionResult NormalAndAdminReachTest()
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("reach/policy/VerifiedUsers")]
+        public IActionResult VerifiedUsersReachTest()
         {
             return Ok(
                 new
                 {
-                    msg = "Reach NormalAndAdminPolicy"
+                    msg = "Reach VerifiedUsersPolicy"
                 }
                 );
         }

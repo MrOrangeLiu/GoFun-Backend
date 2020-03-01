@@ -19,6 +19,7 @@ namespace DivingApplication.Entities
             Banned,
             EmailNotVerified,
             Normal,
+            Coach,
             Admin,
         }
 
@@ -48,6 +49,8 @@ namespace DivingApplication.Entities
 
         public byte[] PasswordSalt { get; set; }
         public Role UserRole { get; set; } = Role.EmailNotVerified;
+        public CoachInfo CoachInfo { get; set; }
+
         public Gender UserGender { get; set; } = Gender.Male;
         public DateTime CreatedAt { get; set; }
         public DateTime LastSeen { get; set; }
@@ -55,10 +58,13 @@ namespace DivingApplication.Entities
         public List<UserFollow> Followers { get; set; } = new List<UserFollow>();
         public List<UserFollow> Following { get; set; } = new List<UserFollow>();
         public List<Post> OwningPosts { get; set; } = new List<Post>();
+        public List<Comment> OwingComments { get; set; } = new List<Comment>();
         public List<UserChatRoom> UserChatRooms { get; set; } = new List<UserChatRoom>();
         public List<UserPostLike> LikePosts { get; set; } = new List<UserPostLike>();
         public List<UserPostSave> SavePosts { get; set; } = new List<UserPostSave>();
         public List<UserMessageLike> LikeMessages { get; set; } = new List<UserMessageLike>();
         public List<UserMessageRead> ReadMessages { get; set; } = new List<UserMessageRead>();
+        public List<ServiceInfo> OwningServiceInfos { get; set; } = new List<ServiceInfo>();
+
     }
 }

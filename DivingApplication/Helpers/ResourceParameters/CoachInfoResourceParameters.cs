@@ -5,12 +5,10 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Helpers.ResourceParameters
 {
-    public class PostResourceParameters 
+    public class CoachInfoResourceParameters
     {
         // Searching
-        public string SearchQuery { get; set; } // Used for searching the title
-
-
+        public string SearchQuery { get; set; } // Used for searching the title // Seaching for the coach name
 
         // Pagination
         const int maxPageSize = 50;

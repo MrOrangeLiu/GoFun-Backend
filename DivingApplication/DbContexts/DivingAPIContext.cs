@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static DivingApplication.Entities.Message;
 using static DivingApplication.Entities.Post;
+using static DivingApplication.Entities.ServiceInfo;
 using static DivingApplication.Entities.User;
 
 namespace DivingApplication.DbContexts
@@ -18,13 +19,14 @@ namespace DivingApplication.DbContexts
 
         }
 
-
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<ChatRoom> ChatRooms { get; set; }
         public DbSet<GroupChatRoom> GroupChatRooms { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<CoachInfo> CoachInfos { get; set; }
+        public DbSet<ServiceInfo> ServiceInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +52,11 @@ namespace DivingApplication.DbContexts
                        v => ((MessageContentType)Enum.Parse(typeof(MessageContentType), v))
                      );
 
+
+            modelBuilder.Entity<ServiceInfo>().Property(s => s.ServiceCenterType).HasConversion(
+                    v => v.ToString(),
+                    v => ((CenterType)Enum.Parse(typeof(CenterType), v))
+                );
 
             // Dealing with Many-to-Many Relationship
 
@@ -147,6 +154,11 @@ namespace DivingApplication.DbContexts
                         .WithMany(u => u.ReadMessages)
                         .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.Restrict);
 
+
+            // If the user is deleted, then the comments and posts will not be affected
+            modelBuilder.Entity<User>().HasMany(u => u.OwningPosts).WithOne(p => p.Author).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>().HasMany(u => u.OwingComments).WithOne(c => c.Author).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Post>().HasMany(p => p.Comments).WithOne(c => c.BelongPost).OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
 

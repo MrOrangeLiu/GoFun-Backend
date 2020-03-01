@@ -8,7 +8,7 @@ namespace DivingApplication.Services.PropertyServices
 {
     public class PropertyValidationService : IPropertyValidationService
     {
-        public bool HasValidProperties<T>(string fields)
+        public bool HasValidProperties<T>(string fields) // testing if the fields string contain correct name of fields
         {
             if (string.IsNullOrWhiteSpace(fields)) return true;
 

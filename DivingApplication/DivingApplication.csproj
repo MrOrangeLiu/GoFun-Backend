@@ -9,6 +9,22 @@
     <Compile Remove="Migrations\20200221084452_initial.Designer.cs" />
     <Compile Remove="Migrations\20200221085553_Initial.cs" />
     <Compile Remove="Migrations\20200221085553_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20200225101856_commentVersion.cs" />
+    <Compile Remove="Migrations\20200225101856_commentVersion.Designer.cs" />
+    <Compile Remove="Migrations\20200225102331_commentVersion_2.cs" />
+    <Compile Remove="Migrations\20200225102331_commentVersion_2.Designer.cs" />
+    <Compile Remove="Migrations\20200225113052_commentVersion_3.cs" />
+    <Compile Remove="Migrations\20200225113052_commentVersion_3.Designer.cs" />
+    <Compile Remove="Migrations\20200225113214_commentVersion_3.cs" />
+    <Compile Remove="Migrations\20200225113214_commentVersion_3.Designer.cs" />
+    <Compile Remove="Migrations\20200225120603_commentVersion_3.cs" />
+    <Compile Remove="Migrations\20200225120603_commentVersion_3.Designer.cs" />
+    <Compile Remove="Migrations\20200225120940_commentVersion_3.cs" />
+    <Compile Remove="Migrations\20200225120940_commentVersion_3.Designer.cs" />
+    <Compile Remove="Migrations\20200225121531_comment_1.cs" />
+    <Compile Remove="Migrations\20200225121531_comment_1.Designer.cs" />
+    <Compile Remove="Migrations\20200225122655_comment_1.cs" />
+    <Compile Remove="Migrations\20200225122655_comment_1.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

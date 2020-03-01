@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DivingApplication.Models.CoachInfo;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,5 +26,7 @@ namespace DivingApplication.Models.Users
         public List<Guid> UserChatRooms { get; set; } = new List<Guid>();
         public List<Guid> LikePosts { get; set; } = new List<Guid>();
         public List<Guid> SavePosts { get; set; } = new List<Guid>();
+        public List<Guid> OwingServiceInfos { get; set; } = new List<Guid>();
+        public CoachInfoOutputDto CoachInfo { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace DivingApplication.Models.Posts
         public List<string> ContentURL { get; set; } = new List<string>();
 
         [ForeignKey("AuthorId")]
-        public UserOutputDto Author { get; set; }
+        public UserBriefOutputDto Author { get; set; }
         public Guid AuthorId { get; set; } // Include Author
 
         public int PostLikedCount { get; set; }
