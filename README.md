@@ -49,11 +49,11 @@
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Get CoachInfo by FollowersCount|Must | Richard |1 Mar 2020 ||
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Partially Update Coach Info |Must | Richard | 1 Mar 2020||
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Delete Coach Info |Must | Richard | 1 Mar 2020||
-|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Create ServiceInfo |Must | Richard | | Storing the service you provide|
-|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Partially Update ServiceInfo |Must | Richard | ||
-|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Get ServiceInfo by Location |Must | Richard | ||
-|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Get ServiceInfo by Id |Must | Richard | ||
-|<ul><li>- [ ] </li></ul>|**ServiceInfo**: Get ServiceInfo by FollowersCount |Must | Richard | ||
+|<ul><li>- [x] </li></ul>|**ServiceInfo**: Create ServiceInfo |Must | Richard |  1 Mar 2020| Storing the service you provide|
+|<ul><li>- [x] </li></ul>|**ServiceInfo**: Partially Update ServiceInfo |Must | Richard |  1 Mar 2020||
+|<ul><li>- [x] </li></ul>|**ServiceInfo**: Get ServiceInfo by Location |Must | Richard | ||
+|<ul><li>- [x] </li></ul>|**ServiceInfo**: Get ServiceInfo by Id |Must | Richard | 1 Mar 2020 ||
+|<ul><li>- [x] </li></ul>|**ServiceInfo**: Get ServiceInfo by FollowersCount |Must | Richard | 1 Mar 2020 ||
 
 
 
