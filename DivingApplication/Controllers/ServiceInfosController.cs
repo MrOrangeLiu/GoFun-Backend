@@ -132,7 +132,7 @@ namespace DivingApplication.Controllers
         }
 
         [Authorize(Policy = "VerifiedUsers")]
-        [HttpDelete("{postId}")]
+        [HttpDelete("{serviceInfoId}")]
         public async Task<IActionResult> DeleteServiceInfo(Guid serviceInfoId, [FromQuery] string fields)
         {
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
