@@ -13,7 +13,6 @@ using DivingApplication.Models.CoachInfo;
 using DivingApplication.Repositories.CoachInfos;
 using DivingApplication.Services.PropertyServices;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using static DivingApplication.Entities.User;
@@ -39,6 +38,53 @@ namespace DivingApplication.Controllers
             _propertyMapping = propertyMapping;
             _propertyValidation = propertyValidation;
         }
+
+
+        // Get
+
+
+        [AllowAnonymous]
+        [HttpGet(Name = "GetCoachInfos")]
+        public IActionResult GetCoachInfos([FromQuery] CoachInfoResourceParameters coachInfoReposrceParameters)
+        {
+
+            if (!_propertyMapping.ValidMappingExist<CoachInfoOutputDto, CoachInfo>(coachInfoReposrceParameters.OrderBy)) return BadRequest();
+            if (!_propertyValidation.HasValidProperties<CoachInfoOutputDto>(coachInfoReposrceParameters.Fields)) return BadRequest();
+
+            var coachInfoFromRepo = _coachInfosRepository.GetCoachInfos(coachInfoReposrceParameters);
+
+            var previousPageLink = coachInfoFromRepo.HasPrevious ? CreateCoachInfoUri(coachInfoReposrceParameters, UriType.PreviousPage, "GetCoachInfos") : null;
+            var nextPageLink = coachInfoFromRepo.HasNext ? CreateCoachInfoUri(coachInfoReposrceParameters, UriType.NextPage, "GetCoachInfos") : null;
+
+            var metaData = new
+            {
+                totalCount = coachInfoFromRepo.TotalCount,
+                pageSize = coachInfoFromRepo.PageSize,
+                currentPage = coachInfoFromRepo.CurrentPage,
+                totalPages = coachInfoFromRepo.TotalPages,
+                previousPageLink,
+                nextPageLink,
+            };
+
+            Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
+
+            return Ok(_mapper.Map<IEnumerable<CoachInfoOutputDto>>(coachInfoFromRepo).ShapeData(coachInfoReposrceParameters.Fields));
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{coachInfoId}", Name = "GetCoachInfo")]
+        public async Task<IActionResult> GetCoachInfo(Guid coachInfoId, [FromQuery] string fields)
+        {
+
+            if (!_propertyValidation.HasValidProperties<CoachInfoOutputDto>(fields)) return BadRequest();
+
+            var coachInfoFromRepo = await _coachInfosRepository.GetCoachInfo(coachInfoId).ConfigureAwait(false);
+
+            var coachInfoToReturn = _mapper.Map<CoachInfoOutputDto>(coachInfoFromRepo);
+
+            return Ok(coachInfoToReturn.ShapeData(fields));
+        }
+
 
 
         [Authorize(Policy = "CoachAndAdmin")]
@@ -95,8 +141,8 @@ namespace DivingApplication.Controllers
 
 
         [Authorize(Policy = "CoachAndAdmin")]
-        [HttpPatch("{coachInfoId}")]
-        public async Task<IActionResult> DeletePost(Guid coachInfoId, [FromQuery] string fields)
+        [HttpDelete("{coachInfoId}")]
+        public async Task<IActionResult> DeleteCoachInfo(Guid coachInfoId, [FromQuery] string fields)
         {
             if (!_propertyValidation.HasValidProperties<CoachInfoOutputDto>(fields)) return BadRequest();
 
@@ -114,38 +160,6 @@ namespace DivingApplication.Controllers
 
             return Ok(_mapper.Map<CoachInfoOutputDto>(postFromRepo).ShapeData(fields));
         }
-
-        // Get
-
-
-        [AllowAnonymous]
-        [HttpGet(Name = "GetCoachInfos")]
-        public IActionResult GetPosts([FromQuery] CoachInfoResourceParameters coachInfoReposrceParameters)
-        {
-
-            if (!_propertyMapping.ValidMappingExist<CoachInfoOutputDto, CoachInfo>(coachInfoReposrceParameters.OrderBy)) return BadRequest();
-            if (!_propertyValidation.HasValidProperties<CoachInfoOutputDto>(coachInfoReposrceParameters.Fields)) return BadRequest();
-
-            var coachInfoFromRepo = _coachInfosRepository.GetCoachInfos(coachInfoReposrceParameters);
-
-            var previousPageLink = coachInfoFromRepo.HasPrevious ? CreateCoachInfoUri(coachInfoReposrceParameters, UriType.PreviousPage, "GetCoachInfos") : null;
-            var nextPageLink = coachInfoFromRepo.HasNext ? CreateCoachInfoUri(coachInfoReposrceParameters, UriType.NextPage, "GetCoachInfos") : null;
-
-            var metaData = new
-            {
-                totalCount = coachInfoFromRepo.TotalCount,
-                pageSize = coachInfoFromRepo.PageSize,
-                currentPage = coachInfoFromRepo.CurrentPage,
-                totalPages = coachInfoFromRepo.TotalPages,
-                previousPageLink,
-                nextPageLink,
-            };
-
-            Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
-
-            return Ok(_mapper.Map<IEnumerable<CoachInfoOutputDto>>(coachInfoFromRepo).ShapeData(coachInfoReposrceParameters.Fields));
-        }
-
 
 
         private string CreateCoachInfoUri(CoachInfoResourceParameters coachInfoResourceParameters, UriType uriType, string routeName)

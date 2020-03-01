@@ -41,7 +41,7 @@ namespace DivingApplication.Repositories.CoachInfos
         {
             if (coachInfoResourceParameters == null) throw new ArgumentNullException(nameof(coachInfoResourceParameters));
 
-            var collection = _context.CoachInfos as IQueryable<CoachInfo>;
+            var collection = _context.CoachInfos.Include(c =>c.Author) as IQueryable<CoachInfo>;
 
             if (!string.IsNullOrWhiteSpace(coachInfoResourceParameters.SearchQuery))
             {

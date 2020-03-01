@@ -38,6 +38,7 @@ namespace DivingApplication.Repositories.Users
                                      .Include(u => u.OwingComments)
                                      .Include(u => u.OwningPosts)
                                      .Include(u => u.OwningServiceInfos)
+                                     .Include(c => c.CoachInfo)
                                      .SingleOrDefault(x => x.Email == Email);
 
             // check if Email exists

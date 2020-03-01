@@ -134,7 +134,7 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var postFromRepo = await _postRepository.GetPost(postId);
+            var postFromRepo = await _postRepository.GetPost(postId).ConfigureAwait(false);
 
             if (postFromRepo == null) return NotFound();
 
@@ -147,9 +147,9 @@ namespace DivingApplication.Controllers
 
             _mapper.Map(postToPatch, postFromRepo); // Overriding
 
-            _postRepository.UpdatePost(postFromRepo);
+            await _postRepository.UpdatePost(postFromRepo).ConfigureAwait(false);
 
-            await _postRepository.Save();
+            await _postRepository.Save().ConfigureAwait(false);
 
             var postToReturn = _mapper.Map<PostOutputDto>(postFromRepo);
 
@@ -174,7 +174,7 @@ namespace DivingApplication.Controllers
             if (logginUserId != postFromRepo.AuthorId && (Role)Enum.Parse(typeof(Role), userRole) != Role.Admin) return Unauthorized();
 
             _postRepository.DeletePost(postFromRepo);
-            await _postRepository.Save();
+            await _postRepository.Save().ConfigureAwait(false);
 
             return Ok(_mapper.Map<PostOutputDto>(postFromRepo).ShapeData(fields));
         }
@@ -188,7 +188,7 @@ namespace DivingApplication.Controllers
 
             // Checking if the post Exist
 
-            var post = await _postRepository.GetPost(postId);
+            var post = await _postRepository.GetPost(postId).ConfigureAwait(false);
 
             if (post == null) return NotFound();
 
@@ -198,14 +198,14 @@ namespace DivingApplication.Controllers
             if (currentPostLike == null)
             {
                 currentPostLike = await _postRepository.UserLikePost(userId, postId);
-                await _postRepository.Save();
+                await _postRepository.Save().ConfigureAwait(false);
                 Adding = true;
 
             }
             else
             {
                 _postRepository.UserUnlikeAPost(currentPostLike);
-                await _postRepository.Save();
+                await _postRepository.Save().ConfigureAwait(false);
                 Adding = false;
 
             }

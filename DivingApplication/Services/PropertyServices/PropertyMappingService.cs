@@ -79,7 +79,6 @@ namespace DivingApplication.Services.PropertyServices
             {"DiveAssociations", new PropertyMappingValue(new List<string>(){"DiveAssociations"})},
             {"SupportedLanguages", new PropertyMappingValue(new List<string>(){"SupportedLanguages"})},
             {"SupportedPayment", new PropertyMappingValue(new List<string>(){"SupportedPayment"})},
-            {"PhoneNumber", new PropertyMappingValue(new List<string>(){"PhoneNumber"})},
             {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
             {"UpdatedAt", new PropertyMappingValue(new List<string>(){"UpdatedAt"}, true)},
         };
