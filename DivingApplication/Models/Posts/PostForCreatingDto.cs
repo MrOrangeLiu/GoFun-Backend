@@ -18,8 +18,12 @@ namespace DivingApplication.Models.Posts
         public string Description { get; set; }
         [Required]
         public string PostContentType { get; set; }
-
+        public string LocationAddress { get; set; }
+        public string LatLng { get; set; }
         [Required]
         public List<string> ContentURL { get; set; } = new List<string>();
+        public List<string> PostTopics { get; set; } = new List<string>();  // TaggedTopics Id 
+        public List<string> TaggedUsers { get; set; } = new List<string>(); // TaggedUsers Id
+
     }
 }

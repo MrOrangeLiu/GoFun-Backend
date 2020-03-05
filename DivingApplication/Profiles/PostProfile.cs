@@ -59,9 +59,36 @@ namespace DivingApplication.Profiles
                 ).ForMember(
                     dest => dest.CommentCount,
                     opt => opt.MapFrom(src => src.Comments.Count)
+                ).ForMember(
+                    dest => dest.TaggedUsers,
+                    opt => opt.MapFrom(src => src.TaggedUsers.Select(tu => tu.User))
+                ).ForMember(
+                    dest => dest.PostTopics,
+                    opt => opt.MapFrom(src => src.PostTopics.Select(pt => pt.Topic))
                 );
 
-
+            CreateMap<Post, PostPrviewOutputDto>().ForMember(
+                    dest => dest.ContentURL,
+                    opt => opt.MapFrom(src => src.ContentURL.Split(new[] { urlSplittor }, StringSplitOptions.RemoveEmptyEntries))
+                ).ForMember(
+                    dest => dest.PostContentType,
+                    opt => opt.MapFrom(src => src.PostContentType.ToString())
+                ).ForMember(
+                    dest => dest.PostLikedCount,
+                    opt => opt.MapFrom(src => src.PostLikedBy.Count)
+                ).ForMember(
+                    dest => dest.PostSavedCount,
+                    opt => opt.MapFrom(src => src.PostSavedBy.Count)
+                ).ForMember(
+                    dest => dest.CommentCount,
+                    opt => opt.MapFrom(src => src.Comments.Count)
+                ).ForMember(
+                    dest => dest.TaggedUsers,
+                    opt => opt.MapFrom(src => src.TaggedUsers.Select(tu => tu.User))
+                ).ForMember(
+                    dest => dest.PostTopics,
+                    opt => opt.MapFrom(src => src.PostTopics.Select(pt => pt.Topic))
+                ); ;
 
         }
     }

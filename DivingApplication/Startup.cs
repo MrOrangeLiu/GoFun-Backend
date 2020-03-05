@@ -9,6 +9,7 @@ using DivingApplication.Repositories.CoachInfos;
 using DivingApplication.Repositories.Comments;
 using DivingApplication.Repositories.Posts;
 using DivingApplication.Repositories.ServiceInfos;
+using DivingApplication.Repositories.Topics;
 using DivingApplication.Repositories.Users;
 using DivingApplication.Services;
 using DivingApplication.Services.PropertyServices;
@@ -113,6 +114,7 @@ namespace DivingApplication
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<ICoachInfosRepository, CoachInfosRepository>();
             services.AddScoped<IServiceInfosRepository, ServiceInfosRepository>();
+            services.AddScoped<ITopicsRepository, TopicsRepository>();
 
             services.AddScoped<IPropertyMappingService, PropertyMappingService>();
             services.AddScoped<IPropertyValidationService, PropertyValidationService>();

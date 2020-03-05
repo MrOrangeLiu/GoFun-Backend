@@ -47,9 +47,18 @@ namespace DivingApplication.Entities
 
         public List<Comment> Comments { get; set; } = new List<Comment>();
 
+        public List<PostTopic> PostTopics { get; set; } = new List<PostTopic>();
+        public List<UserPostTag> TaggedUsers { get; set; } = new List<UserPostTag>();
+
+        public int Views { get; set; } = 0;
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
+
+        public string LocationAddress { get; set; }
+        public string LatLng { get; set; }
+
 
     }
 }

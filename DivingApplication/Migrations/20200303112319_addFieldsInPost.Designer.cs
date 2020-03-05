@@ -4,14 +4,16 @@ using DivingApplication.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DivingApplication.Migrations
 {
     [DbContext(typeof(DivingAPIContext))]
-    partial class DivingAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20200303112319_addFieldsInPost")]
+    partial class addFieldsInPost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,21 +102,6 @@ namespace DivingApplication.Migrations
                     b.HasIndex("BelongPostId");
 
                     b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.PostTopic", b =>
-                {
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("PostId", "TopicId");
-
-                    b.HasIndex("TopicId");
-
-                    b.ToTable("PostTopic");
                 });
 
             modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserChatRoom", b =>
@@ -207,21 +194,6 @@ namespace DivingApplication.Migrations
                     b.ToTable("UserPostSave");
                 });
 
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserPostTag", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "PostId");
-
-                    b.HasIndex("PostId");
-
-                    b.ToTable("UserPostTag");
-                });
-
             modelBuilder.Entity("DivingApplication.Entities.Message", b =>
                 {
                     b.Property<Guid>("Id")
@@ -272,10 +244,7 @@ namespace DivingApplication.Migrations
                         .HasColumnType("nvarchar(2048)")
                         .HasMaxLength(2048);
 
-                    b.Property<string>("LatLng")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LocationAddress")
+                    b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PostContentType")
@@ -389,27 +358,6 @@ namespace DivingApplication.Migrations
                     b.ToTable("ServiceInfos");
                 });
 
-            modelBuilder.Entity("DivingApplication.Entities.Topic", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Topics");
-                });
-
             modelBuilder.Entity("DivingApplication.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -490,21 +438,6 @@ namespace DivingApplication.Migrations
                     b.HasOne("DivingApplication.Entities.Post", "BelongPost")
                         .WithMany("Comments")
                         .HasForeignKey("BelongPostId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.PostTopic", b =>
-                {
-                    b.HasOne("DivingApplication.Entities.Post", "Post")
-                        .WithMany("PostTopics")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DivingApplication.Entities.Topic", "Topic")
-                        .WithMany("TopicPosts")
-                        .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -594,21 +527,6 @@ namespace DivingApplication.Migrations
 
                     b.HasOne("DivingApplication.Entities.User", "User")
                         .WithMany("SavePosts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.UserPostTag", b =>
-                {
-                    b.HasOne("DivingApplication.Entities.Post", "Post")
-                        .WithMany("TaggedUsers")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DivingApplication.Entities.User", "User")
-                        .WithMany("PostsTaggedMe")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();

@@ -25,8 +25,8 @@ namespace DivingApplication.Controllers
     {
         private readonly ICoachInfosRepository _coachInfosRepository;
         private readonly IMapper _mapper;
-        private readonly IPropertyMappingService _propertyMapping;
-        private readonly IPropertyValidationService _propertyValidation;
+        private readonly IPropertyMappingService _propertyMapping; // For ordering
+        private readonly IPropertyValidationService _propertyValidation; // For fields
 
         public CoachInfosController(ICoachInfosRepository coachInfosRepository,
                                     IMapper mapper,

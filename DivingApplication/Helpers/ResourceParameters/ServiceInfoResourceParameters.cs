@@ -23,6 +23,7 @@ namespace DivingApplication.Helpers.ResourceParameters
 
         // Sorting and Population
         public string OrderBy { get; set; } = "CreatedAt";
+
         public string Fields { get; set; }
     }
 }

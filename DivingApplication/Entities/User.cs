@@ -65,6 +65,7 @@ namespace DivingApplication.Entities
         public List<UserMessageLike> LikeMessages { get; set; } = new List<UserMessageLike>();
         public List<UserMessageRead> ReadMessages { get; set; } = new List<UserMessageRead>();
         public List<ServiceInfo> OwningServiceInfos { get; set; } = new List<ServiceInfo>();
+        public List<UserPostTag> PostsTaggedMe { get; set; } = new List<UserPostTag>();
 
     }
 }

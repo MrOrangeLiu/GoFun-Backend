@@ -3,6 +3,7 @@ using DivingApplication.Models.CoachInfo;
 using DivingApplication.Models.Comments;
 using DivingApplication.Models.Posts;
 using DivingApplication.Models.ServiceInfo;
+using DivingApplication.Models.Topic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,10 @@ namespace DivingApplication.Services.PropertyServices
             {"CommentCount", new PropertyMappingValue(new List<string>(){"Comments.Count"}, true)},
             {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
             {"UpdatedAt", new PropertyMappingValue(new List<string>(){"UpdatedAt"}, true)},
+            {"Views", new PropertyMappingValue(new List<string>(){"Views"}, true)},
+            {"LocationAddress", new PropertyMappingValue(new List<string>(){"LocationAddress"}, true)},
+            {"LatLng", new PropertyMappingValue(new List<string>(){"LatLng"}, true)},
+
         };
 
 
@@ -84,6 +89,16 @@ namespace DivingApplication.Services.PropertyServices
         };
 
 
+        private Dictionary<string, PropertyMappingValue> _topicPropertyMapping = new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
+            {"Name", new PropertyMappingValue(new List<string>(){"Name"})},
+            {"TopicPosts.Count", new PropertyMappingValue(new List<string>(){"TopicPosts.Count"})},
+            {"Hot", new PropertyMappingValue(new List<string>(){"Hot"})},
+            {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
+            {"UpdatedAt", new PropertyMappingValue(new List<string>(){"UpdatedAt"}, true)},
+        };
+
         private IList<IPropertyMappingMarker> _propertyMappings = new List<IPropertyMappingMarker>();
 
 
@@ -93,6 +108,7 @@ namespace DivingApplication.Services.PropertyServices
             _propertyMappings.Add(new PropertyMapping<CommentOutputDto, Comment>(_commentPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<CoachInfoOutputDto, CoachInfo>(_coachInfoPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<ServiceInfoOutputDto, ServiceInfo>(_serviceInfoPropertyMapping));
+            _propertyMappings.Add(new PropertyMapping<TopicOutputDto, Topic>(_topicPropertyMapping));
         }
         public Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>()
         {

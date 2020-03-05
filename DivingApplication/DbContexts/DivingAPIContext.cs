@@ -27,6 +27,7 @@ namespace DivingApplication.DbContexts
         public DbSet<Message> Messages { get; set; }
         public DbSet<CoachInfo> CoachInfos { get; set; }
         public DbSet<ServiceInfo> ServiceInfos { get; set; }
+        public DbSet<Topic> Topics { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -106,9 +107,37 @@ namespace DivingApplication.DbContexts
                         .WithMany(u => u.LikePosts)
                         .HasForeignKey(upl => upl.UserId).OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<UserPostTag>()
+                        .HasKey(upt => new { upt.UserId, upt.PostId });
+
+
+            modelBuilder.Entity<UserPostTag>()
+                        .HasOne(upt => upt.Post)
+                        .WithMany(p => p.TaggedUsers)
+                        .HasForeignKey(upt => upt.PostId).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserPostTag>()
+                        .HasOne(upt => upt.User)
+                        .WithMany(u => u.PostsTaggedMe)
+                        .HasForeignKey(upt => upt.UserId).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PostTopic>()
+            .HasKey(pt => new { pt.PostId, pt.TopicId });
+
+
+            modelBuilder.Entity<PostTopic>()
+                        .HasOne(pt => pt.Post)
+                        .WithMany(p => p.PostTopics)
+                        .HasForeignKey(pt => pt.PostId).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PostTopic>()
+                        .HasOne(pt => pt.Topic)
+                        .WithMany(t => t.TopicPosts)
+                        .HasForeignKey(pt => pt.TopicId).OnDelete(DeleteBehavior.Restrict);
+
 
             modelBuilder.Entity<UserPostSave>()
-            .HasKey(ups => new { ups.UserId, ups.PostId });
+                        .HasKey(ups => new { ups.UserId, ups.PostId });
 
 
             modelBuilder.Entity<UserPostSave>()

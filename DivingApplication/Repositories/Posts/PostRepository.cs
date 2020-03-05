@@ -38,7 +38,7 @@ namespace DivingApplication.Repositories.Posts
             await _context.Posts.AddRangeAsync(post).ConfigureAwait(false);
         }
 
-        public PageList<Post> GetPosts(PostResourceParameters postResourceParameters)
+        public PageList<Post> GetPosts(PostResourceParametersWithOrderBy postResourceParameters)
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
@@ -59,7 +59,27 @@ namespace DivingApplication.Repositories.Posts
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
         }
 
-        public async Task<PageList<Post>> GetAllFollowingPosts(Guid userId, PostResourceParameters postResourceParameters)
+        public PageList<Post> GetHotPosts(PostResourceParametersForHot postResourceParameters)
+        {
+            if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
+
+            var collection = _context.Posts as IQueryable<Post>;
+
+            if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
+            {
+                string searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
+                collection = collection.Where(p => p.Title.ToLower().Contains(searchinQuery));
+            }
+
+            // Using the Hot Algorithm
+            collection.OrderByDescending(p =>
+             ((p.Views * 1) + (p.PostLikedBy.Count * 5) + (p.PostSavedBy.Count * 25) + (p.Comments.Count * 30)) / Math.Pow(2.718281828, (double)(DateTime.Now.Subtract(p.CreatedAt).Hours))
+            );
+
+            return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
+        }
+
+        public async Task<PageList<Post>> GetAllFollowingPosts(Guid userId, PostResourceParametersWithOrderBy postResourceParameters)
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
@@ -144,10 +164,7 @@ namespace DivingApplication.Repositories.Posts
             _context.Remove(currentUserPostSave);
         }
 
-        public void UserLikePostExist(Guid userId, Guid postId)
-        {
 
-        }
 
 
         public async Task<Post> GetPost(Guid postId)

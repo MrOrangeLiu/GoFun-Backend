@@ -1,5 +1,4 @@
-﻿using DivingApplication.Entities;
-using DivingApplication.Models.Topic;
+﻿using DivingApplication.Models.Topic;
 using DivingApplication.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -7,11 +6,10 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using static DivingApplication.Entities.Post;
 
 namespace DivingApplication.Models.Posts
 {
-    public class PostOutputDto
+    public class PostPrviewOutputDto
     {
         [Key]
         public Guid Id { get; set; }
@@ -26,7 +24,7 @@ namespace DivingApplication.Models.Posts
         public string PostContentType { get; set; }
 
         [Url]
-        public List<string> ContentURL { get; set; } = new List<string>();
+        public List<string> ContentURL { get; set; } = new List<string>(); // Changing to Prviews
 
         [ForeignKey("AuthorId")]
         public UserBriefOutputDto Author { get; set; }
@@ -34,13 +32,14 @@ namespace DivingApplication.Models.Posts
 
         public int PostLikedCount { get; set; }
         public int PostSavedCount { get; set; }
-        public int Views { get; set; }
-
         public int CommentCount { get; set; }
+        public int Views { get; set; }
         public string LocationAddress { get; set; }
         public string LatLng { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+
 
         public List<TopicOutputDto> PostTopics { get; set; } = new List<TopicOutputDto>();
         public List<UserTaggedOutputDto> TaggedUsers { get; set; } = new List<UserTaggedOutputDto>();

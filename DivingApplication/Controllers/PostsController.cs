@@ -39,7 +39,7 @@ namespace DivingApplication.Controllers
 
         [AllowAnonymous]
         [HttpGet(Name = "GetPosts")]
-        public IActionResult GetPosts([FromQuery] PostResourceParameters postResourceParameters)
+        public IActionResult GetPosts([FromQuery] PostResourceParametersWithOrderBy postResourceParameters)
         {
 
             if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return BadRequest();
@@ -62,12 +62,40 @@ namespace DivingApplication.Controllers
 
             Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
 
-            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+            return Ok(_mapper.Map<IEnumerable<PostPrviewOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet("hot", Name = "GetHotPosts")]
+        public IActionResult GetHotPosts([FromQuery] PostResourceParametersForHot postResourceParameters)
+        {
+            // No orderBy Options in the postResourceParameters
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
+
+            var postsFromRepo = _postRepository.GetHotPosts(postResourceParameters); // the orderBy property will be ignore
+
+            var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetHotPosts") : null;
+            var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetHotPosts") : null;
+
+            var metaData = new
+            {
+                totalCount = postsFromRepo.TotalCount,
+                pageSize = postsFromRepo.PageSize,
+                currentPage = postsFromRepo.CurrentPage,
+                totalPages = postsFromRepo.TotalPages,
+                previousPageLink,
+                nextPageLink,
+            };
+
+            Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
+
+            return Ok(_mapper.Map<IEnumerable<PostPrviewOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
         }
 
         [Authorize(Policy = "VerifiedUsers")]
-        [HttpGet("/following", Name = "GetFollowingPosts")]
-        public async Task<IActionResult> GetAllFollowingPosts([FromQuery] PostResourceParameters postResourceParameters)
+        [HttpGet("following", Name = "GetFollowingPosts")]
+        public async Task<IActionResult> GetAllFollowingPosts([FromQuery] PostResourceParametersWithOrderBy postResourceParameters)
         {
             if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return BadRequest();
             if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
@@ -115,12 +143,35 @@ namespace DivingApplication.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] PostForCreatingDto post, [FromQuery] string fields)
         {
+
             if (!_propertyValidation.HasValidProperties<PostOutputDto>(fields)) return BadRequest();
 
             var postEntity = _mapper.Map<Post>(post);
 
-            await _postRepository.AddPost(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
-            await _postRepository.Save();
+
+
+            await _postRepository.AddPost(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))).ConfigureAwait(false);
+
+            // Adding Tags
+            foreach (var pt in post.PostTopics)
+            {
+                postEntity.PostTopics.Add(new Entities.ManyToManyEntities.PostTopic
+                {
+                    PostId = postEntity.Id,
+                    TopicId = Guid.Parse(pt)
+                });
+            }
+
+            foreach (var tu in post.TaggedUsers)
+            {
+                postEntity.TaggedUsers.Add(new Entities.ManyToManyEntities.UserPostTag
+                {
+                    PostId = postEntity.Id,
+                    UserId = Guid.Parse(tu)
+                });
+            }
+
+            await _postRepository.Save().ConfigureAwait(false);
 
             var postToReturn = _mapper.Map<PostOutputDto>(postEntity);
 
@@ -262,39 +313,9 @@ namespace DivingApplication.Controllers
         }
 
 
-        private string CreatePostsUri(PostResourceParameters postResourceParameters, UriType uriType, string routeName)
+        private string CreatePostsUri(IPostResourceParameters postResourceParameters, UriType uriType, string routeName)
         {
-            switch (uriType)
-            {
-                case UriType.PreviousPage:
-                    return Url.Link(routeName, new
-                    {
-                        pageNumber = postResourceParameters.PageNumber - 1,
-                        postResourceParameters.PageSize,
-                        postResourceParameters.SearchQuery,
-                        postResourceParameters.OrderBy,
-                        postResourceParameters.Fields
-                    });
-                case UriType.NextPage:
-                    return Url.Link(routeName, new
-                    {
-                        pageNumber = postResourceParameters.PageNumber + 1,
-                        postResourceParameters.PageSize,
-                        searchQuery = postResourceParameters.SearchQuery,
-                        postResourceParameters.OrderBy,
-                        postResourceParameters.Fields
-                    });
-                default:
-                    return Url.Link(routeName, new
-                    {
-                        postResourceParameters.PageNumber,
-                        postResourceParameters.PageSize,
-                        postResourceParameters.SearchQuery,
-                        postResourceParameters.OrderBy,
-                        postResourceParameters.Fields
-                    });
-
-            }
+            return Url.Link(routeName, postResourceParameters.CreateUrlParameters(uriType));
         }
     }
 }
