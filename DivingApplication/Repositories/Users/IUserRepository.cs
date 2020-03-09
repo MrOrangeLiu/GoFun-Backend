@@ -1,5 +1,7 @@
 ﻿using DivingApplication.Entities;
 using DivingApplication.Entities.ManyToManyEntities;
+using DivingApplication.Helpers;
+using DivingApplication.Helpers.ResourceParameters;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,6 +24,7 @@ namespace DivingApplication.Repositories.Users
         Task<List<ServiceInfo>> GetServiceInfosForUser(Guid userId);
         Task<User> GetUser(Guid userId);
         User GetUserForJwt(Guid userId);
+        PageList<User> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId);
         Task<bool> Save();
         Task UpdateUser(User user);
         Task<bool> UserEmailExists(string email);

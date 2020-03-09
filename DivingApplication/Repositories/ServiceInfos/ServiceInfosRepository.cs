@@ -32,7 +32,7 @@ namespace DivingApplication.Repositories.ServiceInfos
             serviceInfo.CreatedAt = DateTime.Now;
             serviceInfo.UpdatedAt = DateTime.Now;
 
-            await _context.ServiceInfos.AddRangeAsync(serviceInfo).ConfigureAwait(false);
+            await _context.ServiceInfos.AddRangeAsync(serviceInfo);
         }
 
         public PageList<ServiceInfo> GetServiceInfos(ServiceInfoResourceParameters serviceInfoResourceParameters)
@@ -59,7 +59,7 @@ namespace DivingApplication.Repositories.ServiceInfos
         public async Task<ServiceInfo> GetServiceInfo(Guid serviceInfoId)
         {
             if (serviceInfoId == Guid.Empty) throw new ArgumentNullException(nameof(serviceInfoId));
-            return await _context.ServiceInfos.FindAsync(serviceInfoId).ConfigureAwait(false);
+            return await _context.ServiceInfos.FindAsync(serviceInfoId);
         }
 
         public async Task UpdateServiceInfo(ServiceInfo serviceInfo)
@@ -75,11 +75,11 @@ namespace DivingApplication.Repositories.ServiceInfos
         public async Task<bool> ServiceExists(Guid serviceInfoId)
         {
             if (serviceInfoId == Guid.Empty) throw new ArgumentNullException(nameof(serviceInfoId));
-            return await _context.ServiceInfos.AnyAsync(u => u.Id == serviceInfoId).ConfigureAwait(false);
+            return await _context.ServiceInfos.AnyAsync(u => u.Id == serviceInfoId);
         }
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
+            return ((await _context.SaveChangesAsync()) >= 0);
         }
     }
 }

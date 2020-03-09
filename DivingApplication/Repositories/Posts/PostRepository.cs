@@ -35,7 +35,7 @@ namespace DivingApplication.Repositories.Posts
             post.CreatedAt = DateTime.Now;
             post.UpdatedAt = DateTime.Now;
 
-            await _context.Posts.AddRangeAsync(post).ConfigureAwait(false);
+            await _context.Posts.AddRangeAsync(post);
         }
 
         public PageList<Post> GetPosts(PostResourceParametersWithOrderBy postResourceParameters)
@@ -125,7 +125,7 @@ namespace DivingApplication.Repositories.Posts
                 PostId = postId,
                 UserId = userId,
             };
-            await _context.AddRangeAsync(userPostLike).ConfigureAwait(false);
+            await _context.AddRangeAsync(userPostLike);
             return userPostLike;
 
         }
@@ -154,7 +154,7 @@ namespace DivingApplication.Repositories.Posts
                 PostId = postId,
                 UserId = userId,
             };
-            await _context.AddRangeAsync(userPostSave).ConfigureAwait(false);
+            await _context.AddRangeAsync(userPostSave);
             return userPostSave;
 
         }
@@ -189,11 +189,11 @@ namespace DivingApplication.Repositories.Posts
         {
             if (postId == Guid.Empty) throw new ArgumentNullException(nameof(postId));
 
-            return await _context.Posts.AnyAsync(u => u.Id == postId).ConfigureAwait(false);
+            return await _context.Posts.AnyAsync(u => u.Id == postId);
         }
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
+            return ((await _context.SaveChangesAsync()) >= 0);
         }
 
 

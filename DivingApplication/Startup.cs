@@ -107,7 +107,7 @@ namespace DivingApplication
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // Adding autoMapper service
 
-            services.AddDbContext<DivingAPIContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DivingAPIContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient);
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPostRepository, PostRepository>();

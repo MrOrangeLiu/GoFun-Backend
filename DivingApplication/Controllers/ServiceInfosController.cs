@@ -74,7 +74,7 @@ namespace DivingApplication.Controllers
         {
             if (!_propertyValidation.HasValidProperties<ServiceInfoOutputDto>(fields)) return BadRequest();
 
-            var postFromRepo = await _serviceInfoRepository.GetServiceInfo(serviceInfoId).ConfigureAwait(false);
+            var postFromRepo = await _serviceInfoRepository.GetServiceInfo(serviceInfoId);
 
             if (postFromRepo == null) return NotFound();
 
@@ -90,8 +90,8 @@ namespace DivingApplication.Controllers
 
             var postEntity = _mapper.Map<ServiceInfo>(post);
 
-            await _serviceInfoRepository.AddServiceInfo(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))).ConfigureAwait(false);
-            await _serviceInfoRepository.Save().ConfigureAwait(false);
+            await _serviceInfoRepository.AddServiceInfo(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+            await _serviceInfoRepository.Save();
 
             var serviceInfoToReturn = _mapper.Map<ServiceInfoOutputDto>(postEntity);
 
@@ -105,7 +105,7 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var serviceInfoFromRepo = await _serviceInfoRepository.GetServiceInfo(serviceInfoId).ConfigureAwait(false);
+            var serviceInfoFromRepo = await _serviceInfoRepository.GetServiceInfo(serviceInfoId);
 
             if (serviceInfoFromRepo == null) return NotFound();
 
@@ -118,9 +118,9 @@ namespace DivingApplication.Controllers
 
             _mapper.Map(serviceInfoToPatch, serviceInfoFromRepo); // Overriding
 
-            await _serviceInfoRepository.UpdateServiceInfo(serviceInfoFromRepo).ConfigureAwait(false);
+            await _serviceInfoRepository.UpdateServiceInfo(serviceInfoFromRepo);
 
-            await _serviceInfoRepository.Save().ConfigureAwait(false);
+            await _serviceInfoRepository.Save();
 
             var serviceInfoToReturn = _mapper.Map<ServiceInfoOutputDto>(serviceInfoFromRepo);
 
@@ -138,14 +138,14 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var serviceInfoFromRepo = await _serviceInfoRepository.GetServiceInfo(serviceInfoId).ConfigureAwait(false);
+            var serviceInfoFromRepo = await _serviceInfoRepository.GetServiceInfo(serviceInfoId);
 
             if (serviceInfoFromRepo == null) return NotFound();
 
             if (logginUserId != serviceInfoFromRepo.Owner.Id && (Role)Enum.Parse(typeof(Role), userRole) != Role.Admin) return Unauthorized();
 
             _serviceInfoRepository.DeleteServiceInfo(serviceInfoFromRepo);
-            await _serviceInfoRepository.Save().ConfigureAwait(false);
+            await _serviceInfoRepository.Save();
 
             return Ok(_mapper.Map<ServiceInfoOutputDto>(serviceInfoFromRepo).ShapeData(fields));
         }

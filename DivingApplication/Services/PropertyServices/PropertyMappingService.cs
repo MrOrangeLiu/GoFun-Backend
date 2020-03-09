@@ -4,6 +4,7 @@ using DivingApplication.Models.Comments;
 using DivingApplication.Models.Posts;
 using DivingApplication.Models.ServiceInfo;
 using DivingApplication.Models.Topic;
+using DivingApplication.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,7 @@ namespace DivingApplication.Services.PropertyServices
             {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
             {"AuthorId", new PropertyMappingValue(new List<string>(){"AuthorId"})},
             {"Author", new PropertyMappingValue(new List<string>(){"Author"})},
-            {"Author.Followers.Count", new PropertyMappingValue(new List<string>(){"Author.Followers.Count"})},
+            {"Author.Followers.Count", new PropertyMappingValue(new List<string>(){"Author.Followers.Count"},true)},
             {"Description", new PropertyMappingValue(new List<string>(){"Description"})},
             {"LocationImageUrls", new PropertyMappingValue(new List<string>(){"LocationImageUrls"})},
             {"SelfieUrls", new PropertyMappingValue(new List<string>(){"SelfieUrls"})},
@@ -66,7 +67,7 @@ namespace DivingApplication.Services.PropertyServices
             {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
             {"OwnerId", new PropertyMappingValue(new List<string>(){"OwnerId"})},
             {"Owner", new PropertyMappingValue(new List<string>(){"Owner"})},
-            {"Owner.Followers.Count", new PropertyMappingValue(new List<string>(){"Owner.Followers.Count"})},
+            {"Owner.Followers.Count", new PropertyMappingValue(new List<string>(){"Owner.Followers.Count"},true)},
             {"ServiceImageUrls", new PropertyMappingValue(new List<string>(){"ServiceImageUrls"})},
             {"CenterName", new PropertyMappingValue(new List<string>(){"CenterName"})},
             {"LocalCenterName", new PropertyMappingValue(new List<string>(){"LocalCenterName"})},
@@ -93,8 +94,29 @@ namespace DivingApplication.Services.PropertyServices
         {
             {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
             {"Name", new PropertyMappingValue(new List<string>(){"Name"})},
-            {"TopicPosts.Count", new PropertyMappingValue(new List<string>(){"TopicPosts.Count"})},
+            {"TopicPostsCount", new PropertyMappingValue(new List<string>(){"TopicPosts.Count"},true)},
             {"Hot", new PropertyMappingValue(new List<string>(){"Hot"})},
+            {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
+            {"UpdatedAt", new PropertyMappingValue(new List<string>(){"UpdatedAt"}, true)},
+        };
+
+
+
+        private Dictionary<string, PropertyMappingValue> _userPropertyMapping = new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
+            {"Email", new PropertyMappingValue(new List<string>(){"Id"})},
+            {"Name", new PropertyMappingValue(new List<string>(){"Name"})},
+            {"ProfileImage", new PropertyMappingValue(new List<string>(){"ProfileImage"})},
+            {"Familiarity", new PropertyMappingValue(new List<string>(){"Familiarity"})},
+            {"UserRole", new PropertyMappingValue(new List<string>(){"UserRole"})},
+            {"UserGender", new PropertyMappingValue(new List<string>(){"UserGender"})},
+
+            {"LastSeen", new PropertyMappingValue(new List<string>(){"LastSeen"})},
+            {"FollowersCount", new PropertyMappingValue(new List<string>(){"Followers.Count"}, true)},
+            {"FollowingCount", new PropertyMappingValue(new List<string>(){"Following.Count"}, true)},
+            {"OwningPostsCount", new PropertyMappingValue(new List<string>(){"OwningPosts.Count"}, true)},
+            {"OwningServiceInfosCount", new PropertyMappingValue(new List<string>(){"OwningServiceInfos.Count"}, true)},
             {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
             {"UpdatedAt", new PropertyMappingValue(new List<string>(){"UpdatedAt"}, true)},
         };
@@ -109,6 +131,7 @@ namespace DivingApplication.Services.PropertyServices
             _propertyMappings.Add(new PropertyMapping<CoachInfoOutputDto, CoachInfo>(_coachInfoPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<ServiceInfoOutputDto, ServiceInfo>(_serviceInfoPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<TopicOutputDto, Topic>(_topicPropertyMapping));
+            _propertyMappings.Add(new PropertyMapping<UserBriefOutputDto, User>(_userPropertyMapping));
         }
         public Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>()
         {
@@ -138,13 +161,7 @@ namespace DivingApplication.Services.PropertyServices
                 if (!propertyMapping.ContainsKey(propertyName)) return false;
 
             }
-
             return true;
         }
-
-
-
-
-
     }
 }

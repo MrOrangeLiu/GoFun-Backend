@@ -63,13 +63,13 @@ namespace DivingApplication.Repositories.CoachInfos
         public async Task<CoachInfo> GetCoachInfo(Guid coachId)
         {
             if (coachId == Guid.Empty) throw new ArgumentNullException(nameof(coachId));
-            return await _context.CoachInfos.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == coachId).ConfigureAwait(false);
+            return await _context.CoachInfos.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == coachId);
         }
 
         public async Task<CoachInfo> GetCoachInfoForUser(Guid userId)
         {
             if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
-            return await _context.CoachInfos.Include(c => c.Author).FirstOrDefaultAsync(c => c.AuthorId == userId).ConfigureAwait(false);
+            return await _context.CoachInfos.Include(c => c.Author).FirstOrDefaultAsync(c => c.AuthorId == userId);
         }
 
         public void UpdateCoachInfo(CoachInfo coachInfo)
@@ -86,12 +86,12 @@ namespace DivingApplication.Repositories.CoachInfos
         public async Task<bool> CoachInfoExists(Guid coachId)
         {
             if (coachId == Guid.Empty) throw new ArgumentNullException(nameof(coachId));
-            return await _context.CoachInfos.AnyAsync(c => c.Id == coachId).ConfigureAwait(false);
+            return await _context.CoachInfos.AnyAsync(c => c.Id == coachId);
         }
 
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
+            return ((await _context.SaveChangesAsync()) >= 0);
         }
 
     }

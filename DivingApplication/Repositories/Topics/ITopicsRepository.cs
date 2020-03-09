@@ -13,7 +13,7 @@ namespace DivingApplication.Repositories.Topics
         Task<Topic> GetTopic(Guid topicId);
         PageList<Topic> GetTopics(TopicResourceParameters topicResourceParameters);
         Task<bool> Save();
-        Task<bool> TopicExists(Guid topicId);
+        bool TopicExists(Guid topicId);
         Task<bool> TopicWithNameExists(string name);
         Task UpdateTopic(Topic topic);
     }

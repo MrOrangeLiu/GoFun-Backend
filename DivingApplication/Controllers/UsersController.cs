@@ -24,6 +24,8 @@ using DivingApplication.Services.PropertyServices;
 using DivingApplication.Helpers.Extensions;
 using DivingApplication.Models.CoachInfo;
 using DivingApplication.Models.ServiceInfo;
+using DivingApplication.Helpers.ResourceParameters;
+using System.Text.Json;
 
 namespace DivingApplication.Controllers
 {
@@ -68,12 +70,12 @@ namespace DivingApplication.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SingupUser([FromBody] UserForCreatingDto userForCreatingDto)
         {
-            if (await _userRepository.UserEmailExists(userForCreatingDto.Email).ConfigureAwait(false)) return BadRequest("User Already Exist");
+            if (await _userRepository.UserEmailExists(userForCreatingDto.Email)) return BadRequest("User Already Exist");
 
             var user = _mapper.Map<User>(userForCreatingDto);
 
-            await _userRepository.AddUser(user, userForCreatingDto.Password).ConfigureAwait(false);
-            await _userRepository.Save().ConfigureAwait(false);
+            await _userRepository.AddUser(user, userForCreatingDto.Password);
+            await _userRepository.Save();
 
             // Generating JWT Token
             var token = GenerateTokenForUser(user);
@@ -103,8 +105,8 @@ namespace DivingApplication.Controllers
 
             // Updating LastSeen
             user.LastSeen = DateTime.Now;
-            await _userRepository.UpdateUser(user).ConfigureAwait(false);
-            await _userRepository.Save().ConfigureAwait(false);
+            await _userRepository.UpdateUser(user);
+            await _userRepository.Save();
 
             var userToReturn = _mapper.Map<UserOutputDto>(user);
 
@@ -125,7 +127,7 @@ namespace DivingApplication.Controllers
             // Check if the updating user and the current user is the same one.
             if (Guid.Parse(logginUserId) != userId) return BadRequest();
 
-            var userFromRepo = await _userRepository.GetUser(userId).ConfigureAwait(false);
+            var userFromRepo = await _userRepository.GetUser(userId);
 
             if (userFromRepo == null) return NotFound();
 
@@ -137,8 +139,8 @@ namespace DivingApplication.Controllers
 
             _mapper.Map(userToPatch, userFromRepo); // Overriding 
             userFromRepo.LastSeen = DateTime.Now;
-            await _userRepository.UpdateUser(userFromRepo).ConfigureAwait(false); //Faking
-            await _userRepository.Save().ConfigureAwait(false);
+            await _userRepository.UpdateUser(userFromRepo); //Faking
+            await _userRepository.Save();
 
             var userToReturn = _mapper.Map<UserOutputDto>(userFromRepo);
 
@@ -156,7 +158,7 @@ namespace DivingApplication.Controllers
         [HttpGet("{userId}", Name = "GetUserById")]
         public async Task<ActionResult<UserOutputDto>> GetUser(Guid userId)
         {
-            var userFromRepo = await _userRepository.GetUser(userId).ConfigureAwait(false);
+            var userFromRepo = await _userRepository.GetUser(userId);
             if (userFromRepo == null) return NotFound();
 
             return Ok(_mapper.Map<UserOutputDto>(userFromRepo));
@@ -172,24 +174,24 @@ namespace DivingApplication.Controllers
 
             // Checking if the user Exist
 
-            var followingUser = await _userRepository.GetUser(followerUserId).ConfigureAwait(false);
+            var followingUser = await _userRepository.GetUser(followerUserId);
 
             if (followingUser == null) return NotFound();
 
-            var currentFollowStatus = await _userRepository.GetCurrentUserFollow(followerUserId, followingUserId).ConfigureAwait(false);
+            var currentFollowStatus = await _userRepository.GetCurrentUserFollow(followerUserId, followingUserId);
             bool Adding;
 
             if (currentFollowStatus == null)
             {
-                currentFollowStatus = await _userRepository.UserFollowUser(followerUserId, followingUserId).ConfigureAwait(false);
-                await _userRepository.Save().ConfigureAwait(false);
+                currentFollowStatus = await _userRepository.UserFollowUser(followerUserId, followingUserId);
+                await _userRepository.Save();
                 Adding = true;
 
             }
             else
             {
                 _userRepository.UserUnFollowUser(currentFollowStatus);
-                await _userRepository.Save().ConfigureAwait(false);
+                await _userRepository.Save();
                 Adding = false;
 
             }
@@ -215,7 +217,7 @@ namespace DivingApplication.Controllers
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var allFollowers = await _userRepository.GetAllFollowers(userId).ConfigureAwait(false);
+            var allFollowers = await _userRepository.GetAllFollowers(userId);
 
             var allFollwersToReturn = _mapper.Map<IEnumerable<UserBriefOutputDto>>(allFollowers);
 
@@ -234,7 +236,7 @@ namespace DivingApplication.Controllers
             }
 
 
-            var allFollowing = await _userRepository.GetAllFollowing(userId).ConfigureAwait(false);
+            var allFollowing = await _userRepository.GetAllFollowing(userId);
 
             var allFollowingToReturn = _mapper.Map<IEnumerable<UserBriefOutputDto>>(allFollowing);
 
@@ -252,10 +254,41 @@ namespace DivingApplication.Controllers
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var userSavePosts = await _userRepository.GetAllSavePosts(userId).ConfigureAwait(false);
+            var userSavePosts = await _userRepository.GetAllSavePosts(userId);
 
             return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userSavePosts.ShapeData(fields)));
         }
+
+
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet(Name = "GetUsers")]
+        public IActionResult GetUsers([FromQuery] UserResourceParameterts userResourceParameterts)
+        {
+            if (!_propertyMapping.ValidMappingExist<UserBriefOutputDto, User>(userResourceParameterts.OrderBy)) return BadRequest();
+            if (!_propertyValidation.HasValidProperties<UserBriefOutputDto>(userResourceParameterts.Fields)) return BadRequest();
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var usersFromRepo = _userRepository.GetUsers(userResourceParameterts, userId);
+
+            var previousPageLink = usersFromRepo.HasPrevious ? CreatePostsUri(userResourceParameterts, UriType.PreviousPage, "GetUsers") : null;
+            var nextPageLink = usersFromRepo.HasNext ? CreatePostsUri(userResourceParameterts, UriType.NextPage, "GetUsers") : null;
+
+            var metaData = new
+            {
+                totalCount = usersFromRepo.TotalCount,
+                pageSize = usersFromRepo.PageSize,
+                currentPage = usersFromRepo.CurrentPage,
+                totalPages = usersFromRepo.TotalPages,
+                previousPageLink,
+                nextPageLink,
+            };
+
+            Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
+
+            return Ok(_mapper.Map<IEnumerable<UserBriefOutputDto>>(usersFromRepo).ShapeData(userResourceParameterts.Fields));
+        }
+
 
 
 
@@ -270,7 +303,7 @@ namespace DivingApplication.Controllers
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var userLikePosts = await _userRepository.GetAllLikePosts(userId).ConfigureAwait(false);
+            var userLikePosts = await _userRepository.GetAllLikePosts(userId);
 
             return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userLikePosts.ShapeData(fields)));
         }
@@ -289,7 +322,7 @@ namespace DivingApplication.Controllers
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var userOwningPosts = await _userRepository.GetAllOwningPost(userId).ConfigureAwait(false);
+            var userOwningPosts = await _userRepository.GetAllOwningPost(userId);
 
             return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(userOwningPosts.ShapeData(fields)));
         }
@@ -306,7 +339,7 @@ namespace DivingApplication.Controllers
             }
 
 
-            var userCoachInfo = await _userRepository.GetCoachInfoForUser(userId).ConfigureAwait(false);
+            var userCoachInfo = await _userRepository.GetCoachInfoForUser(userId);
 
             return Ok(_mapper.Map<IEnumerable<CoachInfoOutputDto>>(userCoachInfo.ShapeData(fields)));
         }
@@ -323,7 +356,7 @@ namespace DivingApplication.Controllers
                 userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            var userServiceInfo = await _userRepository.GetServiceInfoForUser(userId).ConfigureAwait(false);
+            var userServiceInfo = await _userRepository.GetServiceInfoForUser(userId);
 
             return Ok(_mapper.Map<IEnumerable<ServiceInfoOutputDto>>(userServiceInfo.ShapeData(fields)));
         }
@@ -349,8 +382,8 @@ namespace DivingApplication.Controllers
             // Saving it to Db
             userFromRepo.EmailVerificationCode = code;
             userFromRepo.LastSeen = DateTime.Now;
-            await _userRepository.UpdateUser(userFromRepo).ConfigureAwait(false);
-            await _userRepository.Save().ConfigureAwait(false);
+            await _userRepository.UpdateUser(userFromRepo);
+            await _userRepository.Save();
 
             var sendingMessage = new MimeMessage
             {
@@ -373,13 +406,13 @@ namespace DivingApplication.Controllers
 
                 smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls).ConfigureAwait(false);
+                await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls);
 
-                await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword).ConfigureAwait(false);
+                await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword);
 
-                await smtp.SendAsync(sendingMessage).ConfigureAwait(false);
+                await smtp.SendAsync(sendingMessage);
 
-                await smtp.DisconnectAsync(true).ConfigureAwait(false);
+                await smtp.DisconnectAsync(true);
 
             }
 
@@ -396,7 +429,7 @@ namespace DivingApplication.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var userFromRepo = await _userRepository.GetUser(userId).ConfigureAwait(false);
+            var userFromRepo = await _userRepository.GetUser(userId);
 
             if (userFromRepo == null) return NotFound();
 
@@ -408,13 +441,15 @@ namespace DivingApplication.Controllers
 
             userFromRepo.UserRole = Role.Normal;
 
-            _userRepository.Save().ConfigureAwait(false);
+            _userRepository.Save();
 
             var userToReturn = _mapper.Map<UserOutputDto>(userFromRepo);
 
             return Ok(userToReturn);
 
         }
+
+
 
 
 
@@ -537,6 +572,11 @@ namespace DivingApplication.Controllers
             }
 
             return builder.ToString();
+        }
+
+        private string CreatePostsUri(UserResourceParameterts userResrouceParameters, UriType uriType, string routeName)
+        {
+            return Url.Link(routeName, userResrouceParameters.CreateUrlParameters(uriType));
         }
 
     }

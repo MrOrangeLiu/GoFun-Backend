@@ -36,7 +36,7 @@ namespace DivingApplication.Repositories.Comments
             comment.CreatedAt = DateTime.Now;
             comment.UpdatedAt = DateTime.Now;
 
-            await _context.Comments.AddRangeAsync(comment).ConfigureAwait(false);
+            await _context.Comments.AddRangeAsync(comment);
         }
 
         public async Task<Comment> GetComment(Guid commentId)
@@ -77,12 +77,12 @@ namespace DivingApplication.Repositories.Comments
         public async Task<bool> CommentExists(Guid commentId)
         {
             if (commentId == Guid.Empty) throw new ArgumentNullException(nameof(commentId));
-            return await _context.Comments.AnyAsync(c => c.Id == commentId).ConfigureAwait(false);
+            return await _context.Comments.AnyAsync(c => c.Id == commentId);
         }
 
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
+            return ((await _context.SaveChangesAsync()) >= 0);
         }
 
 

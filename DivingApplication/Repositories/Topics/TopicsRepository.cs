@@ -31,7 +31,7 @@ namespace DivingApplication.Repositories.Topics
             topic.CreatedAt = DateTime.Now;
             topic.UpdatedAt = DateTime.Now;
 
-            await _context.Topics.AddRangeAsync(topic).ConfigureAwait(false);
+            await _context.Topics.AddRangeAsync(topic);
         }
 
 
@@ -44,6 +44,8 @@ namespace DivingApplication.Repositories.Topics
 
             //_context.Topics.Include(t => t.TopicPosts.Select(t => t.Post));
             //_context.Topics.Include("TopicPosts.Post");
+
+
 
             if (!string.IsNullOrWhiteSpace(topicResourceParameters.SearchQuery))
             {
@@ -67,6 +69,13 @@ namespace DivingApplication.Repositories.Topics
                 collection = collection.ApplySort(topicResourceParameters.OrderBy, postPropertyMappingDictionary);
             }
 
+
+            if (!string.IsNullOrWhiteSpace(topicResourceParameters.SearchQuery))
+            {
+                string searchinQuery = topicResourceParameters.SearchQuery.Trim().ToLower();
+                collection = collection.OrderBy(t => t.Name.ToLower() == searchinQuery ? 0 : 1);
+            }
+
             return PageList<Topic>.Create(collection, topicResourceParameters.PageNumber, topicResourceParameters.PageSize);
         }
 
@@ -86,11 +95,11 @@ namespace DivingApplication.Repositories.Topics
 
             _context.Topics.Remove(topic);
         }
-        public async Task<bool> TopicExists(Guid topicId)
+        public bool TopicExists(Guid topicId)
         {
             if (topicId == Guid.Empty) throw new ArgumentNullException(nameof(topicId));
 
-            return await _context.Topics.AnyAsync(t => t.Id == topicId).ConfigureAwait(false);
+            return _context.Topics.Any(t => t.Id == topicId);
 
         }
 
@@ -98,13 +107,13 @@ namespace DivingApplication.Repositories.Topics
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            return await _context.Topics.AnyAsync(t => t.Name == name).ConfigureAwait(false);
+            return await _context.Topics.AnyAsync(t => t.Name == name);
         }
 
 
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
+            return ((await _context.SaveChangesAsync()) >= 0);
         }
 
     }

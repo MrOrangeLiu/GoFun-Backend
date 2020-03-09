@@ -85,8 +85,8 @@ namespace DivingApplication.Controllers
         {
             var commentEntity = _mapper.Map<Comment>(comment);
 
-            await _commentRepository.AddComment(commentEntity, postId, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))).ConfigureAwait(false);
-            await _commentRepository.Save().ConfigureAwait(false);
+            await _commentRepository.AddComment(commentEntity, postId, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+            await _commentRepository.Save();
 
             var commentToReturn = _mapper.Map<CommentOutputDto>(commentEntity);
 
@@ -102,7 +102,7 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var commentFromRepo = await _commentRepository.GetComment(commentId).ConfigureAwait(false);
+            var commentFromRepo = await _commentRepository.GetComment(commentId);
 
             if (commentFromRepo == null) return NotFound();
 
@@ -117,7 +117,7 @@ namespace DivingApplication.Controllers
 
             _commentRepository.UpdateComment(commentFromRepo);
 
-            await _commentRepository.Save().ConfigureAwait(false);
+            await _commentRepository.Save();
 
             var commentToReturn = _mapper.Map<CommentOutputDto>(commentFromRepo);
 
@@ -136,12 +136,12 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var commentFromRepo = await _commentRepository.GetComment(commentId).ConfigureAwait(false);
+            var commentFromRepo = await _commentRepository.GetComment(commentId);
 
             if (commentFromRepo == null) return NotFound();
 
             _commentRepository.DeleteComment(commentFromRepo);
-            await _commentRepository.Save().ConfigureAwait(false);
+            await _commentRepository.Save();
 
             return Ok(_mapper.Map<CommentOutputDto>(commentFromRepo).ShapeData(fields));
         }

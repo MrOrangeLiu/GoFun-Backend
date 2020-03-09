@@ -78,7 +78,7 @@ namespace DivingApplication.Controllers
 
             if (!_propertyValidation.HasValidProperties<CoachInfoOutputDto>(fields)) return BadRequest();
 
-            var coachInfoFromRepo = await _coachInfosRepository.GetCoachInfo(coachInfoId).ConfigureAwait(false);
+            var coachInfoFromRepo = await _coachInfosRepository.GetCoachInfo(coachInfoId);
 
             var coachInfoToReturn = _mapper.Map<CoachInfoOutputDto>(coachInfoFromRepo);
 
@@ -95,8 +95,8 @@ namespace DivingApplication.Controllers
 
             var coachInfoEntity = _mapper.Map<CoachInfo>(coachInfo);
 
-            await _coachInfosRepository.AddCoachInfo(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), coachInfoEntity).ConfigureAwait(false);
-            await _coachInfosRepository.Save().ConfigureAwait(false);
+            await _coachInfosRepository.AddCoachInfo(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), coachInfoEntity);
+            await _coachInfosRepository.Save();
 
             var coachInfoToReturn = _mapper.Map<CoachInfoOutputDto>(coachInfoEntity);
 
@@ -112,7 +112,7 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var coachInfoFromRepo = await _coachInfosRepository.GetCoachInfo(coachInfoId).ConfigureAwait(false);
+            var coachInfoFromRepo = await _coachInfosRepository.GetCoachInfo(coachInfoId);
 
             if (coachInfoFromRepo == null) return NotFound();
 
@@ -127,7 +127,7 @@ namespace DivingApplication.Controllers
 
             _coachInfosRepository.UpdateCoachInfo(coachInfoFromRepo);
 
-            await _coachInfosRepository.Save().ConfigureAwait(false);
+            await _coachInfosRepository.Save();
 
             var postToReturn = _mapper.Map<CoachInfoOutputDto>(coachInfoFromRepo);
 
@@ -149,14 +149,14 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var postFromRepo = await _coachInfosRepository.GetCoachInfo(coachInfoId).ConfigureAwait(false);
+            var postFromRepo = await _coachInfosRepository.GetCoachInfo(coachInfoId);
 
             if (postFromRepo == null) return NotFound();
 
             if (logginUserId != postFromRepo.AuthorId && (Role)Enum.Parse(typeof(Role), userRole) != Role.Admin) return Unauthorized();
 
             _coachInfosRepository.DeleteCoachInfo(postFromRepo);
-            await _coachInfosRepository.Save().ConfigureAwait(false);
+            await _coachInfosRepository.Save();
 
             return Ok(_mapper.Map<CoachInfoOutputDto>(postFromRepo).ShapeData(fields));
         }

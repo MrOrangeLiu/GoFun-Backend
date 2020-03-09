@@ -150,7 +150,7 @@ namespace DivingApplication.Controllers
 
 
 
-            await _postRepository.AddPost(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))).ConfigureAwait(false);
+            await _postRepository.AddPost(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
 
             // Adding Tags
             foreach (var pt in post.PostTopics)
@@ -171,7 +171,7 @@ namespace DivingApplication.Controllers
                 });
             }
 
-            await _postRepository.Save().ConfigureAwait(false);
+            await _postRepository.Save();
 
             var postToReturn = _mapper.Map<PostOutputDto>(postEntity);
 
@@ -185,7 +185,7 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var postFromRepo = await _postRepository.GetPost(postId).ConfigureAwait(false);
+            var postFromRepo = await _postRepository.GetPost(postId);
 
             if (postFromRepo == null) return NotFound();
 
@@ -198,9 +198,9 @@ namespace DivingApplication.Controllers
 
             _mapper.Map(postToPatch, postFromRepo); // Overriding
 
-            await _postRepository.UpdatePost(postFromRepo).ConfigureAwait(false);
+            await _postRepository.UpdatePost(postFromRepo);
 
-            await _postRepository.Save().ConfigureAwait(false);
+            await _postRepository.Save();
 
             var postToReturn = _mapper.Map<PostOutputDto>(postFromRepo);
 
@@ -218,14 +218,14 @@ namespace DivingApplication.Controllers
             var logginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var postFromRepo = await _postRepository.GetPost(postId).ConfigureAwait(false);
+            var postFromRepo = await _postRepository.GetPost(postId);
 
             if (postFromRepo == null) return NotFound();
 
             if (logginUserId != postFromRepo.AuthorId && (Role)Enum.Parse(typeof(Role), userRole) != Role.Admin) return Unauthorized();
 
             _postRepository.DeletePost(postFromRepo);
-            await _postRepository.Save().ConfigureAwait(false);
+            await _postRepository.Save();
 
             return Ok(_mapper.Map<PostOutputDto>(postFromRepo).ShapeData(fields));
         }
@@ -239,7 +239,7 @@ namespace DivingApplication.Controllers
 
             // Checking if the post Exist
 
-            var post = await _postRepository.GetPost(postId).ConfigureAwait(false);
+            var post = await _postRepository.GetPost(postId);
 
             if (post == null) return NotFound();
 
@@ -249,14 +249,14 @@ namespace DivingApplication.Controllers
             if (currentPostLike == null)
             {
                 currentPostLike = await _postRepository.UserLikePost(userId, postId);
-                await _postRepository.Save().ConfigureAwait(false);
+                await _postRepository.Save();
                 Adding = true;
 
             }
             else
             {
                 _postRepository.UserUnlikeAPost(currentPostLike);
-                await _postRepository.Save().ConfigureAwait(false);
+                await _postRepository.Save();
                 Adding = false;
 
             }

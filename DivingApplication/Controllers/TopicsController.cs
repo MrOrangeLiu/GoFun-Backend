@@ -73,13 +73,12 @@ namespace DivingApplication.Controllers
         {
             if (!_propertyValidation.HasValidProperties<TopicOutputDto>(fields)) return BadRequest();
 
-            var topicFromRepo = await _topicsRepository.GetTopic(topicId).ConfigureAwait(false);
+            var topicFromRepo = await _topicsRepository.GetTopic(topicId);
 
             if (topicFromRepo == null) return NotFound();
 
             return Ok(_mapper.Map<TopicOutputDto>(topicFromRepo).ShapeData(fields));
         }
-
 
         [Authorize(Policy = "VerifiedUsers")]
         [HttpPost]
@@ -88,13 +87,13 @@ namespace DivingApplication.Controllers
 
             if (!_propertyValidation.HasValidProperties<TopicOutputDto>(fields)) return BadRequest();
 
-            if (await _topicsRepository.TopicWithNameExists(topic.Name).ConfigureAwait(false)) return BadRequest();
+            if (await _topicsRepository.TopicWithNameExists(topic.Name)) return BadRequest();
 
             var topicEntity = _mapper.Map<Topic>(topic);
 
-            await _topicsRepository.AddTopic(topicEntity).ConfigureAwait(false);
+            await _topicsRepository.AddTopic(topicEntity);
 
-            await _topicsRepository.Save().ConfigureAwait(false);
+            await _topicsRepository.Save();
 
             var topicToReturn = _mapper.Map<TopicOutputDto>(topicEntity);
 
@@ -108,7 +107,7 @@ namespace DivingApplication.Controllers
 
             // Usually We don't want to change the name of Topics
 
-            var topicFromRepo = await _topicsRepository.GetTopic(topicId).ConfigureAwait(false);
+            var topicFromRepo = await _topicsRepository.GetTopic(topicId);
 
             if (topicFromRepo == null) return NotFound();
 
@@ -119,9 +118,9 @@ namespace DivingApplication.Controllers
 
             _mapper.Map(postToPatch, topicFromRepo); // Overriding
 
-            await _topicsRepository.UpdateTopic(topicFromRepo).ConfigureAwait(false);
+            await _topicsRepository.UpdateTopic(topicFromRepo);
 
-            await _topicsRepository.Save().ConfigureAwait(false);
+            await _topicsRepository.Save();
 
             var topicToReturn = _mapper.Map<TopicOutputDto>(topicFromRepo);
 
@@ -137,12 +136,12 @@ namespace DivingApplication.Controllers
         public async Task<IActionResult> DeleteTopic(Guid topicId, [FromQuery] string fields)
         {
 
-            var topicToReturn = await _topicsRepository.GetTopic(topicId).ConfigureAwait(false);
+            var topicToReturn = await _topicsRepository.GetTopic(topicId);
 
             if (topicToReturn == null) return NotFound();
 
             _topicsRepository.DeleteTopic(topicToReturn);
-            await _topicsRepository.Save().ConfigureAwait(false);
+            await _topicsRepository.Save();
 
             return Ok(_mapper.Map<TopicOutputDto>(topicToReturn).ShapeData(fields));
         }

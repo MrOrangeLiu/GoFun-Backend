@@ -5,6 +5,7 @@ using DivingApplication.Helpers;
 using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Models.Posts;
+using DivingApplication.Models.Users;
 using DivingApplication.Services.PropertyServices;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -68,7 +69,7 @@ namespace DivingApplication.Repositories.Users
             user.CreatedAt = DateTime.Now;
             user.LastSeen = DateTime.Now;
 
-            await _context.Users.AddRangeAsync(user).ConfigureAwait(false);
+            await _context.Users.AddRangeAsync(user);
 
         }
 
@@ -93,7 +94,7 @@ namespace DivingApplication.Repositories.Users
         {
             if (userId == null) throw new ArgumentNullException(nameof(userId));
 
-            var user = await _context.Users.Include(u => u.OwningServiceInfos).FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.OwningServiceInfos).FirstOrDefaultAsync(u => u.Id == userId);
 
             return user.OwningServiceInfos;
         }
@@ -116,7 +117,7 @@ namespace DivingApplication.Repositories.Users
         {
             if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
 
-            return await _context.Users.AnyAsync(u => u.Id == userId).ConfigureAwait(false);
+            return await _context.Users.AnyAsync(u => u.Id == userId);
         }
 
 
@@ -124,12 +125,12 @@ namespace DivingApplication.Repositories.Users
         {
             if (email == null) throw new ArgumentNullException(nameof(email));
 
-            return await _context.Users.AnyAsync(u => u.Email == email).ConfigureAwait(false);
+            return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
         public async Task<bool> Save()
         {
-            return ((await _context.SaveChangesAsync().ConfigureAwait(false)) >= 0);
+            return ((await _context.SaveChangesAsync()) >= 0);
             // if the SaveChanges returns negative int, then it fail to save 
         }
 
@@ -153,7 +154,7 @@ namespace DivingApplication.Repositories.Users
                 FollowingId = followingId,
             };
 
-            await _context.AddRangeAsync(userFollow).ConfigureAwait(false);
+            await _context.AddRangeAsync(userFollow);
             return userFollow;
         }
 
@@ -164,83 +165,127 @@ namespace DivingApplication.Repositories.Users
 
         public async Task<IEnumerable<User>> GetAllFollowers(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.Followers).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.Followers).SingleOrDefaultAsync(u => u.Id == userId);
             return user.Followers.Select(uf => uf.Follower).ToList();
         }
 
 
         public async Task<IEnumerable<User>> GetAllFollowing(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.Following).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.Following).SingleOrDefaultAsync(u => u.Id == userId);
             return user.Following.Select(uf => uf.Following).ToList();
         }
 
         public async Task<IEnumerable<Post>> GetAllSavePosts(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.SavePosts).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.SavePosts).SingleOrDefaultAsync(u => u.Id == userId);
             var allPostId = user.SavePosts.Select(sp => sp.PostId).ToList();
-            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync().ConfigureAwait(false);
+            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync();
         }
 
 
         public async Task<IEnumerable<Post>> GetAllLikePosts(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.LikePosts).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.LikePosts).SingleOrDefaultAsync(u => u.Id == userId);
             var allPostId = user.LikePosts.Select(sp => sp.PostId).ToList();
-            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync().ConfigureAwait(false);
+            return await _context.Posts.Where(p => allPostId.Contains(p.Id)).ToListAsync();
 
         }
 
         public async Task<IEnumerable<Post>> GetAllOwningPost(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.OwningPosts).SingleOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.OwningPosts).SingleOrDefaultAsync(u => u.Id == userId);
             return user.OwningPosts;
         }
 
         public async Task<CoachInfo> GetCoachInfoForUser(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.CoachInfo).FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.CoachInfo).FirstOrDefaultAsync(u => u.Id == userId);
             return user.CoachInfo;
         }
 
 
         public async Task<IEnumerable<ServiceInfo>> GetServiceInfoForUser(Guid userId)
         {
-            var user = await _context.Users.Include(u => u.OwningServiceInfos).FirstOrDefaultAsync(u => u.Id == userId).ConfigureAwait(false);
+            var user = await _context.Users.Include(u => u.OwningServiceInfos).FirstOrDefaultAsync(u => u.Id == userId);
             return user.OwningServiceInfos;
         }
 
-        //public async Task RemoveAllUserFollow()
-        //{
-        //    var users = await _context.Users.Include(u => u.Followers).ToListAsync();
+        public PageList<User> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId)
+        {
+            var loginUser = _context.Users
+                .Include(u => u.Followers)
+                .Include(u => u.Following)
+                .Include(u => u.UserChatRooms)
+                .ThenInclude(c => c.ChatRoom)
+                .ThenInclude(c => c.UserChatRooms)
+                .SingleOrDefault(u => u.Id == loginUserId);
 
-        //    foreach (var u in users)
-        //    {
-        //        foreach (var f in u.Followers)
-        //        {
-        //            var uf = (UserFollow)await _context.FindAsync(typeof(UserFollow), f.FollowerId, f.FollowingId);
+            if (loginUser == null) throw new Exception(message: "Cannot find the user");
 
-        //            if (uf != null)
-        //            {
-        //                _context.Remove(uf);
-        //            }
+            if (userResourceParameters == null) throw new ArgumentNullException(nameof(userResourceParameters));
 
-        //        }
+            var collection = _context.Users as IQueryable<User>;
 
-        //        foreach (var f in u.Following)
-        //        {
-        //            var uf = (UserFollow)await _context.FindAsync(typeof(UserFollow), f.FollowerId, f.FollowingId);
+            if (!string.IsNullOrWhiteSpace(userResourceParameters.SearchQuery))
+            {
+                string searchinQuery = userResourceParameters.SearchQuery.Trim().ToLower();
+                collection = collection.Where(p => p.Name.ToLower().Contains(searchinQuery) || p.Email.Contains(searchinQuery));
+            }
 
-        //            if (uf != null)
-        //            {
-        //                _context.Remove(uf);
-        //            }
+            var removedString = "familiarity";
+            var indexOfHot = userResourceParameters.OrderBy.IndexOf(removedString, StringComparison.OrdinalIgnoreCase);
+            userResourceParameters.OrderBy = (indexOfHot < 0) ? userResourceParameters.OrderBy : userResourceParameters.OrderBy.Remove(indexOfHot, removedString.Length);
 
-        //        }
-        //    }
+            var stringNullTest = string.IsNullOrWhiteSpace(userResourceParameters.OrderBy);
 
-        //    await _context.SaveChangesAsync();
-        //}
+            if (!stringNullTest)
+            {
+                var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<UserBriefOutputDto, User>();
+                collection = collection.ApplySort(userResourceParameters.OrderBy, postPropertyMappingDictionary);
+            }
+
+            if (indexOfHot >= 0)
+            {
+                // Familiar Algorithm
+
+                if (loginUser == null) throw new ArgumentNullException(nameof(loginUser));
+
+                var followingUsers = loginUser.Following.Select(f => f.FollowingId);
+                var followerUsers = loginUser.Followers.Select(f => f.FollowerId);
+                var chatRoomUsers = loginUser.UserChatRooms.SelectMany(c => c.ChatRoom.UserChatRooms.Select(ucr => ucr.UserId).Where(uid => uid != loginUser.Id));
+
+
+                collection = collection.OrderByDescending(u =>
+                              (followingUsers.Contains(u.Id) ? 0 : 1) +
+                              (followerUsers.Contains(u.Id) ? 0 : 1) +
+                              (chatRoomUsers.Contains(u.Id) ? 0 : 1)
+                              );
+
+                // Checking if the user is the followers, followings or the one in the same chatRooms,
+                //collection = collection.OrderBy(u =>
+                //(
+                //        loginUser.Following.Select(f => f.FollowingId).Contains(u.Id) ||
+                //        loginUser.Followers.Select(f => f.FollowerId).Contains(u.Id)
+                //                //loginUser.UserChatRooms.
+                //                //        SelectMany(c => c.ChatRoom.UserChatRooms.Select(ucr => ucr.UserId).Where(uid => uid != loginUser.Id)).Contains(u.Id)
+                //                )
+                //                ? 0 : 1
+                //                );
+
+            } // it has familiarity sort
+
+            // if it match an Email, put it at first
+            if (!string.IsNullOrWhiteSpace(userResourceParameters.SearchQuery))
+            {
+                // We don't need exact match, only need familiarity
+                string searchinQuery = userResourceParameters.SearchQuery.Trim().ToLower();
+                collection = collection.OrderBy(u => u.Email.ToLower() == searchinQuery ? 0 : 1);
+            }
+
+            return PageList<User>.Create(collection, userResourceParameters.PageNumber, userResourceParameters.PageSize);
+        }
+
 
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
