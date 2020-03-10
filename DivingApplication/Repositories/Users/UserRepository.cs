@@ -134,6 +134,12 @@ namespace DivingApplication.Repositories.Users
             // if the SaveChanges returns negative int, then it fail to save 
         }
 
+        public bool SaveForJwt()
+        {
+            return (_context.SaveChanges() >= 0);
+            // if the SaveChanges returns negative int, then it fail to save 
+        }
+
 
         public async Task<UserFollow> GetCurrentUserFollow(Guid followerId, Guid followingId)
         {
@@ -211,15 +217,15 @@ namespace DivingApplication.Repositories.Users
             return user.OwningServiceInfos;
         }
 
-        public PageList<User> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId)
+        public async Task<PageList<User>> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId)
         {
-            var loginUser = _context.Users
-                .Include(u => u.Followers)
-                .Include(u => u.Following)
+            var loginUser = await _context.Users
                 .Include(u => u.UserChatRooms)
                 .ThenInclude(c => c.ChatRoom)
                 .ThenInclude(c => c.UserChatRooms)
-                .SingleOrDefault(u => u.Id == loginUserId);
+                .Include(u => u.Followers)
+                .Include(u => u.Following)
+                .SingleOrDefaultAsync(u => u.Id == loginUserId);
 
             if (loginUser == null) throw new Exception(message: "Cannot find the user");
 

@@ -24,8 +24,9 @@ namespace DivingApplication.Repositories.Users
         Task<List<ServiceInfo>> GetServiceInfosForUser(Guid userId);
         Task<User> GetUser(Guid userId);
         User GetUserForJwt(Guid userId);
-        PageList<User> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId);
+        Task<PageList<User>> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId);
         Task<bool> Save();
+        bool SaveForJwt();
         Task UpdateUser(User user);
         Task<bool> UserEmailExists(string email);
         Task<bool> UserExists(Guid userId);

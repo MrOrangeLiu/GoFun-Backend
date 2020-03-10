@@ -262,14 +262,14 @@ namespace DivingApplication.Controllers
 
         [Authorize(Policy = "VerifiedUsers")]
         [HttpGet(Name = "GetUsers")]
-        public IActionResult GetUsers([FromQuery] UserResourceParameterts userResourceParameterts)
+        public async Task<IActionResult> GetUsers([FromQuery] UserResourceParameterts userResourceParameterts)
         {
             if (!_propertyMapping.ValidMappingExist<UserBriefOutputDto, User>(userResourceParameterts.OrderBy)) return BadRequest();
             if (!_propertyValidation.HasValidProperties<UserBriefOutputDto>(userResourceParameterts.Fields)) return BadRequest();
 
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var usersFromRepo = _userRepository.GetUsers(userResourceParameterts, userId);
+            var usersFromRepo = await _userRepository.GetUsers(userResourceParameterts, userId);
 
             var previousPageLink = usersFromRepo.HasPrevious ? CreatePostsUri(userResourceParameterts, UriType.PreviousPage, "GetUsers") : null;
             var nextPageLink = usersFromRepo.HasNext ? CreatePostsUri(userResourceParameterts, UriType.NextPage, "GetUsers") : null;

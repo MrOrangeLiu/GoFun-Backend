@@ -10,10 +10,7 @@ namespace DivingApplication.Models.Posts
     [ContentURLAmountLimit(ErrorMessage = "The ContentType or PostContentURL is not valid")]
     public class PostForCreatingDto
     {
-        [Required]
-        [MinLength(4)]
-        [MaxLength(64)]
-        public string Title { get; set; }
+
         [MaxLength(2048)]
         public string Description { get; set; }
         [Required]

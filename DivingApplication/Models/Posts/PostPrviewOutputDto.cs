@@ -14,11 +14,6 @@ namespace DivingApplication.Models.Posts
         [Key]
         public Guid Id { get; set; }
 
-        [Required]
-        [MinLength(4)]
-        [MaxLength(64)]
-
-        public string Title { get; set; }
         [MaxLength(2048)]
         public string Description { get; set; }
         public string PostContentType { get; set; }

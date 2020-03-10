@@ -19,7 +19,7 @@ namespace DivingApplication.Entities
         public enum ContentType
         {
             Image,
-            Vedio,
+            video,
         }
 
 

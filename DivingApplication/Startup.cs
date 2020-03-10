@@ -76,8 +76,7 @@ namespace DivingApplication
 
                      // Update the LastSeen
                      user.LastSeen = DateTime.Now;
-                     userService.UpdateUser(user);
-                     userService.Save();
+                     userService.SaveForJwt();
 
                      if (user == null)
                      {
