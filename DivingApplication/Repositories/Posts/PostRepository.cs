@@ -47,7 +47,7 @@ namespace DivingApplication.Repositories.Posts
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
                 string searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
-                collection = collection.Where(p => p.Title.ToLower().Contains(searchinQuery));
+                collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
             }
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
@@ -63,12 +63,20 @@ namespace DivingApplication.Repositories.Posts
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
-            var collection = _context.Posts as IQueryable<Post>;
+            var collection = _context.Posts
+                .Include(p => p.Author)
+                .Include(p => p.Comments)
+                .Include(p => p.PostLikedBy)
+                .Include(p => p.PostSavedBy)
+                .Include(p => p.PostTopics)
+                .ThenInclude(t => t.Topic)
+                .Include(p => p.TaggedUsers)
+                .ThenInclude(u => u.User) as IQueryable<Post>;
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
                 string searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
-                collection = collection.Where(p => p.Title.ToLower().Contains(searchinQuery));
+                collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
             }
 
             // Using the Hot Algorithm
@@ -94,7 +102,7 @@ namespace DivingApplication.Repositories.Posts
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
                 var searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
-                collection = collection.Where(p => p.Title.ToLower().Contains(searchinQuery));
+                collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
             }
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))

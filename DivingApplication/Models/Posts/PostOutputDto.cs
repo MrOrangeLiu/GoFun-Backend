@@ -21,7 +21,8 @@ namespace DivingApplication.Models.Posts
         public string Description { get; set; }
         public string PostContentType { get; set; }
 
-        [Url]
+        public string PreviewURL { get; set; }
+
         public List<string> ContentURL { get; set; } = new List<string>();
 
         [ForeignKey("AuthorId")]

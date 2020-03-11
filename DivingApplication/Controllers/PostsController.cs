@@ -62,7 +62,7 @@ namespace DivingApplication.Controllers
 
             Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
 
-            return Ok(_mapper.Map<IEnumerable<PostPrviewOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
         }
 
 
@@ -90,7 +90,7 @@ namespace DivingApplication.Controllers
 
             Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
 
-            return Ok(_mapper.Map<IEnumerable<PostPrviewOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
         }
 
         [Authorize(Policy = "VerifiedUsers")]
@@ -153,7 +153,7 @@ namespace DivingApplication.Controllers
             await _postRepository.AddPost(postEntity, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
 
             // Adding Tags
-            foreach (var pt in post.PostTopics)
+            foreach (var pt in post.PostTopicsIds)
             {
                 postEntity.PostTopics.Add(new Entities.ManyToManyEntities.PostTopic
                 {
@@ -162,7 +162,7 @@ namespace DivingApplication.Controllers
                 });
             }
 
-            foreach (var tu in post.TaggedUsers)
+            foreach (var tu in post.TaggedUsersIds)
             {
                 postEntity.TaggedUsers.Add(new Entities.ManyToManyEntities.UserPostTag
                 {

@@ -18,7 +18,8 @@ namespace DivingApplication.Models.Posts
         public string Description { get; set; }
         public string PostContentType { get; set; }
 
-        [Url]
+        public string PreviewURL { get; set; }
+
         public List<string> ContentURL { get; set; } = new List<string>(); // Changing to Prviews
 
         [ForeignKey("AuthorId")]
@@ -26,15 +27,9 @@ namespace DivingApplication.Models.Posts
         public Guid AuthorId { get; set; } // Include Author
 
         public int PostLikedCount { get; set; }
-        public int PostSavedCount { get; set; }
-        public int CommentCount { get; set; }
-        public int Views { get; set; }
         public string LocationAddress { get; set; }
-        public string LatLng { get; set; }
 
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
 
         public List<TopicOutputDto> PostTopics { get; set; } = new List<TopicOutputDto>();
         public List<UserTaggedOutputDto> TaggedUsers { get; set; } = new List<UserTaggedOutputDto>();

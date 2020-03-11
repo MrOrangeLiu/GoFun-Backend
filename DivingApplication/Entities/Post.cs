@@ -26,16 +26,12 @@ namespace DivingApplication.Entities
         [Key]
         public Guid Id { get; set; }
 
-        [Required]
-        [MinLength(4)]
-        [MaxLength(64)]
-
-        public string Title { get; set; }
         [MaxLength(2048)]
         public string Description { get; set; }
         public ContentType PostContentType { get; set; }
 
-        [Url]
+        public string PreviewURL { get; set; }
+
         public string ContentURL { get; set; }
 
         [ForeignKey("AuthorId")]
