@@ -23,7 +23,7 @@ namespace DivingApplication.Validations
                     if (urlList.Count > 9) return new ValidationResult("Cannot have more than 9 images in a post", new[] { "PostForCreatingDto" });
                     break;
 
-                case ContentType.video:
+                case ContentType.Video:
                     if (urlList.Count > 1) return new ValidationResult("Cannot have more than 1 video in a post", new[] { "PostForCreatingDto" });
                     break;
                 default:
