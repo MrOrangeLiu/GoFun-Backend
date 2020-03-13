@@ -78,7 +78,17 @@ namespace DivingApplication.Repositories.Users
             if (userId == null)
                 throw new ArgumentNullException(nameof(userId));
 
-            return await _context.Users.FindAsync(userId);
+            return _context.Users.Include(u => u.LikePosts) // What will happend?
+                                     .Include(u => u.SavePosts)
+                                     .Include(u => u.Followers)
+                                     .Include(u => u.Following)
+                                     .Include(u => u.OwingComments)
+                                     .Include(u => u.OwningPosts)
+                                     .Include(u => u.OwningServiceInfos)
+                                     .Include(c => c.CoachInfo)
+                                     .SingleOrDefault(x => x.Id == userId);
+
+            //return await _context.Users.FindAsync(userId);
         }
 
 

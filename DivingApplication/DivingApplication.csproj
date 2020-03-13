@@ -25,6 +25,12 @@
     <Compile Remove="Migrations\20200225121531_comment_1.Designer.cs" />
     <Compile Remove="Migrations\20200225122655_comment_1.cs" />
     <Compile Remove="Migrations\20200225122655_comment_1.Designer.cs" />
+    <Compile Remove="Migrations\20200313150339_backToBytes.cs" />
+    <Compile Remove="Migrations\20200313150339_backToBytes.Designer.cs" />
+    <Compile Remove="Migrations\20200313150725_test.cs" />
+    <Compile Remove="Migrations\20200313150725_test.Designer.cs" />
+    <Compile Remove="Migrations\20200313151708_removeProfileIamge.cs" />
+    <Compile Remove="Migrations\20200313151708_removeProfileIamge.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
