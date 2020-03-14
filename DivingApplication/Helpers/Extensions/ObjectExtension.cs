@@ -31,7 +31,7 @@ namespace DivingApplication.Helpers.Extensions
             }
 
 
-            var fieldsAfterSplit = fields.Split(",");
+            var fieldsAfterSplit = fields.Split(",").Select(s => s.Trim()).Where(s => !string.IsNullOrWhiteSpace(s));
             foreach (var filed in fieldsAfterSplit) // Adding the info of the required properties to the list
             {
                 var propertyName = filed.Trim();

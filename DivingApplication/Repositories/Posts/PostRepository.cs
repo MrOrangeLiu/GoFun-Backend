@@ -9,6 +9,7 @@ using DivingApplication.Services.PropertyServices;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,6 +51,7 @@ namespace DivingApplication.Repositories.Posts
                 collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
             }
 
+
             if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
@@ -79,12 +81,41 @@ namespace DivingApplication.Repositories.Posts
                 collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
             }
 
-            // Using the Hot Algorithm
-            collection.OrderByDescending(p =>
-             ((p.Views * 1) + (p.PostLikedBy.Count * 5) + (p.PostSavedBy.Count * 25) + (p.Comments.Count * 30)) / Math.Pow(2.718281828, (double)(DateTime.Now.Subtract(p.CreatedAt).Hours))
-            );
+
+
+            var currentTime = DateTime.Now;
+            //var CurrentTime_2 = DateTime.Now;
+            //System.Data.Entity.DbFunctions.DiffHours(CurrentTime_2, CurrentTime)
+
+            int currentTimeHour = (currentTime.Year * 8760) + (currentTime.Month * 720) + (currentTime.Day * 24) + currentTime.Hour;
+
+
+            //int variableHere = 2;
+
+            //collection = collection.OrderBy(p => (currentTimeHour - ((p.CreatedAt.Year * 8760) + (p.CreatedAt.Month * 720) + (p.CreatedAt.Day * 24) + p.CreatedAt.Hour)));
+
+
+            //collection = collection.OrderBy(p => System.Data.Entity.DbFunctions.AddMonths(p.CreatedAt, 2));
+
+            //collection = collection.OrderBy(p => (Math.Abs((p.CreatedAt.Year) - (CurrentTime.Year)) * 8760) + (Math.Abs((p.CreatedAt.Month) - (CurrentTime.Month)) * 8760));
+
+            collection = collection.OrderByDescending(p =>
+           ((p.Views * 1) + (p.PostLikedBy.Count * 5) + (p.PostSavedBy.Count * 25) + (p.Comments.Count * 30)) / Math.Pow(2.718281828,
+           (double)(currentTimeHour - ((p.CreatedAt.Year * 8760) + (p.CreatedAt.Month * 720) + (p.CreatedAt.Day * 24) + p.CreatedAt.Hour)))
+          );
+
+
+            //collection.OrderBy(p => p.CreatedAt != null ? (p.CreatedAt - CurrentTime).TotalHours : 0);
+
+            //(p.CreatedAt == null ? CurrentTime : p.CreatedAt)
+
+
+            //.OrderByDescending(p => p.CreatedAt)
+
 
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
+
+
         }
 
         public async Task<PageList<Post>> GetAllFollowingPosts(Guid userId, PostResourceParametersWithOrderBy postResourceParameters)
@@ -178,7 +209,15 @@ namespace DivingApplication.Repositories.Posts
         public async Task<Post> GetPost(Guid postId)
         {
             if (postId == Guid.Empty) throw new ArgumentNullException(nameof(postId));
-            return await _context.Posts.FindAsync(postId);
+            return await _context.Posts.
+                Include(p => p.Author)
+                .Include(p => p.Comments)
+                .Include(p => p.PostLikedBy)
+                .Include(p => p.PostSavedBy)
+                .Include(p => p.PostTopics)
+                .ThenInclude(t => t.Topic)
+                .Include(p => p.TaggedUsers)
+                .ThenInclude(u => u.User).SingleOrDefaultAsync(p => p.Id == postId);
 
         }
 

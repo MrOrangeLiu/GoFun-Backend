@@ -2,6 +2,7 @@
 using DivingApplication.Models.Users;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,6 +20,7 @@ namespace DivingApplication.Models.Comments
 
         public UserBriefOutputDto Author { get; set; }
 
+        [Required]
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }

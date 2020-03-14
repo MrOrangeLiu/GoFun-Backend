@@ -19,6 +19,7 @@ namespace DivingApplication.Entities
         public User Author { get; set; }
         public Guid AuthorId { get; set; }
 
+        [Required]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime UpdatedAt { get; set; }

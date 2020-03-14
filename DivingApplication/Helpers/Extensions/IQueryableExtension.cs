@@ -97,7 +97,7 @@ namespace DivingApplication.Helpers.Extensions
                 return source; // Don't need any sorting here
 
 
-            var orderBySplit = orderBy.Split(","); // How can we know it should be decending or ascending?
+            var orderBySplit = orderBy.Split(",").Select(s => s.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)); // How can we know it should be decending or ascending?
 
             foreach (var orderByClause in orderBySplit)
             {

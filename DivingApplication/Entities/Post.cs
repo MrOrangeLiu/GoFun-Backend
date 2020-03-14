@@ -48,6 +48,7 @@ namespace DivingApplication.Entities
 
         public int Views { get; set; } = 0;
 
+        [Required]
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }

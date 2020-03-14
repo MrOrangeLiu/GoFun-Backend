@@ -83,6 +83,9 @@ namespace DivingApplication.Controllers
         [HttpPost("{postId}")]
         public async Task<IActionResult> CreateComment([FromBody] CommentForCreatingDto comment, [FromQuery] string fields, Guid postId)
         {
+
+            if (!_propertyValidation.HasValidProperties<CommentOutputDto>(fields)) return BadRequest();
+
             var commentEntity = _mapper.Map<Comment>(comment);
 
             await _commentRepository.AddComment(commentEntity, postId, Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));

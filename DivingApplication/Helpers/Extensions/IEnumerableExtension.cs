@@ -22,7 +22,7 @@ namespace DivingApplication.Helpers.Extensions
             }
             else
             {
-                var fieldsAfterSplit = fields.Split(",");
+                var fieldsAfterSplit = fields.Split(",").Select(s => s.Trim()).Where(s => !string.IsNullOrWhiteSpace(s));
 
                 foreach (var field in fieldsAfterSplit)
                 {

@@ -29,8 +29,17 @@ namespace DivingApplication.DbContexts
         public DbSet<ServiceInfo> ServiceInfos { get; set; }
         public DbSet<Topic> Topics { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+
+            //modelBuilder.Entity<Post>().Property(p => p.CreatedAt)
+
             // Dealing with the Enum Conversion
 
             modelBuilder.Entity<User>().Property(u => u.UserRole).HasConversion(
