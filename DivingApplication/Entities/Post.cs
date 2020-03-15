@@ -54,7 +54,8 @@ namespace DivingApplication.Entities
         public DateTime UpdatedAt { get; set; }
 
         public string LocationAddress { get; set; }
-        public string LatLng { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
 
 
     }

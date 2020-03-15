@@ -15,6 +15,7 @@ namespace DivingApplication.Repositories.Posts
         Task<UserPostLike> GetCurrentUserPostLike(Guid userId, Guid postId);
         Task<UserPostSave> GetCurrentUserPostSave(Guid userId, Guid postId);
         PageList<Post> GetHotPosts(PostResourceParametersForHot postResourceParameters);
+        PageList<Post> GetNearbyPosts(PostResourceParametersForNearby postResourceParameters);
         Task<Post> GetPost(Guid postId);
         PageList<Post> GetPosts(PostResourceParametersWithOrderBy postResourceParameters);
         Task<bool> PostExists(Guid postId);

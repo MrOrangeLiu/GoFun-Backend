@@ -1,4 +1,5 @@
 ﻿using DivingApplication.Entities;
+using DivingApplication.Models.Comments;
 using DivingApplication.Models.Topic;
 using DivingApplication.Models.Users;
 using System;
@@ -32,10 +33,13 @@ namespace DivingApplication.Models.Posts
         public int PostLikedCount { get; set; }
         public int PostSavedCount { get; set; }
         public int Views { get; set; }
+        public List<CommentOutputDto> FirstTwoComments = new List<CommentOutputDto>();
 
         public int CommentCount { get; set; }
         public string LocationAddress { get; set; }
-        public string LatLng { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

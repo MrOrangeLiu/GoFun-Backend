@@ -6,8 +6,13 @@ using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Models.Posts;
 using DivingApplication.Models.Users;
+using DivingApplication.Services;
 using DivingApplication.Services.PropertyServices;
+using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MimeKit;
+using MimeKit.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +24,16 @@ namespace DivingApplication.Repositories.Users
     {
         private readonly DivingAPIContext _context;
         private readonly IPropertyMappingService _propertyMapping;
+        private readonly AppSettingsService _appSettings;
 
 
-        public UserRepository(DivingAPIContext context, IPropertyMappingService propertyMapping)
+
+        public UserRepository(DivingAPIContext context, IPropertyMappingService propertyMapping, IOptions<AppSettingsService> appSettings)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _propertyMapping = propertyMapping ?? throw new ArgumentNullException(nameof(propertyMapping));
+            _appSettings = appSettings.Value;
+
         }
 
         public User Authenticate(string Email, string password)
@@ -224,7 +233,47 @@ namespace DivingApplication.Repositories.Users
         public async Task<IEnumerable<ServiceInfo>> GetServiceInfoForUser(Guid userId)
         {
             var user = await _context.Users.Include(u => u.OwningServiceInfos).FirstOrDefaultAsync(u => u.Id == userId);
+
+
             return user.OwningServiceInfos;
+        }
+
+        public async Task SendVerificationEmail(User user)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var sendingMessage = new MimeMessage
+            {
+                Sender = new MailboxAddress("DivingApp", "diving_app_2020@outlook.com"),
+                Subject = "Diving App 驗證信",
+            };
+
+
+            sendingMessage.Body = new TextPart(TextFormat.Html)
+            {
+                Text = $"</br></br><center><h1> 使用者 { user.Name } 您好 </h1></center></br><center><h3> 您的身分驗證碼為: {user.EmailVerificationCode} </ h3></center></br></br><center><p> Diving App 團隊 </p><p> 敬上<p> </center> "
+            };
+
+            sendingMessage.To.Add(new MailboxAddress(user.Email));
+
+
+            using (var smtp = new MailKit.Net.Smtp.SmtpClient())
+            {
+                smtp.MessageSent += (sender, args) => { };
+
+                smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls);
+
+                await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword);
+
+                await smtp.SendAsync(sendingMessage);
+
+                await smtp.DisconnectAsync(true);
+
+            }
+
+
         }
 
         public async Task<PageList<User>> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId)
@@ -301,6 +350,8 @@ namespace DivingApplication.Repositories.Users
 
             return PageList<User>.Create(collection, userResourceParameters.PageNumber, userResourceParameters.PageSize);
         }
+
+
 
 
 

@@ -16,7 +16,9 @@ namespace DivingApplication.Models.Posts
         [Required]
         public string PostContentType { get; set; }
         public string LocationAddress { get; set; }
-        public string LatLng { get; set; }
+        public double Lat { get; set; }
+
+        public double Lng { get; set; }
 
         public string PreviewURL { get; set; }
 

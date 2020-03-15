@@ -27,6 +27,7 @@ namespace DivingApplication.Repositories.Users
         Task<PageList<User>> GetUsers(UserResourceParameterts userResourceParameters, Guid loginUserId);
         Task<bool> Save();
         bool SaveForJwt();
+        Task SendVerificationEmail(User user);
         Task UpdateUser(User user);
         Task<bool> UserEmailExists(string email);
         Task<bool> UserExists(Guid userId);

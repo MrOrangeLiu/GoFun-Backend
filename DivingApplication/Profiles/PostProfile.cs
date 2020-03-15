@@ -65,6 +65,9 @@ namespace DivingApplication.Profiles
                 ).ForMember(
                     dest => dest.PostTopics,
                     opt => opt.MapFrom(src => src.PostTopics.Select(pt => pt.Topic))
+                ).ForMember(
+                    dest => dest.FirstTwoComments,
+                    opt => opt.MapFrom(src => src.Comments.OrderByDescending(c => c.CreatedAt).Take(2)) // Do we need to map to OutputDto manually?
                 );
 
             CreateMap<Post, PostPrviewOutputDto>().ForMember(

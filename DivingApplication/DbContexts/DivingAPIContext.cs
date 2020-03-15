@@ -1,4 +1,5 @@
 ﻿using DivingApplication.Entities;
+
 using DivingApplication.Entities.ManyToManyEntities;
 using Microsoft.EntityFrameworkCore;
 using System;

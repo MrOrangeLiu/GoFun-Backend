@@ -12,7 +12,8 @@ namespace DivingApplication.Models.Posts
         [MaxLength(2048)]
         public string Description { get; set; }
         public string LocationAddress { get; set; }
-        public string LatLng { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
         public string PreviewURL { get; set; }
 
         public List<string> ContentURL { get; set; } = new List<string>();

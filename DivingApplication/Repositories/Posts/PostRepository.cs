@@ -9,7 +9,6 @@ using DivingApplication.Services.PropertyServices;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Objects;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -60,6 +59,49 @@ namespace DivingApplication.Repositories.Posts
 
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
         }
+
+        public PageList<Post> GetNearbyPosts(PostResourceParametersForNearby postResourceParameters)
+        {
+            if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
+
+            var collection = _context.Posts
+                .Include(p => p.Author)
+                .Include(p => p.Comments)
+                .Include(p => p.PostLikedBy)
+                .Include(p => p.PostSavedBy)
+                .Include(p => p.PostTopics)
+                .ThenInclude(t => t.Topic)
+                .Include(p => p.TaggedUsers)
+                .ThenInclude(u => u.User) as IQueryable<Post>;
+
+            if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
+            {
+                string searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
+                collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
+            }
+
+            if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
+            {
+                var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
+                collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
+            }
+
+            double multiplyToRadians = (Math.PI / 180);
+
+            double lat1 = postResourceParameters.Lat;
+            double lng1 = postResourceParameters.Lng;
+
+
+            collection = collection.OrderBy((p) => Math.Atan2(Math.Sqrt(Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) * Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) + Math.Cos(lat1 * multiplyToRadians) * Math.Cos(p.Lat * multiplyToRadians) + Math.Sin((p.Lng - lng1) * multiplyToRadians / 2) * Math.Sin((p.Lng - lng1) * multiplyToRadians / 2)), Math.Sqrt(1 - Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) * Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) + Math.Cos(lat1 * multiplyToRadians) * Math.Cos(p.Lat * multiplyToRadians) + Math.Sin((p.Lng - lng1) * multiplyToRadians / 2) * Math.Sin((p.Lng - lng1) * multiplyToRadians / 2)))
+            );
+
+            return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
+
+
+        }
+
+
+
 
         public PageList<Post> GetHotPosts(PostResourceParametersForHot postResourceParameters)
         {
@@ -126,7 +168,15 @@ namespace DivingApplication.Repositories.Posts
 
             List<Guid> allFollowingIds = user.Following.Select(uf => uf.FollowingId).ToList();
 
-            var collection = _context.Posts as IQueryable<Post>;
+            var collection = _context.Posts.Include(p => p.Author)
+                .Include(p => p.Comments)
+                .ThenInclude(c => c.Author)
+                .Include(p => p.PostLikedBy)
+                .Include(p => p.PostSavedBy)
+                .Include(p => p.PostTopics)
+                .ThenInclude(t => t.Topic)
+                .Include(p => p.TaggedUsers)
+                .ThenInclude(u => u.User) as IQueryable<Post>;
 
             collection = collection.Where(p => allFollowingIds.Contains(p.AuthorId));
 

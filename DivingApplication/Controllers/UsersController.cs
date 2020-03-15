@@ -74,7 +74,14 @@ namespace DivingApplication.Controllers
 
             var user = _mapper.Map<User>(userForCreatingDto);
 
+            var code = GenerateVerificationString(6);
+
+            user.EmailVerificationCode = code;
+
             await _userRepository.AddUser(user, userForCreatingDto.Password);
+
+            await _userRepository.SendVerificationEmail(user);
+
             await _userRepository.Save();
 
             // Generating JWT Token
@@ -365,7 +372,7 @@ namespace DivingApplication.Controllers
 
         [Authorize(Roles = "EmailNotVerified")]
         [HttpPost("email/send")]
-        public async Task<IActionResult> SendingEmailToUserTest()
+        public async Task<IActionResult> SendingEmailToUser()
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
@@ -385,36 +392,38 @@ namespace DivingApplication.Controllers
             await _userRepository.UpdateUser(userFromRepo);
             await _userRepository.Save();
 
-            var sendingMessage = new MimeMessage
-            {
-                Sender = new MailboxAddress("DivingApp", "diving_app_2020@outlook.com"),
-                Subject = "Diving App 驗證信",
-            };
+            await _userRepository.SendVerificationEmail(userFromRepo);
+
+            //var sendingMessage = new MimeMessage
+            //{
+            //    Sender = new MailboxAddress("DivingApp", "diving_app_2020@outlook.com"),
+            //    Subject = "Diving App 驗證信",
+            //};
 
 
-            sendingMessage.Body = new TextPart(TextFormat.Html)
-            {
-                Text = $"</br></br><center><h1> 使用者 { userFromRepo.Name } 您好 </h1></center></br><center><h3> 您的身分驗證碼為: {code} </ h3></center></br></br><center><p> Diving App 團隊 </p><p> 敬上<p> </center> "
-            };
+            //sendingMessage.Body = new TextPart(TextFormat.Html)
+            //{
+            //    Text = $"</br></br><center><h1> 使用者 { userFromRepo.Name } 您好 </h1></center></br><center><h3> 您的身分驗證碼為: {code} </ h3></center></br></br><center><p> Diving App 團隊 </p><p> 敬上<p> </center> "
+            //};
 
-            sendingMessage.To.Add(new MailboxAddress(userFromRepo.Email));
+            //sendingMessage.To.Add(new MailboxAddress(userFromRepo.Email));
 
 
-            using (var smtp = new MailKit.Net.Smtp.SmtpClient())
-            {
-                smtp.MessageSent += (sender, args) => { };
+            //using (var smtp = new MailKit.Net.Smtp.SmtpClient())
+            //{
+            //    smtp.MessageSent += (sender, args) => { };
 
-                smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
+            //    smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls);
+            //    await smtp.ConnectAsync("smtp-mail.outlook.com", 587, SecureSocketOptions.StartTls);
 
-                await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword);
+            //    await smtp.AuthenticateAsync(_appSettings.Email, _appSettings.EmailPassword);
 
-                await smtp.SendAsync(sendingMessage);
+            //    await smtp.SendAsync(sendingMessage);
 
-                await smtp.DisconnectAsync(true);
+            //    await smtp.DisconnectAsync(true);
 
-            }
+            //}
 
             return Ok(new
             {

@@ -93,6 +93,33 @@ namespace DivingApplication.Controllers
             return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
         }
 
+        [AllowAnonymous]
+        [HttpGet("nearby", Name = "GetNearbyPosts")]
+        public IActionResult GetNearbyPosts([FromQuery] PostResourceParametersForNearby postResourceParameters)
+        {
+            // No orderBy Options in the postResourceParameters
+            if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
+
+            var postsFromRepo = _postRepository.GetNearbyPosts(postResourceParameters); // the orderBy property will be ignore
+
+            var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetNearbyPosts") : null;
+            var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetNearbyPosts") : null;
+
+            var metaData = new
+            {
+                totalCount = postsFromRepo.TotalCount,
+                pageSize = postsFromRepo.PageSize,
+                currentPage = postsFromRepo.CurrentPage,
+                totalPages = postsFromRepo.TotalPages,
+                previousPageLink,
+                nextPageLink,
+            };
+
+            Response.Headers.Add("Pagination", JsonSerializer.Serialize(metaData));
+
+            return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
+        }
+
         [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("following", Name = "GetFollowingPosts")]
         public async Task<IActionResult> GetAllFollowingPosts([FromQuery] PostResourceParametersWithOrderBy postResourceParameters)

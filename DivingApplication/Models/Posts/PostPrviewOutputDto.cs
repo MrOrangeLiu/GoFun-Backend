@@ -31,6 +31,10 @@ namespace DivingApplication.Models.Posts
 
         public DateTime CreatedAt { get; set; }
 
+        public double Lat { get; set; }
+
+        public double Lng { get; set; }
+
         public List<TopicOutputDto> PostTopics { get; set; } = new List<TopicOutputDto>();
         public List<UserTaggedOutputDto> TaggedUsers { get; set; } = new List<UserTaggedOutputDto>();
     }
