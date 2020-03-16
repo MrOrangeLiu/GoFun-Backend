@@ -107,7 +107,7 @@ namespace DivingApplication.Helpers.Extensions
                 var indexOfSpace = trimmedOrderBy.IndexOf(" ");
                 var propertyName = indexOfSpace == -1 ? trimmedOrderBy : trimmedOrderBy.Remove(indexOfSpace); // the first to indexOfSpace will be kept
 
-                if (propertyName.ToLower() == "Hot") continue; // Ignoreing the Hot Ordering here
+                //if (propertyName.ToLower() == "Hot") continue; // Ignoreing the Hot Ordering here
 
 
                 if (!mappingDictionary.ContainsKey(propertyName))

@@ -4,14 +4,16 @@ using DivingApplication.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DivingApplication.Migrations
 {
     [DbContext(typeof(DivingAPIContext))]
-    partial class DivingAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20200316132711_addIntroToUser")]
+    partial class addIntroToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

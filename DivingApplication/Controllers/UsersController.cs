@@ -163,10 +163,16 @@ namespace DivingApplication.Controllers
 
         [AllowAnonymous]
         [HttpGet("{userId}", Name = "GetUserById")]
-        public async Task<ActionResult<UserOutputDto>> GetUser(Guid userId)
+        public async Task<IActionResult> GetUser(Guid userId, [FromQuery]GetUserResourceParameter resourceParameter)
         {
             var userFromRepo = await _userRepository.GetUser(userId);
             if (userFromRepo == null) return NotFound();
+
+            if (resourceParameter.Brief)
+            {
+                return Ok(_mapper.Map<UserBriefOutputDto>(userFromRepo));
+
+            }
 
             return Ok(_mapper.Map<UserOutputDto>(userFromRepo));
         }
@@ -452,9 +458,11 @@ namespace DivingApplication.Controllers
 
             _userRepository.Save();
 
+            var token = GenerateTokenForUser(userFromRepo);
+
             var userToReturn = _mapper.Map<UserOutputDto>(userFromRepo);
 
-            return Ok(userToReturn);
+            return Ok(new { user = userToReturn, token, });
 
         }
 

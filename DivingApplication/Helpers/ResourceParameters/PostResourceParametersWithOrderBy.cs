@@ -1,4 +1,6 @@
-﻿namespace DivingApplication.Helpers.ResourceParameters
+﻿using System;
+
+namespace DivingApplication.Helpers.ResourceParameters
 {
     public class PostResourceParametersWithOrderBy : IPostResourceParameters
     {
@@ -18,6 +20,8 @@
 
         // Sorting and Population
         public string OrderBy { get; set; } = "CreatedAt";
+
+        public Guid AuthorId { get; set; }
         public string Fields { get; set; }
 
 

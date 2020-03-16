@@ -15,6 +15,10 @@ namespace DivingApplication.Models.CoachInfo
         public List<string> LocationImageUrls { get; set; } // Images for showing the location where you're instructing
         public List<string> SelfieUrls { get; set; } // Image of yourself
         public string InsturctingLocation { get; set; } // Instruction Location
+
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdateAt { get; set; }
     }

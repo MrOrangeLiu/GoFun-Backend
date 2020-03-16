@@ -57,7 +57,7 @@ namespace DivingApplication.Repositories.Comments
 
             collection = collection.Include(c => c.Author).Where(c => c.BelongPostId == postId);
 
-            if (!string.IsNullOrWhiteSpace(commentResourceParameters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(commentResourceParameters?.OrderBy?.Replace(",", "")))
             {
                 var commentPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
                 collection = collection.ApplySort(commentResourceParameters.OrderBy, commentPropertyMappingDictionary);

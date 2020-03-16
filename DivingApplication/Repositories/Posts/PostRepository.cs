@@ -42,7 +42,22 @@ namespace DivingApplication.Repositories.Posts
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
-            var collection = _context.Posts as IQueryable<Post>;
+            var collection = _context.Posts
+                .Include(p => p.Author)
+                .ThenInclude(a => a.CoachInfo)
+                .Include(p => p.Comments)
+                .Include(p => p.PostLikedBy)
+                .Include(p => p.PostSavedBy)
+                .Include(p => p.PostTopics)
+                .ThenInclude(t => t.Topic)
+                .Include(p => p.TaggedUsers)
+                .ThenInclude(u => u.User) as IQueryable<Post>;
+
+            if (postResourceParameters.AuthorId != Guid.Empty)
+            {
+                collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
+            }
+
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
@@ -51,7 +66,7 @@ namespace DivingApplication.Repositories.Posts
             }
 
 
-            if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(postResourceParameters?.OrderBy?.Replace(",", "")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
                 collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
@@ -66,6 +81,7 @@ namespace DivingApplication.Repositories.Posts
 
             var collection = _context.Posts
                 .Include(p => p.Author)
+                .ThenInclude(a => a.CoachInfo)
                 .Include(p => p.Comments)
                 .Include(p => p.PostLikedBy)
                 .Include(p => p.PostSavedBy)
@@ -74,13 +90,18 @@ namespace DivingApplication.Repositories.Posts
                 .Include(p => p.TaggedUsers)
                 .ThenInclude(u => u.User) as IQueryable<Post>;
 
+            if (postResourceParameters.AuthorId != Guid.Empty)
+            {
+                collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
+            }
+
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
                 string searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
                 collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
             }
 
-            if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(postResourceParameters?.OrderBy?.Replace(",", "")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
                 collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
@@ -109,6 +130,7 @@ namespace DivingApplication.Repositories.Posts
 
             var collection = _context.Posts
                 .Include(p => p.Author)
+                .ThenInclude(a => a.CoachInfo)
                 .Include(p => p.Comments)
                 .Include(p => p.PostLikedBy)
                 .Include(p => p.PostSavedBy)
@@ -117,6 +139,11 @@ namespace DivingApplication.Repositories.Posts
                 .Include(p => p.TaggedUsers)
                 .ThenInclude(u => u.User) as IQueryable<Post>;
 
+            if (postResourceParameters.AuthorId != Guid.Empty)
+            {
+                collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
+            }
+
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
                 string searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
@@ -124,22 +151,18 @@ namespace DivingApplication.Repositories.Posts
             }
 
 
+            if (!string.IsNullOrWhiteSpace(postResourceParameters?.OrderBy?.Replace(",", "")))
+            {
+                var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
+                collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
+            }
+
 
             var currentTime = DateTime.Now;
-            //var CurrentTime_2 = DateTime.Now;
-            //System.Data.Entity.DbFunctions.DiffHours(CurrentTime_2, CurrentTime)
+
 
             int currentTimeHour = (currentTime.Year * 8760) + (currentTime.Month * 720) + (currentTime.Day * 24) + currentTime.Hour;
 
-
-            //int variableHere = 2;
-
-            //collection = collection.OrderBy(p => (currentTimeHour - ((p.CreatedAt.Year * 8760) + (p.CreatedAt.Month * 720) + (p.CreatedAt.Day * 24) + p.CreatedAt.Hour)));
-
-
-            //collection = collection.OrderBy(p => System.Data.Entity.DbFunctions.AddMonths(p.CreatedAt, 2));
-
-            //collection = collection.OrderBy(p => (Math.Abs((p.CreatedAt.Year) - (CurrentTime.Year)) * 8760) + (Math.Abs((p.CreatedAt.Month) - (CurrentTime.Month)) * 8760));
 
             collection = collection.OrderByDescending(p =>
            ((p.Views * 1) + (p.PostLikedBy.Count * 5) + (p.PostSavedBy.Count * 25) + (p.Comments.Count * 30)) / Math.Pow(2.718281828,
@@ -147,12 +170,6 @@ namespace DivingApplication.Repositories.Posts
           );
 
 
-            //collection.OrderBy(p => p.CreatedAt != null ? (p.CreatedAt - CurrentTime).TotalHours : 0);
-
-            //(p.CreatedAt == null ? CurrentTime : p.CreatedAt)
-
-
-            //.OrderByDescending(p => p.CreatedAt)
 
 
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
@@ -171,6 +188,7 @@ namespace DivingApplication.Repositories.Posts
             var collection = _context.Posts.Include(p => p.Author)
                 .Include(p => p.Comments)
                 .ThenInclude(c => c.Author)
+                .ThenInclude(a => a.CoachInfo)
                 .Include(p => p.PostLikedBy)
                 .Include(p => p.PostSavedBy)
                 .Include(p => p.PostTopics)
@@ -180,13 +198,18 @@ namespace DivingApplication.Repositories.Posts
 
             collection = collection.Where(p => allFollowingIds.Contains(p.AuthorId));
 
+            if (postResourceParameters.AuthorId != Guid.Empty)
+            {
+                collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
+            }
+
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
                 var searchinQuery = postResourceParameters.SearchQuery.Trim().ToLower();
                 collection = collection.Where(p => p.Description.ToLower().Contains(searchinQuery));
             }
 
-            if (!string.IsNullOrWhiteSpace(postResourceParameters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(postResourceParameters?.OrderBy?.Replace(",", "")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
                 collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);

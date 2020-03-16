@@ -49,7 +49,7 @@ namespace DivingApplication.Repositories.CoachInfos
                 collection = collection.Where(c => c.Author.Name.ToLower().Contains(searchinQuery) || c.Author.Email.ToLower().Contains(searchinQuery)); // Do we need includes to do this?
             }
 
-            if (!string.IsNullOrWhiteSpace(coachInfoResourceParameters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(coachInfoResourceParameters.OrderBy.Replace(",","")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<CoachInfoOutputDto, CoachInfo>();
                 collection = collection.ApplySort(coachInfoResourceParameters.OrderBy, postPropertyMappingDictionary);

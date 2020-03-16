@@ -15,6 +15,9 @@ namespace DivingApplication.Helpers.ResourceParameters
         public int PageNumber { get; set; } = 1;
         private int _pageSize = 20; // Default Page Size
 
+        public string OrderBy { get; set; }
+
+        public Guid AuthorId { get; set; }
 
 
         public int PageSize

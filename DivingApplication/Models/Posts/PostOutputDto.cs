@@ -33,7 +33,8 @@ namespace DivingApplication.Models.Posts
         public int PostLikedCount { get; set; }
         public int PostSavedCount { get; set; }
         public int Views { get; set; }
-        public List<CommentOutputDto> FirstTwoComments = new List<CommentOutputDto>();
+
+        public List<CommentOutputDto> Comments { get; set; } = new List<CommentOutputDto>();
 
         public int CommentCount { get; set; }
         public string LocationAddress { get; set; }

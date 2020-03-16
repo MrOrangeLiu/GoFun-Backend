@@ -1,7 +1,10 @@
-﻿namespace DivingApplication.Helpers.ResourceParameters
+﻿using System;
+
+namespace DivingApplication.Helpers.ResourceParameters
 {
     public interface IPostResourceParameters
     {
+        Guid AuthorId { get; set; }
         string Fields { get; set; }
         int PageNumber { get; set; }
         int PageSize { get; set; }

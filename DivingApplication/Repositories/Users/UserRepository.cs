@@ -284,6 +284,7 @@ namespace DivingApplication.Repositories.Users
                 .ThenInclude(c => c.UserChatRooms)
                 .Include(u => u.Followers)
                 .Include(u => u.Following)
+                .Include(u => u.CoachInfo)
                 .SingleOrDefaultAsync(u => u.Id == loginUserId);
 
             if (loginUser == null) throw new Exception(message: "Cannot find the user");
@@ -302,7 +303,7 @@ namespace DivingApplication.Repositories.Users
             var indexOfHot = userResourceParameters.OrderBy.IndexOf(removedString, StringComparison.OrdinalIgnoreCase);
             userResourceParameters.OrderBy = (indexOfHot < 0) ? userResourceParameters.OrderBy : userResourceParameters.OrderBy.Remove(indexOfHot, removedString.Length);
 
-            var stringNullTest = string.IsNullOrWhiteSpace(userResourceParameters.OrderBy);
+            var stringNullTest = string.IsNullOrWhiteSpace(userResourceParameters?.OrderBy?.Replace(",", ""));
 
             if (!stringNullTest)
             {
@@ -316,15 +317,15 @@ namespace DivingApplication.Repositories.Users
 
                 if (loginUser == null) throw new ArgumentNullException(nameof(loginUser));
 
-                var followingUsers = loginUser.Following.Select(f => f.FollowingId);
-                var followerUsers = loginUser.Followers.Select(f => f.FollowerId);
-                var chatRoomUsers = loginUser.UserChatRooms.SelectMany(c => c.ChatRoom.UserChatRooms.Select(ucr => ucr.UserId).Where(uid => uid != loginUser.Id));
+                List<Guid> followingUsers = loginUser.Following.Select(f => f.FollowingId).ToList();
+                List<Guid> followerUsers = loginUser.Followers.Select(f => f.FollowerId).ToList();
+                List<Guid> chatRoomUsers = loginUser.UserChatRooms.SelectMany(c => c.ChatRoom.UserChatRooms.Select(ucr => ucr.UserId).Where(uid => uid != loginUser.Id)).ToList();
 
 
-                collection = collection.OrderByDescending(u =>
-                              (followingUsers.Contains(u.Id) ? 0 : 1) +
-                              (followerUsers.Contains(u.Id) ? 0 : 1) +
-                              (chatRoomUsers.Contains(u.Id) ? 0 : 1)
+                collection = collection.OrderBy(u =>
+                              (followingUsers.Contains(u.Id) ? 1 : 0) +
+                              (followerUsers.Contains(u.Id) ? 1 : 0) +
+                              (chatRoomUsers.Contains(u.Id) ? 1 : 0)
                               );
 
                 // Checking if the user is the followers, followings or the one in the same chatRooms,

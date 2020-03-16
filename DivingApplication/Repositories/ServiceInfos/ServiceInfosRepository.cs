@@ -47,7 +47,7 @@ namespace DivingApplication.Repositories.ServiceInfos
                 collection = collection.Where(s => s.CenterName.ToLower().Contains(searchinQuery) || s.LocalCenterName.ToLower().Contains(searchinQuery));
             }
 
-            if (!string.IsNullOrWhiteSpace(serviceInfoResourceParameters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(serviceInfoResourceParameters?.OrderBy?.Replace(",", "")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<ServiceInfoOutputDto, ServiceInfo>();
                 collection = collection.ApplySort(serviceInfoResourceParameters.OrderBy, postPropertyMappingDictionary);

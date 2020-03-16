@@ -63,7 +63,7 @@ namespace DivingApplication.Repositories.Topics
                 topicResourceParameters.OrderBy = (indexOfHot < 0) ? topicResourceParameters.OrderBy : topicResourceParameters.OrderBy.Remove(indexOfHot, removedString.Length);
             }
 
-            if (!string.IsNullOrWhiteSpace(topicResourceParameters.OrderBy))
+            if (!string.IsNullOrWhiteSpace(topicResourceParameters?.OrderBy?.Replace(",", "")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<TopicOutputDto, Topic>();
                 collection = collection.ApplySort(topicResourceParameters.OrderBy, postPropertyMappingDictionary);

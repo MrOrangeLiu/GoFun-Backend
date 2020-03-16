@@ -51,6 +51,8 @@ namespace DivingApplication.Entities
         public Role UserRole { get; set; } = Role.EmailNotVerified;
         public CoachInfo CoachInfo { get; set; }
 
+        public string Intro { get; set; }
+
         public Gender UserGender { get; set; } = Gender.Male;
         public DateTime CreatedAt { get; set; }
         public DateTime LastSeen { get; set; }

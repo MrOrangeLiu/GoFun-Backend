@@ -11,5 +11,8 @@ namespace DivingApplication.Models.Users
         public string Email { set; get; }
         public string Password { get; set; }
         public string UserGender { get; set; }
+
+        public string Intro { get; set; }
+
     }
 }

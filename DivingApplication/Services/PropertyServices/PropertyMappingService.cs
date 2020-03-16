@@ -30,6 +30,7 @@ namespace DivingApplication.Services.PropertyServices
             {"UpdatedAt", new PropertyMappingValue(new List<string>(){"UpdatedAt"}, true)},
             {"Views", new PropertyMappingValue(new List<string>(){"Views"}, true)},
             {"LocationAddress", new PropertyMappingValue(new List<string>(){"LocationAddress"}, true)},
+            {"Comments", new PropertyMappingValue(new List<string>(){"Comments"}, true)},
             {"Lat", new PropertyMappingValue(new List<string>(){"Lat"}, true)},
             {"Lng", new PropertyMappingValue(new List<string>(){"Lng"}, true)},
         };

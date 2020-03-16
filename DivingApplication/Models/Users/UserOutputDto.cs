@@ -16,6 +16,9 @@ namespace DivingApplication.Models.Users
 
         public byte[] ProfileImage { set; get; }
 
+        public string Intro { get; set; }
+
+
         public string UserRole { get; set; }
         public string UserGender { get; set; }
         public DateTime CreatedAt { get; set; }

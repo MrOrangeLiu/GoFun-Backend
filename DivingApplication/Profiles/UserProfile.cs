@@ -45,6 +45,7 @@ namespace DivingApplication.Profiles
 
 
             CreateMap<User, UserBriefOutputDto>()
+              .ForMember(dest => dest.CoachInfoId, opt => opt.MapFrom(src => src.CoachInfo.Id))
               .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.UserRole.ToString()))
               .ForMember(dest => dest.UserGender, opt => opt.MapFrom(src => src.UserGender.ToString()))
               .ForMember(dest => dest.FollowersCount, opt => opt.MapFrom(src => src.Followers.Count))
