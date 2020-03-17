@@ -39,13 +39,13 @@ namespace DivingApplication.Controllers
 
         [AllowAnonymous]
         [HttpGet(Name = "GetPosts")]
-        public IActionResult GetPosts([FromQuery] PostResourceParametersWithOrderBy postResourceParameters)
+        public async Task<IActionResult> GetPosts([FromQuery] PostResourceParametersWithOrderBy postResourceParameters)
         {
 
             if (!_propertyMapping.ValidMappingExist<PostOutputDto, Post>(postResourceParameters.OrderBy)) return BadRequest();
             if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
 
-            var postsFromRepo = _postRepository.GetPosts(postResourceParameters);
+            var postsFromRepo = await _postRepository.GetPosts(postResourceParameters);
 
             var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetPosts") : null;
             var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetPosts") : null;
@@ -68,12 +68,12 @@ namespace DivingApplication.Controllers
 
         [AllowAnonymous]
         [HttpGet("hot", Name = "GetHotPosts")]
-        public IActionResult GetHotPosts([FromQuery] PostResourceParametersForHot postResourceParameters)
+        public async Task<IActionResult> GetHotPosts([FromQuery] PostResourceParametersForHot postResourceParameters)
         {
             // No orderBy Options in the postResourceParameters
             if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
 
-            var postsFromRepo = _postRepository.GetHotPosts(postResourceParameters); // the orderBy property will be ignore
+            var postsFromRepo = await _postRepository.GetHotPosts(postResourceParameters); // the orderBy property will be ignore
 
             var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetHotPosts") : null;
             var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetHotPosts") : null;
@@ -95,12 +95,12 @@ namespace DivingApplication.Controllers
 
         [AllowAnonymous]
         [HttpGet("nearby", Name = "GetNearbyPosts")]
-        public IActionResult GetNearbyPosts([FromQuery] PostResourceParametersForNearby postResourceParameters)
+        public async Task<IActionResult> GetNearbyPosts([FromQuery] PostResourceParametersForNearby postResourceParameters)
         {
             // No orderBy Options in the postResourceParameters
             if (!_propertyValidation.HasValidProperties<PostOutputDto>(postResourceParameters.Fields)) return BadRequest();
 
-            var postsFromRepo = _postRepository.GetNearbyPosts(postResourceParameters); // the orderBy property will be ignore
+            var postsFromRepo = await _postRepository.GetNearbyPosts(postResourceParameters); // the orderBy property will be ignore
 
             var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetNearbyPosts") : null;
             var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetNearbyPosts") : null;
@@ -131,6 +131,7 @@ namespace DivingApplication.Controllers
 
 
             var postsFromRepo = await _postRepository.GetAllFollowingPosts(userId, postResourceParameters);
+
 
             var previousPageLink = postsFromRepo.HasPrevious ? CreatePostsUri(postResourceParameters, UriType.PreviousPage, "GetFollowingPosts") : null;
             var nextPageLink = postsFromRepo.HasNext ? CreatePostsUri(postResourceParameters, UriType.NextPage, "GetFollowingPosts") : null;

@@ -14,10 +14,10 @@ namespace DivingApplication.Repositories.Posts
         Task<PageList<Post>> GetAllFollowingPosts(Guid userId, PostResourceParametersWithOrderBy postResourceParameters);
         Task<UserPostLike> GetCurrentUserPostLike(Guid userId, Guid postId);
         Task<UserPostSave> GetCurrentUserPostSave(Guid userId, Guid postId);
-        PageList<Post> GetHotPosts(PostResourceParametersForHot postResourceParameters);
-        PageList<Post> GetNearbyPosts(PostResourceParametersForNearby postResourceParameters);
+        Task<PageList<Post>> GetHotPosts(PostResourceParametersForHot postResourceParameters);
+        Task<PageList<Post>> GetNearbyPosts(PostResourceParametersForNearby postResourceParameters);
         Task<Post> GetPost(Guid postId);
-        PageList<Post> GetPosts(PostResourceParametersWithOrderBy postResourceParameters);
+        Task<PageList<Post>> GetPosts(PostResourceParametersWithOrderBy postResourceParameters);
         Task<bool> PostExists(Guid postId);
         Task<bool> Save();
         Task UpdatePost(Post post);

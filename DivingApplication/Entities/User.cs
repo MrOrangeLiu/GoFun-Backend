@@ -39,6 +39,8 @@ namespace DivingApplication.Entities
 
         [Required]
         [MaxLength(64)]
+        [MinLength(1)]
+
         public string Name { set; get; }
 
         public byte[] ProfileImage { set; get; }
@@ -51,7 +53,8 @@ namespace DivingApplication.Entities
         public Role UserRole { get; set; } = Role.EmailNotVerified;
         public CoachInfo CoachInfo { get; set; }
 
-        public string Intro { get; set; }
+        [MaxLength(150)]
+        public string Intro { get; set; } = "";
 
         public Gender UserGender { get; set; } = Gender.Male;
         public DateTime CreatedAt { get; set; }

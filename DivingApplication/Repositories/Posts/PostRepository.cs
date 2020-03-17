@@ -38,7 +38,7 @@ namespace DivingApplication.Repositories.Posts
             await _context.Posts.AddRangeAsync(post);
         }
 
-        public PageList<Post> GetPosts(PostResourceParametersWithOrderBy postResourceParameters)
+        public async Task<PageList<Post>> GetPosts(PostResourceParametersWithOrderBy postResourceParameters)
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
@@ -55,7 +55,7 @@ namespace DivingApplication.Repositories.Posts
 
             if (postResourceParameters.AuthorId != Guid.Empty)
             {
-                collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
+                collection = collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
             }
 
 
@@ -72,10 +72,15 @@ namespace DivingApplication.Repositories.Posts
                 collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
             }
 
+
+
+            await collection.ForEachAsync(p => p.Views += 1);
+            await _context.SaveChangesAsync();
+
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
         }
 
-        public PageList<Post> GetNearbyPosts(PostResourceParametersForNearby postResourceParameters)
+        public async Task<PageList<Post>> GetNearbyPosts(PostResourceParametersForNearby postResourceParameters)
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
@@ -116,6 +121,10 @@ namespace DivingApplication.Repositories.Posts
             collection = collection.OrderBy((p) => Math.Atan2(Math.Sqrt(Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) * Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) + Math.Cos(lat1 * multiplyToRadians) * Math.Cos(p.Lat * multiplyToRadians) + Math.Sin((p.Lng - lng1) * multiplyToRadians / 2) * Math.Sin((p.Lng - lng1) * multiplyToRadians / 2)), Math.Sqrt(1 - Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) * Math.Sin((p.Lat - lat1) * multiplyToRadians / 2) + Math.Cos(lat1 * multiplyToRadians) * Math.Cos(p.Lat * multiplyToRadians) + Math.Sin((p.Lng - lng1) * multiplyToRadians / 2) * Math.Sin((p.Lng - lng1) * multiplyToRadians / 2)))
             );
 
+
+            await collection.ForEachAsync(p => p.Views += 1);
+            await _context.SaveChangesAsync();
+
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
 
 
@@ -124,7 +133,7 @@ namespace DivingApplication.Repositories.Posts
 
 
 
-        public PageList<Post> GetHotPosts(PostResourceParametersForHot postResourceParameters)
+        public async Task<PageList<Post>> GetHotPosts(PostResourceParametersForHot postResourceParameters)
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
@@ -170,6 +179,8 @@ namespace DivingApplication.Repositories.Posts
           );
 
 
+            await collection.ForEachAsync(p => p.Views += 1);
+            await _context.SaveChangesAsync();
 
 
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
@@ -181,7 +192,7 @@ namespace DivingApplication.Repositories.Posts
         {
             if (postResourceParameters == null) throw new ArgumentNullException(nameof(postResourceParameters));
 
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.Include(u => u.Following).SingleOrDefaultAsync(u => u.Id == userId);
 
             List<Guid> allFollowingIds = user.Following.Select(uf => uf.FollowingId).ToList();
 
@@ -214,6 +225,9 @@ namespace DivingApplication.Repositories.Posts
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<PostOutputDto, Post>();
                 collection = collection.ApplySort(postResourceParameters.OrderBy, postPropertyMappingDictionary);
             }
+
+            await collection.ForEachAsync(p => p.Views += 1);
+            await _context.SaveChangesAsync();
 
             return PageList<Post>.Create(collection, postResourceParameters.PageNumber, postResourceParameters.PageSize);
         }
