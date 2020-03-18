@@ -25,7 +25,7 @@ namespace DivingApplication
                 {
                     var context = scope.ServiceProvider.GetService<DivingAPIContext>();
 
-                    //context.Database.EnsureDeleted(); // Need to send an request for activates
+                    context.Database.EnsureDeleted(); // Need to send an request for activates
                     context.Database.EnsureCreated();
                     context.Database.Migrate();
 

@@ -1,9 +1,11 @@
-﻿using System;
+﻿using DivingApplication.Entities;
+using System;
 
 namespace DivingApplication.Helpers.ResourceParameters
 {
     public interface IPostResourceParameters
     {
+        Place Place { get; set; }
         Guid AuthorId { get; set; }
         string Fields { get; set; }
         int PageNumber { get; set; }

@@ -41,7 +41,14 @@ namespace DivingApplication.Repositories.CoachInfos
         {
             if (coachInfoResourceParameters == null) throw new ArgumentNullException(nameof(coachInfoResourceParameters));
 
-            var collection = _context.CoachInfos.Include(c =>c.Author) as IQueryable<CoachInfo>;
+            var collection = _context.CoachInfos.Include(c => c.Author) as IQueryable<CoachInfo>;
+
+            if (coachInfoResourceParameters.Place != null)
+            {
+                // Doing place searching here,
+                collection = collection.SearchingByPlace(coachInfoResourceParameters.Place) as IQueryable<CoachInfo>;
+            }
+
 
             if (!string.IsNullOrWhiteSpace(coachInfoResourceParameters.SearchQuery))
             {
@@ -49,7 +56,7 @@ namespace DivingApplication.Repositories.CoachInfos
                 collection = collection.Where(c => c.Author.Name.ToLower().Contains(searchinQuery) || c.Author.Email.ToLower().Contains(searchinQuery)); // Do we need includes to do this?
             }
 
-            if (!string.IsNullOrWhiteSpace(coachInfoResourceParameters.OrderBy.Replace(",","")))
+            if (!string.IsNullOrWhiteSpace(coachInfoResourceParameters.OrderBy.Replace(",", "")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<CoachInfoOutputDto, CoachInfo>();
                 collection = collection.ApplySort(coachInfoResourceParameters.OrderBy, postPropertyMappingDictionary);

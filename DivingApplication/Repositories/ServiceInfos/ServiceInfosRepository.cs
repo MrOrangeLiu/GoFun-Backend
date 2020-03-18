@@ -41,6 +41,13 @@ namespace DivingApplication.Repositories.ServiceInfos
 
             var collection = _context.ServiceInfos as IQueryable<ServiceInfo>;
 
+
+            if (serviceInfoResourceParameters.Place != null)
+            {
+                // Doing place searching here,
+                collection = collection.SearchingByPlace(serviceInfoResourceParameters.Place) as IQueryable<ServiceInfo>;
+            }
+
             if (!string.IsNullOrWhiteSpace(serviceInfoResourceParameters.SearchQuery))
             {
                 string searchinQuery = serviceInfoResourceParameters.SearchQuery.Trim().ToLower();

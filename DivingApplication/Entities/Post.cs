@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace DivingApplication.Entities
 {
     [StringContentURLAmountLimit]
-    public class Post
+    public class Post : IHasPlace
     {
 
         public static readonly string urlSplittor = "{%}";
@@ -34,6 +34,7 @@ namespace DivingApplication.Entities
 
         public string ContentURL { get; set; }
 
+
         [ForeignKey("AuthorId")]
         public User Author { get; set; }
         public Guid AuthorId { get; set; }
@@ -54,6 +55,7 @@ namespace DivingApplication.Entities
         public DateTime UpdatedAt { get; set; }
 
         public string LocationAddress { get; set; }
+        public Place Place { get; set; }
         public double Lat { get; set; }
         public double Lng { get; set; }
 

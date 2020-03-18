@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DivingApplication.Entities;
+using System;
 
 namespace DivingApplication.Helpers.ResourceParameters
 {
@@ -7,6 +8,7 @@ namespace DivingApplication.Helpers.ResourceParameters
         // Searching
         public string SearchQuery { get; set; } // Used for searching the title
 
+        public Place Place { get; set; }
         // Pagination
         const int maxPageSize = 50;
         public int PageNumber { get; set; } = 1;
@@ -17,6 +19,8 @@ namespace DivingApplication.Helpers.ResourceParameters
             get => _pageSize;
             set => _pageSize = (value > maxPageSize) ? maxPageSize : value;
         }
+
+
 
         // Sorting and Population
         public string OrderBy { get; set; } = "CreatedAt";

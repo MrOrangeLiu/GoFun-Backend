@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DivingApplication.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace DivingApplication.Helpers.ResourceParameters
         public double Lng { get; set; }
 
         public string OrderBy { get; set; }
-
+        public Place Place { get; set; }
         // Pagination
         const int maxPageSize = 50;
         public int PageNumber { get; set; } = 1;

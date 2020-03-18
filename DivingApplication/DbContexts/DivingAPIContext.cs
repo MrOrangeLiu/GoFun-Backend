@@ -30,6 +30,8 @@ namespace DivingApplication.DbContexts
         public DbSet<ServiceInfo> ServiceInfos { get; set; }
         public DbSet<Topic> Topics { get; set; }
 
+        public DbSet<Place> Places { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();

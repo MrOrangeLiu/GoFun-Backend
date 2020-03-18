@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DivingApplication.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace DivingApplication.Models.Posts
         public string LocationAddress { get; set; }
         public double Lat { get; set; }
         public double Lng { get; set; }
+        public Place Place { get; set; }
         public string PreviewURL { get; set; }
 
         public List<string> ContentURL { get; set; } = new List<string>();

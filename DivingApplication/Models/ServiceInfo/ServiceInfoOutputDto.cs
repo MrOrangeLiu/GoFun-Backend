@@ -1,4 +1,5 @@
-﻿using DivingApplication.Models.Users;
+﻿using DivingApplication.Entities;
+using DivingApplication.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -39,10 +40,12 @@ namespace DivingApplication.Models.ServiceInfo
         [MaxLength(256)]
         public string SocialMediaAccount { get; set; }
         public DateTime CenterOpeningDate { get; set; }
-        public string Location { get; set; }
 
         [MaxLength(2048)]
-        public string DetailedAddress { get; set; }
+        public string LocationAddress { get; set; }
+        public Place Place { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
 
         [MaxLength(1024)]
         public string CenterDescription { get; set; }

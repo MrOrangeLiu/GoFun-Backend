@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using System.Linq.Dynamic.Core;
 using System.Reflection;
+using DivingApplication.Entities;
 
 namespace DivingApplication.Helpers.Extensions
 {
@@ -81,6 +82,55 @@ namespace DivingApplication.Helpers.Extensions
         //    return source; // We need dynamic linq to make it work
 
         //}
+
+
+        static public IQueryable<IHasPlace> SearchingByPlace(this IQueryable<IHasPlace> collection, Place place)
+        {
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (place == null) throw new ArgumentNullException(nameof(place));
+
+            if (!string.IsNullOrWhiteSpace(place.AdministrativeArea))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.Country))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.CountryCode))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.Locality))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.Name))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.PostalCode))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.SubAdministrativeArea))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.SubLocality))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.SubThoroughfare))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            if (!string.IsNullOrWhiteSpace(place.Thoroughfare))
+            {
+                collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+            }
+            return collection;
+        }
 
         public static IQueryable<T> ApplySort<T>(this IQueryable<T> source, string orderBy, Dictionary<string, PropertyMappingValue> mappingDictionary)
         {

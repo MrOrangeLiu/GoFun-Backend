@@ -9,7 +9,7 @@ namespace DivingApplication.Entities
 {
 
 
-    public class ServiceInfo
+    public class ServiceInfo : IHasPlace
     {
 
         public static readonly string urlSplittor = "{%}";
@@ -53,10 +53,12 @@ namespace DivingApplication.Entities
         [MaxLength(256)]
         public string SocialMediaAccount { get; set; }
         public DateTime CenterOpeningDate { get; set; }
-        public string Location { get; set; }
 
         [MaxLength(2048)]
-        public string DetailedAddress { get; set; }
+        public string LocationAddress { get; set; }
+        public Place Place { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
 
         [MaxLength(1024)]
         public string CenterDescription { get; set; }

@@ -45,6 +45,7 @@ namespace DivingApplication.Repositories.Posts
             var collection = _context.Posts
                 .Include(p => p.Author)
                 .ThenInclude(a => a.CoachInfo)
+                .Include(p => p.Place)
                 .Include(p => p.Comments)
                 .Include(p => p.PostLikedBy)
                 .Include(p => p.PostSavedBy)
@@ -56,6 +57,12 @@ namespace DivingApplication.Repositories.Posts
             if (postResourceParameters.AuthorId != Guid.Empty)
             {
                 collection = collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
+            }
+
+            if (postResourceParameters.Place != null)
+            {
+                // Doing place searching here,
+                collection = collection.SearchingByPlace(postResourceParameters.Place) as IQueryable<Post>;
             }
 
 
@@ -94,6 +101,14 @@ namespace DivingApplication.Repositories.Posts
                 .ThenInclude(t => t.Topic)
                 .Include(p => p.TaggedUsers)
                 .ThenInclude(u => u.User) as IQueryable<Post>;
+
+            if (postResourceParameters.Place != null)
+            {
+                // Doing place searching here,
+                collection = collection.SearchingByPlace(postResourceParameters.Place) as IQueryable<Post>;
+            }
+
+
 
             if (postResourceParameters.AuthorId != Guid.Empty)
             {
@@ -152,6 +167,13 @@ namespace DivingApplication.Repositories.Posts
             {
                 collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
             }
+
+            if (postResourceParameters.Place != null)
+            {
+                // Doing place searching here,
+                collection = collection.SearchingByPlace(postResourceParameters.Place) as IQueryable<Post>;
+            }
+
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
             {
@@ -212,6 +234,13 @@ namespace DivingApplication.Repositories.Posts
             if (postResourceParameters.AuthorId != Guid.Empty)
             {
                 collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
+            }
+
+
+            if (postResourceParameters.Place != null)
+            {
+                // Doing place searching here,
+                collection = collection.SearchingByPlace(postResourceParameters.Place) as IQueryable<Post>;
             }
 
             if (!string.IsNullOrWhiteSpace(postResourceParameters.SearchQuery))
@@ -331,6 +360,53 @@ namespace DivingApplication.Repositories.Posts
         }
 
 
+        //static public IQueryable<IHasPlace> SearchingByPlace(IQueryable<IHasPlace> collection, Place place)
+        //{
+        //    if (collection == null) throw new ArgumentNullException(nameof(collection));
+        //    if (place == null) throw new ArgumentNullException(nameof(place));
+
+        //    if (!string.IsNullOrWhiteSpace(place.AdministrativeArea))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.Country))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.CountryCode))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.Locality))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.Name))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.PostalCode))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.SubAdministrativeArea))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.SubLocality))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.SubThoroughfare))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(place.Thoroughfare))
+        //    {
+        //        collection = collection.Where(p => p.Place.AdministrativeArea == place.AdministrativeArea);
+        //    }
+        //    return collection;
+        //}
 
     }
 }

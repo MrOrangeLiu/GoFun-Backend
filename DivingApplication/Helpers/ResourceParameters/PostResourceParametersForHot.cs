@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DivingApplication.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace DivingApplication.Helpers.ResourceParameters
 
         public Guid AuthorId { get; set; }
 
+        public Place Place { get; set; } 
 
         public int PageSize
         {

@@ -39,7 +39,10 @@ namespace DivingApplication.Models.Posts
         public int CommentCount { get; set; }
         public string LocationAddress { get; set; }
         public double Lat { get; set; }
+
         public double Lng { get; set; }
+
+        public Place Place { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

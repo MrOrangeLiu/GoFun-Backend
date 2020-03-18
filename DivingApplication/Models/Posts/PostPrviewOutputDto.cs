@@ -1,4 +1,5 @@
-﻿using DivingApplication.Models.Topic;
+﻿using DivingApplication.Entities;
+using DivingApplication.Models.Topic;
 using DivingApplication.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,8 @@ namespace DivingApplication.Models.Posts
         public double Lat { get; set; }
 
         public double Lng { get; set; }
+
+        public Place Place { get; set; }
 
         public List<TopicOutputDto> PostTopics { get; set; } = new List<TopicOutputDto>();
         public List<UserTaggedOutputDto> TaggedUsers { get; set; } = new List<UserTaggedOutputDto>();
