@@ -45,7 +45,7 @@
 |<ul><li>- [ ] </li></ul>|**Comment**: Like Comment |Could | Richard | ||
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Create CoachInfo |Must | Richard |1 Mar 2020| For storing the info of certain coach user|
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Get CoachInfo by ID|Must | Richard | 1 Mar 2020||
-|<ul><li>- [ ] </li></ul>|**CoachInfo**: Get CoachInfo by Location|Must | Richard | ||
+|<ul><li>- [x] </li></ul>|**CoachInfo**: Get CoachInfo by Location|Must | Richard | ||
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Get CoachInfo by FollowersCount|Must | Richard |1 Mar 2020 ||
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Partially Update Coach Info |Must | Richard | 1 Mar 2020||
 |<ul><li>- [x] </li></ul>|**CoachInfo**: Delete Coach Info |Must | Richard | 1 Mar 2020||
