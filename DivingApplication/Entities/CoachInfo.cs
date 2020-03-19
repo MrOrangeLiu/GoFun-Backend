@@ -5,6 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
+
+enum Certificate
+{
+    
+}
+
+
 namespace DivingApplication.Entities
 {
     public class CoachInfo : IHasPlace

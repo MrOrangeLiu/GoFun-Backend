@@ -11,6 +11,8 @@ namespace DivingApplication.Models.CoachInfo
     {
         public Guid Id { get; set; }
         public UserBriefOutputDto Author { get; set; }
+        public string Certificates { get; set; }
+
         public Guid AuthorId { get; set; }
         public string Description { get; set; } // Describe your story, and introduce yourself
         public List<string> LocationImageUrls { get; set; } // Images for showing the location where you're instructing

@@ -10,6 +10,9 @@ namespace DivingApplication.Helpers.ResourceParameters
     {
         // Searching
         public string SearchQuery { get; set; } // Used for searching the title
+        public Guid TaggedTopicId { get; set; }
+        public Guid TaggedUserId { get; set; }
+        public Guid SavedUserId { get; set; }
 
         public double Lat { get; set; }
         public double Lng { get; set; }

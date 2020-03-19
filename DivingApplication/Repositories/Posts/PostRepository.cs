@@ -59,6 +59,25 @@ namespace DivingApplication.Repositories.Posts
                 collection = collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
             }
 
+            if (postResourceParameters.SavedUserId != Guid.Empty)
+            {
+                User user = await _context.Users.Include(u => u.SavePosts).SingleOrDefaultAsync(u => u.Id == postResourceParameters.SavedUserId);
+                List<Guid> savedPostIds = user.SavePosts.Select(sp => sp.PostId).ToList();
+
+                collection = collection.Where(p => savedPostIds.Contains(p.Id));
+            }
+
+
+            if (postResourceParameters.TaggedUserId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.TaggedUsers.Select(t => t.UserId).Contains(postResourceParameters.TaggedUserId));
+            }
+
+            if (postResourceParameters.TaggedTopicId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.PostTopics.Select(t => t.TopicId).Contains(postResourceParameters.TaggedTopicId));
+            }
+
             if (postResourceParameters.Place != null)
             {
                 // Doing place searching here,
@@ -101,6 +120,19 @@ namespace DivingApplication.Repositories.Posts
                 .ThenInclude(t => t.Topic)
                 .Include(p => p.TaggedUsers)
                 .ThenInclude(u => u.User) as IQueryable<Post>;
+
+
+
+            if (postResourceParameters.TaggedUserId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.TaggedUsers.Select(t => t.UserId).Contains(postResourceParameters.TaggedUserId));
+            }
+
+            if (postResourceParameters.TaggedTopicId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.PostTopics.Select(t => t.TopicId).Contains(postResourceParameters.TaggedTopicId));
+            }
+
 
             if (postResourceParameters.Place != null)
             {
@@ -163,10 +195,24 @@ namespace DivingApplication.Repositories.Posts
                 .Include(p => p.TaggedUsers)
                 .ThenInclude(u => u.User) as IQueryable<Post>;
 
+
+
             if (postResourceParameters.AuthorId != Guid.Empty)
             {
                 collection.Where(p => p.AuthorId == postResourceParameters.AuthorId);
             }
+
+
+            if (postResourceParameters.TaggedUserId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.TaggedUsers.Select(t => t.UserId).Contains(postResourceParameters.TaggedUserId));
+            }
+
+            if (postResourceParameters.TaggedTopicId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.PostTopics.Select(t => t.TopicId).Contains(postResourceParameters.TaggedTopicId));
+            }
+
 
             if (postResourceParameters.Place != null)
             {
@@ -230,6 +276,18 @@ namespace DivingApplication.Repositories.Posts
                 .ThenInclude(u => u.User) as IQueryable<Post>;
 
             collection = collection.Where(p => allFollowingIds.Contains(p.AuthorId));
+
+
+            if (postResourceParameters.TaggedUserId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.TaggedUsers.Select(t => t.UserId).Contains(postResourceParameters.TaggedUserId));
+            }
+
+            if (postResourceParameters.TaggedTopicId != Guid.Empty)
+            {
+                collection = collection.Where(p => p.PostTopics.Select(t => t.TopicId).Contains(postResourceParameters.TaggedTopicId));
+            }
+
 
             if (postResourceParameters.AuthorId != Guid.Empty)
             {

@@ -19,8 +19,12 @@ namespace DivingApplication.Helpers.ResourceParameters
         public string OrderBy { get; set; }
 
         public Guid AuthorId { get; set; }
+        public Guid TaggedTopicId { get; set; }
+        public Guid TaggedUserId { get; set; }
+        public Guid SavedUserId { get; set; }
 
-        public Place Place { get; set; } 
+
+        public Place Place { get; set; }
 
         public int PageSize
         {

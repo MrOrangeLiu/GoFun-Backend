@@ -74,6 +74,8 @@ namespace DivingApplication.DbContexts
             // Dealing with Many-to-Many Relationship
 
 
+            // TODO: Change Many-to-Many to Cascade
+
             modelBuilder.Entity<UserFollow>()
                 .HasKey(uf => new { uf.FollowerId, uf.FollowingId });
 
@@ -140,12 +142,12 @@ namespace DivingApplication.DbContexts
             modelBuilder.Entity<PostTopic>()
                         .HasOne(pt => pt.Post)
                         .WithMany(p => p.PostTopics)
-                        .HasForeignKey(pt => pt.PostId).OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey(pt => pt.PostId).OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PostTopic>()
                         .HasOne(pt => pt.Topic)
                         .WithMany(t => t.TopicPosts)
-                        .HasForeignKey(pt => pt.TopicId).OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey(pt => pt.TopicId).OnDelete(DeleteBehavior.Cascade);
 
 
             modelBuilder.Entity<UserPostSave>()

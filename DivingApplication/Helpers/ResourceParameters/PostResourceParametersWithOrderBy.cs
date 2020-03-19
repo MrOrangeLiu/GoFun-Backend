@@ -13,7 +13,9 @@ namespace DivingApplication.Helpers.ResourceParameters
         const int maxPageSize = 50;
         public int PageNumber { get; set; } = 1;
         private int _pageSize = 20; // Default Page Size
-
+        public Guid SavedUserId { get; set; }
+        public Guid TaggedTopicId { get; set; }
+        public Guid TaggedUserId { get; set; }
         public int PageSize
         {
             get => _pageSize;

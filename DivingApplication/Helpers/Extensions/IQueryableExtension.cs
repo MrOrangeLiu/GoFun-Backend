@@ -83,6 +83,14 @@ namespace DivingApplication.Helpers.Extensions
 
         //}
 
+        static public IQueryable<Post> searchByTaggedUser(this IQueryable<Post> collection, Guid taggedUserId)
+        {
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (taggedUserId == null) throw new ArgumentNullException(nameof(taggedUserId));
+
+            return collection.Where(p => p.TaggedUsers.Select(t => t.UserId).Contains(taggedUserId));
+        }
+
 
         static public IQueryable<IHasPlace> SearchingByPlace(this IQueryable<IHasPlace> collection, Place place)
         {
