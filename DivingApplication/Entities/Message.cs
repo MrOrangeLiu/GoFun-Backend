@@ -13,7 +13,8 @@ namespace DivingApplication.Entities
         public enum MessageContentType
         {
             Text,
-            Photo,
+            Image,
+            Video,
         }
 
         [Key]

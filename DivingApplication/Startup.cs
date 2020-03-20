@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using DivingApplication.Controllers;
 using DivingApplication.DbContexts;
 using DivingApplication.Repositories.CoachInfos;
 using DivingApplication.Repositories.Comments;
@@ -43,6 +44,7 @@ namespace DivingApplication
             var appSettings = appSettingsSection.Get<AppSettingsService>();
 
             services.Configure<AppSettingsService>(appSettingsSection);
+            services.AddSignalR();
 
             services.AddControllers(setupAction =>
             {
@@ -84,7 +86,22 @@ namespace DivingApplication
                          context.Fail("Unauthorized");
                      }
                      return Task.CompletedTask;
-                 }
+                 },
+
+                  OnMessageReceived = context =>
+                  {
+                      var accessToken = context.Request.Query["access_token"];
+
+                     // If the request is for our hub...
+                     var path = context.HttpContext.Request.Path;
+                      if (!string.IsNullOrEmpty(accessToken) &&
+                          (path.StartsWithSegments("/Chat")))
+                      {
+                         // Read the token out of the query string
+                         context.Token = accessToken;
+                      }
+                      return Task.CompletedTask;
+                  }
               };
               x.RequireHttpsMetadata = false;
               x.SaveToken = true;
@@ -93,7 +110,7 @@ namespace DivingApplication
                   ValidateIssuerSigningKey = true,
                   IssuerSigningKey = new SymmetricSecurityKey(key),
                   ValidateIssuer = false,
-                  ValidateAudience = false
+                  ValidateAudience = false,
               };
           });
 
@@ -125,6 +142,7 @@ namespace DivingApplication
                         .AllowAnyHeader();
             }));
 
+
             services.AddControllers();
         }
 
@@ -146,10 +164,19 @@ namespace DivingApplication
 
             app.UseAuthorization();
 
+            //app.UseSignalR(routes =>
+            //{
+            //    routes.MapHub<ChatHub>("/Chat");
+            //});
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<ChatHub>("/Chat");
                 endpoints.MapControllers();
             });
+
+
+
         }
     }
 }
