@@ -24,7 +24,6 @@ namespace DivingApplication.DbContexts
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<ChatRoom> ChatRooms { get; set; }
-        public DbSet<GroupChatRoom> GroupChatRooms { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<CoachInfo> CoachInfos { get; set; }
         public DbSet<ServiceInfo> ServiceInfos { get; set; }

@@ -15,6 +15,7 @@ namespace DivingApplication.Entities
             Text,
             Image,
             Video,
+            System,
         }
 
         [Key]
@@ -23,6 +24,11 @@ namespace DivingApplication.Entities
         [ForeignKey("AuthorId")]
         public User Author { get; set; }
         public Guid AuthorId { get; set; }
+
+        [ForeignKey("BelongChatRoomId")]
+        public ChatRoom BelongChatRoom { get; set; }
+
+        public Guid BelongChatRoomId { get; set; }
 
         public MessageContentType MessageType { get; set; }
 

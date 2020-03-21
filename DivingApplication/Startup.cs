@@ -44,7 +44,14 @@ namespace DivingApplication
             var appSettings = appSettingsSection.Get<AppSettingsService>();
 
             services.Configure<AppSettingsService>(appSettingsSection);
-            services.AddSignalR();
+            services.AddSignalR().AddNewtonsoftJsonProtocol(
+                options => // The first one will be default (XML)
+                {
+                    options.PayloadSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.PayloadSerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;
+                    options.PayloadSerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+                }
+                );
 
             services.AddControllers(setupAction =>
             {
@@ -92,13 +99,13 @@ namespace DivingApplication
                   {
                       var accessToken = context.Request.Query["access_token"];
 
-                     // If the request is for our hub...
-                     var path = context.HttpContext.Request.Path;
+                      // If the request is for our hub...
+                      var path = context.HttpContext.Request.Path;
                       if (!string.IsNullOrEmpty(accessToken) &&
                           (path.StartsWithSegments("/Chat")))
                       {
-                         // Read the token out of the query string
-                         context.Token = accessToken;
+                          // Read the token out of the query string
+                          context.Token = accessToken;
                       }
                       return Task.CompletedTask;
                   }

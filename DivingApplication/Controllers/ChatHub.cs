@@ -31,11 +31,11 @@ namespace DivingApplication.Controllers
 
 
         //[Authorize(Policy = "VerifiedUsers")]
-        public string MethodOneSimpleParameterSimpleReturnValue(string p1)
+        public string MethodOneSimpleParameterSimpleReturnValue(Message message)
         {
 
-            Console.WriteLine($"'MethodOneSimpleParameterSimpleReturnValue' invoked. Parameter value: '{p1}");
-            return p1;
+            Console.WriteLine($"'MethodOneSimpleParameterSimpleReturnValue' invoked. Parameter value: '{message.Content}");
+            return message.Content;
         }
     }
 }

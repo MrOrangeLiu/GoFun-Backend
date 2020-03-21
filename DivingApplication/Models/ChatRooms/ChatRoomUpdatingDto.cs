@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DivingApplication.Entities
+namespace DivingApplication.Models.ChatRoom
 {
-    public class GroupChatRoom : ChatRoom
+    public class ChatRoomUpdatingDto
     {
+        // Only the GroupName can be changed.
         public string GroupName { get; set; }
-        public byte[] GroupPhoto { get; set; }
     }
 }
