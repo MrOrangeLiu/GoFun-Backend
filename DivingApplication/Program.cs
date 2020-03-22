@@ -27,7 +27,6 @@ namespace DivingApplication
 
                     //context.Database.EnsureDeleted(); // Need to send an request for activates
 
-
                     context.Database.EnsureCreated();
                     context.Database.Migrate();
 

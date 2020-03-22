@@ -9,5 +9,7 @@ namespace DivingApplication.Models.ChatRoom
     {
         // Only the GroupName can be changed.
         public string GroupName { get; set; }
+        public byte[] GroupProfileImage { get; set; }
+
     }
 }

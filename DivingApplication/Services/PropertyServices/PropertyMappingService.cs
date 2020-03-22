@@ -1,6 +1,8 @@
 ﻿using DivingApplication.Entities;
+using DivingApplication.Models.ChatRoom;
 using DivingApplication.Models.CoachInfo;
 using DivingApplication.Models.Comments;
+using DivingApplication.Models.Messages;
 using DivingApplication.Models.Posts;
 using DivingApplication.Models.ServiceInfo;
 using DivingApplication.Models.Topic;
@@ -122,6 +124,36 @@ namespace DivingApplication.Services.PropertyServices
             {"UpdatedAt", new PropertyMappingValue(new List<string>(){"UpdatedAt"}, true)},
         };
 
+
+        private Dictionary<string, PropertyMappingValue> _ChatRoomPropertyMapping = new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
+            {"Users", new PropertyMappingValue(new List<string>(){"UserChatRooms.User"})},
+            {"Messages", new PropertyMappingValue(new List<string>(){"Messages"})},
+            {"GroupProfileImage", new PropertyMappingValue(new List<string>(){"GroupProfileImage"})},
+            {"LocationAddress", new PropertyMappingValue(new List<string>(){"LocationAddress"})},
+            {"Place", new PropertyMappingValue(new List<string>(){"Place"})},
+            {"Lat", new PropertyMappingValue(new List<string>(){"Lat"})},
+            {"Lng", new PropertyMappingValue(new List<string>(){"Lng"})},
+            {"IsGroup", new PropertyMappingValue(new List<string>(){"IsGroup"})},
+            {"GroupName", new PropertyMappingValue(new List<string>(){"GroupName"})},
+            {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
+        };
+
+        private Dictionary<string, PropertyMappingValue> _MessagePropertyMapping = new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
+            {"Author", new PropertyMappingValue(new List<string>(){"Author"})},
+            {"AuthorId", new PropertyMappingValue(new List<string>(){"AuthorId"})},
+            {"BelongChatRoomId", new PropertyMappingValue(new List<string>(){"BelongChatRoomId"})},
+            {"MessageType", new PropertyMappingValue(new List<string>(){"MessageType"})},
+            {"Content", new PropertyMappingValue(new List<string>(){"Content"})},
+            {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
+            {"ReadBy", new PropertyMappingValue(new List<string>(){"ReadBy"})},
+            {"LikedBy", new PropertyMappingValue(new List<string>(){"LikedBy"})},
+
+        };
+
         private IList<IPropertyMappingMarker> _propertyMappings = new List<IPropertyMappingMarker>();
 
 
@@ -133,6 +165,9 @@ namespace DivingApplication.Services.PropertyServices
             _propertyMappings.Add(new PropertyMapping<ServiceInfoOutputDto, ServiceInfo>(_serviceInfoPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<TopicOutputDto, Topic>(_topicPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<UserBriefOutputDto, User>(_userPropertyMapping));
+            _propertyMappings.Add(new PropertyMapping<ChatRoomOutputDto, ChatRoom>(_ChatRoomPropertyMapping));
+            _propertyMappings.Add(new PropertyMapping<MessageOutputDto, Message>(_MessagePropertyMapping));
+
         }
         public Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>()
         {
