@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Repositories.Messages
 {
-    public class MessageRepository
+    public class MessageRepository : IMessageRepository
     {
         private readonly DivingAPIContext _context;
         private readonly IPropertyMappingService _propertyMapping;
@@ -91,6 +91,11 @@ namespace DivingApplication.Repositories.Messages
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             _context.Messages.Remove(message);
+        }
+
+        public async Task<bool> Save()
+        {
+            return ((await _context.SaveChangesAsync()) >= 0);
         }
 
     }

@@ -18,7 +18,7 @@ namespace DivingApplication.Helpers.ResourceParameters
         public Guid MemberId { get; set; }
         public Place Place { get; set; }
 
-        public int numOfMessages { get; set; } = 3;
+        public int NumOfMessages { get; set; } = 3;
 
         public int PageSize
         {

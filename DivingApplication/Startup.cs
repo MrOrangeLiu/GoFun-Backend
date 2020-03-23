@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DivingApplication.Controllers;
 using DivingApplication.DbContexts;
+using DivingApplication.Repositories.ChatRooms;
 using DivingApplication.Repositories.CoachInfos;
 using DivingApplication.Repositories.Comments;
+using DivingApplication.Repositories.Messages;
 using DivingApplication.Repositories.Posts;
 using DivingApplication.Repositories.ServiceInfos;
 using DivingApplication.Repositories.Topics;
@@ -80,6 +82,8 @@ namespace DivingApplication
                   OnTokenValidated = (context) =>
                  {
                      var userService = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+
+
                      var userId = Guid.Parse(context.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
                      var user = userService.GetUserForJwt(userId);
 
@@ -138,6 +142,8 @@ namespace DivingApplication
             services.AddScoped<ICoachInfosRepository, CoachInfosRepository>();
             services.AddScoped<IServiceInfosRepository, ServiceInfosRepository>();
             services.AddScoped<ITopicsRepository, TopicsRepository>();
+            services.AddScoped<IChatRepository, ChatRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
 
             services.AddScoped<IPropertyMappingService, PropertyMappingService>();
             services.AddScoped<IPropertyValidationService, PropertyValidationService>();

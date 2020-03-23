@@ -1,5 +1,6 @@
 ﻿using DivingApplication.DbContexts;
 using DivingApplication.Entities;
+using DivingApplication.Entities.ManyToManyEntities;
 using DivingApplication.Helpers;
 using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Repositories.ChatRooms
 {
-    public class ChatRepository
+    public class ChatRepository : IChatRepository
     {
         private readonly DivingAPIContext _context;
         private readonly IPropertyMappingService _propertyMapping;
@@ -44,13 +45,23 @@ namespace DivingApplication.Repositories.ChatRooms
                 .SingleOrDefaultAsync(c => c.Id == chatRoomId);
         }
 
+        public async Task<UserChatRoom> GetUserChatRoom(Guid userId, Guid chatRoomId)
+        {
+            return (UserChatRoom)await _context.FindAsync(typeof(UserChatRoom), userId, chatRoomId);
+        }
+
+        public async void RemoveUserChatRoom(UserChatRoom userChatRoom)
+        {
+            _context.Remove(userChatRoom);
+        }
+
         public async Task<PageList<ChatRoom>> GetChatRooms(ChatRoomResourceParameters resourceParameters)
         {
             if (resourceParameters == null) throw new ArgumentNullException(nameof(resourceParameters));
 
             var collection = _context.ChatRooms
                 .Include(c => c.Place)
-                .Include(c => c.Messages.Take(resourceParameters.numOfMessages))
+                .Include(c => c.Messages.Take(resourceParameters.NumOfMessages))
                 .Include(c => c.UserChatRooms)
                 .ThenInclude(ucr => ucr.User) as IQueryable<ChatRoom>;
 
@@ -70,14 +81,20 @@ namespace DivingApplication.Repositories.ChatRooms
                 collection = collection.SearchingByPlace(resourceParameters.Place) as IQueryable<ChatRoom>;
             }
 
+
+
             if (!string.IsNullOrWhiteSpace(resourceParameters?.OrderBy?.Replace(",", "")))
             {
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<ChatRoomOutputDto, ChatRoom>();
                 collection = collection.ApplySort(resourceParameters.OrderBy, postPropertyMappingDictionary);
             }
+            else
+            {
+                collection = collection.OrderByDescending(c => c.Messages[-1].CreatedAt); // the last // Q: should we do null checking here?
+            }
 
 
-            await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.numOfMessages).ToList());
+            await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.NumOfMessages).ToList());
 
             return PageList<ChatRoom>.Create(collection, resourceParameters.PageNumber, resourceParameters.PageSize);
         }
@@ -116,8 +133,11 @@ namespace DivingApplication.Repositories.ChatRooms
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<ChatRoomOutputDto, ChatRoom>();
                 collection = collection.ApplySort(resourceParameters.OrderBy, postPropertyMappingDictionary);
             }
+            if (resourceParameters.NumOfMessages != null)
+            {
+                await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.NumOfMessages).ToList());
+            }
 
-            await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.numOfMessages).ToList());
             return PageList<ChatRoom>.Create(collection, resourceParameters.PageNumber, resourceParameters.PageSize);
         }
 

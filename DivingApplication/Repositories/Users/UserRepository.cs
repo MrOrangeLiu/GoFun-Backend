@@ -95,6 +95,7 @@ namespace DivingApplication.Repositories.Users
                                      .Include(u => u.OwningPosts)
                                      .Include(u => u.OwningServiceInfos)
                                      .Include(c => c.CoachInfo)
+                                     .Include(u=> u.UserChatRooms)
                                      .SingleOrDefault(x => x.Id == userId);
 
             //return await _context.Users.FindAsync(userId);
