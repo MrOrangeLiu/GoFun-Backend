@@ -34,6 +34,7 @@ namespace DivingApplication.Controllers
             _chatRepository = chatRepository;
             _messageRepository = messageRepository;
             _mapper = mapper;
+            UserIdToConnectionIdDict = new Dictionary<Guid, string>();
         }
 
 
@@ -45,12 +46,17 @@ namespace DivingApplication.Controllers
 
             if (user == null) throw new Exception("Can't find this user in the Database");
 
-            List<string> chatRoomIds = user.UserChatRooms.Select(c => c.ChatRoomId.ToString()).ToList();
+            List<Guid> chatRoomIds = user.UserChatRooms.Select(c => c.ChatRoomId).ToList();
 
-            foreach (var chatRoomId in chatRoomIds)
+            if (chatRoomIds != null && chatRoomIds.Count != 0)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, chatRoomId);
+                foreach (var chatRoomId in chatRoomIds)
+                {
+                    if (chatRoomId != null)
+                        await Groups.AddToGroupAsync(Context.ConnectionId, chatRoomId.ToString());
+                }
             }
+
 
             UserIdToConnectionIdDict.Add(userId, Context.ConnectionId);
 
@@ -177,7 +183,12 @@ namespace DivingApplication.Controllers
 
         public async Task<MessageOutputDto> SendMessageToGroup(MessageForCreatingDto message)
         {
+
+            var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             var messageEntity = _mapper.Map<Message>(message);
+
+            messageEntity.AuthorId = userId;
 
             await _messageRepository.AddMessage(messageEntity);
 

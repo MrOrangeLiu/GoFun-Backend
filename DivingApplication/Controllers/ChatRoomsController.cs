@@ -97,6 +97,22 @@ namespace DivingApplication.Controllers
         }
 
 
+        [Authorize(Policy = "VerifiedUsers")]
+        [HttpGet("{chatRoomId}", Name = "GetChatRoom")]
+        public async Task<IActionResult> GetChatRoom(Guid chatRoomId, [FromQuery] string fields)
+        {
+
+            if (!_propertyValidation.HasValidProperties<ChatRoomOutputDto>(fields)) return BadRequest();
+
+            var chatRoomFromRepo = await _chatRepository.GetChatRoom(chatRoomId);
+
+            if (chatRoomFromRepo == null) return NotFound();
+
+            return Ok(_mapper.Map<ChatRoomOutputDto>(chatRoomFromRepo).ShapeData(fields));
+        }
+
+
+
         private string CreatePostsUri(ChatRoomResourceParameters resourceParameters, UriType uriType, string routeName)
         {
             return Url.Link(routeName, resourceParameters.CreateUrlParameters(uriType));

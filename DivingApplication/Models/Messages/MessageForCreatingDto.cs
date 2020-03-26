@@ -9,6 +9,6 @@ namespace DivingApplication.Models.Messages
     {
         public string MessageType { get; set; }
         public string Content { get; set; }
-        //public Guid BelongChatRoomId { get; set; }
+        public Guid BelongChatRoomId { get; set; }
     }
 }

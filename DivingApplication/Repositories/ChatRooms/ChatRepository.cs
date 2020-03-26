@@ -61,7 +61,7 @@ namespace DivingApplication.Repositories.ChatRooms
 
             var collection = _context.ChatRooms
                 .Include(c => c.Place)
-                .Include(c => c.Messages.Take(resourceParameters.NumOfMessages))
+                .Include(c => c.Messages) //.Take(resourceParameters.NumOfMessages)
                 .Include(c => c.UserChatRooms)
                 .ThenInclude(ucr => ucr.User) as IQueryable<ChatRoom>;
 
@@ -90,11 +90,17 @@ namespace DivingApplication.Repositories.ChatRooms
             }
             else
             {
-                collection = collection.OrderByDescending(c => c.Messages[-1].CreatedAt); // the last // Q: should we do null checking here?
+                //c.Messages.LastOrDefault().CreatedAt
+                collection = collection.OrderByDescending(c => c.Messages.OrderByDescending(m => m.CreatedAt).FirstOrDefault().CreatedAt); // the last // Q: should we do null checking here?
             }
 
 
-            await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.NumOfMessages).ToList());
+            if (resourceParameters.NumOfMessages != null)
+            {
+                await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.NumOfMessages).ToList());
+            }
+
+
 
             return PageList<ChatRoom>.Create(collection, resourceParameters.PageNumber, resourceParameters.PageSize);
         }
@@ -133,6 +139,12 @@ namespace DivingApplication.Repositories.ChatRooms
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<ChatRoomOutputDto, ChatRoom>();
                 collection = collection.ApplySort(resourceParameters.OrderBy, postPropertyMappingDictionary);
             }
+            else
+            {
+                //c.Messages.LastOrDefault().CreatedAt
+                collection = collection.OrderByDescending(c => c.Messages.OrderByDescending(m => m.CreatedAt).FirstOrDefault().CreatedAt); // the last // Q: should we do null checking here?
+            }
+
             if (resourceParameters.NumOfMessages != null)
             {
                 await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.NumOfMessages).ToList());

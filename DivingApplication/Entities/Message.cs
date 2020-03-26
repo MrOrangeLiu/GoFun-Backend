@@ -34,7 +34,7 @@ namespace DivingApplication.Entities
 
         public string Content { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public List<UserMessageRead> ReadBy { get; set; } = new List<UserMessageRead>();
         public List<UserMessageLike> LikedBy { get; set; } = new List<UserMessageLike>();
