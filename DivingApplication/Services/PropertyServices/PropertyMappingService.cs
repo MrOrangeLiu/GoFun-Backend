@@ -143,7 +143,6 @@ namespace DivingApplication.Services.PropertyServices
         private Dictionary<string, PropertyMappingValue> _MessagePropertyMapping = new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
         {
             {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
-            {"Author", new PropertyMappingValue(new List<string>(){"Author"})},
             {"AuthorId", new PropertyMappingValue(new List<string>(){"AuthorId"})},
             {"BelongChatRoomId", new PropertyMappingValue(new List<string>(){"BelongChatRoomId"})},
             {"MessageType", new PropertyMappingValue(new List<string>(){"MessageType"})},

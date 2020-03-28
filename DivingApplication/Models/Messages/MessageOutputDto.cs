@@ -11,7 +11,6 @@ namespace DivingApplication.Models.Messages
     {
         [Key]
         public Guid Id { get; set; }
-        public UserBriefOutputDto Author { get; set; }
         public Guid AuthorId { get; set; }
         public Guid BelongChatRoomId { get; set; }
         public string MessageType { get; set; }

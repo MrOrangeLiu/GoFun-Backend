@@ -1,4 +1,5 @@
 ﻿using DivingApplication.Entities;
+using DivingApplication.Helpers;
 using DivingApplication.Helpers.ResourceParameters;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace DivingApplication.Repositories.Messages
         Task AddMessage(Message message);
         void DeleteMessage(Message message);
         Task<Message> GetMessage(Guid messageId);
-        Task<List<Message>> GetMessages(MessageResourceParameters resourceParameters);
+        Task<PageList<Message>> GetMessages(MessageResourceParameters resourceParameters);
         Task<bool> Save();
     }
 }

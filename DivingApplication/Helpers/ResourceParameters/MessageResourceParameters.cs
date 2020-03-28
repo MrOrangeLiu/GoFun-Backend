@@ -19,7 +19,7 @@ namespace DivingApplication.Helpers.ResourceParameters
 
         public Guid AfterMessageId { get; set; }
         public Guid BeforeMessageId { get; set; }
-        public Guid RoomId { get; set; }
+        public Guid ChatRoomId { get; set; }
         public int PageSize
         {
             get => _pageSize;

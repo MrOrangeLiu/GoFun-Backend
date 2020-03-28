@@ -40,6 +40,7 @@ namespace DivingApplication.Repositories.ChatRooms
 
             return await _context.ChatRooms
                 .OrderByDescending(c => c.CreatedAt)
+                .Include(c => c.UserChatRooms)
                 .Include(c => c.Place)
                 .Include(c => c.Messages)
                 .SingleOrDefaultAsync(c => c.Id == chatRoomId);
@@ -189,6 +190,8 @@ namespace DivingApplication.Repositories.ChatRooms
         }
 
         #endregion
+
+
 
 
     }

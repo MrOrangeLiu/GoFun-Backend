@@ -12,7 +12,7 @@ namespace DivingApplication.Models.ChatRoom
     {
         public Guid Id { get; set; }
 
-        public List<UserOutputDto> Users { get; set; } = new List<UserOutputDto>();
+        public List<UserBriefOutputDto> Users { get; set; } = new List<UserBriefOutputDto>();
         public List<MessageOutputDto> Messages { get; set; } = new List<MessageOutputDto>();
         public DateTime CreatedAt { get; set; }
         public byte[] GroupProfileImage { get; set; }

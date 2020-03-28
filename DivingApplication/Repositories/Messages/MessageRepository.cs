@@ -41,16 +41,16 @@ namespace DivingApplication.Repositories.Messages
             return await _context.Messages.Include(m => m.Author).SingleOrDefaultAsync(m => m.Id == messageId);
         }
 
-        public async Task<List<Message>> GetMessages(MessageResourceParameters resourceParameters)
+        public async Task<PageList<Message>> GetMessages(MessageResourceParameters resourceParameters)
         {
             if (resourceParameters == null) throw new ArgumentNullException(nameof(resourceParameters));
 
 
             var collection = _context.Messages.Include(m => m.Author) as IQueryable<Message>;
 
-            if (resourceParameters.RoomId != Guid.Empty)
+            if (resourceParameters.ChatRoomId != Guid.Empty)
             {
-                collection = collection.Where(m => m.BelongChatRoomId == resourceParameters.RoomId);
+                collection = collection.Where(m => m.BelongChatRoomId == resourceParameters.ChatRoomId);
             }
 
             if (resourceParameters.AfterMessageId != null)

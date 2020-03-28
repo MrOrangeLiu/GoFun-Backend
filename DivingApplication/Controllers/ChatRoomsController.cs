@@ -28,7 +28,7 @@ namespace DivingApplication.Controllers
         private readonly IPropertyValidationService _propertyValidation;
         public ChatRoomsController(IChatRepository chatRepository, IMapper mapper, IPropertyMappingService propertyMapping, IPropertyValidationService propertyValidation)
         {
-            _chatRepository = chatRepository;
+            _chatRepository = chatRepository ?? throw new ArgumentNullException(nameof(chatRepository));
             _propertyMapping = propertyMapping ?? throw new ArgumentNullException(nameof(propertyMapping));
             _propertyValidation = propertyValidation ?? throw new ArgumentNullException(nameof(propertyValidation));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
