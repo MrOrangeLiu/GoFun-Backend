@@ -98,7 +98,11 @@ namespace DivingApplication.Repositories.ChatRooms
 
             if (resourceParameters.NumOfMessages != null)
             {
-                await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.NumOfMessages).ToList());
+                //await collection.ForEachAsync(c => c.Messages = c.Messages.TakeLast(resourceParameters.NumOfMessages).ToList());
+                await collection.ForEachAsync(c => c.Messages = c.Messages.OrderByDescending(m => m.CreatedAt).Take(resourceParameters.NumOfMessages).ToList());
+
+                // From the most recent
+
             }
 
 

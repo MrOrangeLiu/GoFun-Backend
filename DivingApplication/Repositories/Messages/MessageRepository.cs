@@ -82,6 +82,10 @@ namespace DivingApplication.Repositories.Messages
                 var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<MessageOutputDto, Message>();
                 collection = collection.ApplySort(resourceParameters.OrderBy, postPropertyMappingDictionary);
             }
+            else
+            {
+                collection = collection.OrderByDescending(c => c.CreatedAt);
+            }
 
             return PageList<Message>.Create(collection, resourceParameters.PageNumber, resourceParameters.PageSize);
 
