@@ -52,9 +52,10 @@ namespace DivingApplication.Repositories.Messages
             {
                 collection = collection.Where(m => m.BelongChatRoomId == resourceParameters.ChatRoomId);
             }
-
-            if (resourceParameters.AfterMessageId != null)
+             
+            if (resourceParameters.AfterMessageId != Guid.Empty)
             {
+
                 var afterMessage = await _context.Messages.FindAsync(resourceParameters.AfterMessageId);
 
                 if (afterMessage == null) throw new Exception("Cannot find afterMessage");
@@ -62,7 +63,7 @@ namespace DivingApplication.Repositories.Messages
                 collection = collection.Where(m => m.CreatedAt.CompareTo(afterMessage.CreatedAt) >= 0 && m.Id != resourceParameters.AfterMessageId);
             }
 
-            if (resourceParameters.BeforeMessageId != null)
+            if (resourceParameters.BeforeMessageId != Guid.Empty)
             {
                 var beforeMessage = await _context.Messages.FindAsync(resourceParameters.BeforeMessageId);
 
