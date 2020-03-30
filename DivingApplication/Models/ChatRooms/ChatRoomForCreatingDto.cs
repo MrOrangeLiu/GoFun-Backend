@@ -11,14 +11,15 @@ namespace DivingApplication.Models.ChatRoom
     {
         [Required]
         public bool IsGroup { get; set; }
+
+        [MaxLength(128)]
         public string GroupName { get; set; }
         public byte[] GroupProfileImage { get; set; }
-
-        public List<string> UserIds { get; set; } = new List<string>();
-
+        [MaxLength(1024)]
         public string LocationAddress { get; set; }
         public Place Place { get; set; }
         public double Lat { get; set; }
         public double Lng { get; set; }
+
     }
 }

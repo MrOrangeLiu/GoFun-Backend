@@ -5,22 +5,11 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Entities.ManyToManyEntities
 {
-    public class UserChatRoom
+    public class ChatRoomInviteUser
     {
-        public enum UserChatRoomRole
-        {
-            Pending,
-            Normal,
-            Admin,
-            Ownder
-        }
-
         public Guid UserId { get; set; }
         public User User { get; set; }
         public Guid ChatRoomId { get; set; }
         public ChatRoom ChatRoom { get; set; }
-
-        // public
-        public UserChatRoomRole Role { get; set; }
     }
 }

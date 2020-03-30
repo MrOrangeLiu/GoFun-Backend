@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static DivingApplication.Entities.User;
+using DivingApplication.Entities.ManyToManyEntities;
 
 namespace DivingApplication.Profiles
 {
@@ -40,7 +41,8 @@ namespace DivingApplication.Profiles
                 .ForMember(dest => dest.UserChatRooms, opt => opt.MapFrom(src => src.UserChatRooms.Select(c => c.ChatRoomId).ToList()))
                 .ForMember(dest => dest.SavePosts, opt => opt.MapFrom(src => src.SavePosts.Select(p => p.PostId).ToList()))
                 .ForMember(dest => dest.LikePosts, opt => opt.MapFrom(src => src.LikePosts.Select(p => p.PostId).ToList()))
-                .ForMember(dest => dest.OwingServiceInfos, opt => opt.MapFrom(src => src.OwningServiceInfos.Select(s => s.Id).ToList()));
+                .ForMember(dest => dest.OwningServiceInfos, opt => opt.MapFrom(src => src.OwningServiceInfos.Select(s => s.Id).ToList()))
+                ;
 
 
 

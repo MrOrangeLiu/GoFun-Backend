@@ -45,10 +45,10 @@ namespace DivingApplication.Repositories.Users
                                      .Include(u => u.SavePosts)
                                      .Include(u => u.Followers)
                                      .Include(u => u.Following)
-                                     .Include(u => u.OwingComments)
+                                     .Include(u => u.OwningComments)
                                      .Include(u => u.OwningPosts)
                                      .Include(u => u.OwningServiceInfos)
-                                     .Include(c => c.CoachInfo)
+                                     .Include(u => u.CoachInfo)
                                      .SingleOrDefault(x => x.Email == Email);
 
             // check if Email exists
@@ -91,11 +91,11 @@ namespace DivingApplication.Repositories.Users
                                      .Include(u => u.SavePosts)
                                      .Include(u => u.Followers)
                                      .Include(u => u.Following)
-                                     .Include(u => u.OwingComments)
+                                     .Include(u => u.OwningComments)
                                      .Include(u => u.OwningPosts)
                                      .Include(u => u.OwningServiceInfos)
                                      .Include(c => c.CoachInfo)
-                                     .Include(u=> u.UserChatRooms)
+                                     .Include(u => u.UserChatRooms)
                                      .SingleOrDefault(x => x.Id == userId);
 
             //return await _context.Users.FindAsync(userId);

@@ -8,6 +8,7 @@ using DivingApplication.Repositories.Messages;
 using DivingApplication.Repositories.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -118,6 +119,89 @@ namespace DivingApplication.Controllers
         }
 
 
+        public async Task<ChatRoomOutputDto> CreateGroupChatRoom(ChatRoomForCreatingDto chatRoom)
+        {
+
+            // Get CurrentUser Id
+            var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Transform to Entity
+            var chatRoomEntity = _mapper.Map<ChatRoom>(chatRoom);
+
+            // Adding this ChatRoom to Db for Id
+            await _chatRepository.AddChatRoom(chatRoomEntity);
+
+            // Modify the Required Fields
+            chatRoomEntity.IsGroup = true;
+            chatRoomEntity.CreatedAt = DateTime.Now;
+            chatRoomEntity.UserChatRooms.Add(
+                    new UserChatRoom()
+                    {
+                        ChatRoomId = chatRoomEntity.Id,
+                        UserId = userId,
+                        Role = UserChatRoom.UserChatRoomRole.Ownder,
+                    }
+                );
+
+            // Save to Db
+            await _chatRepository.Save();
+
+            // Tranform to ReturnType
+            var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomEntity);
+
+            // Return the ChatRoom
+            return chatRoomToReturn;
+        }
+
+        public async Task<ChatRoomOutputDto> UpdateGroupChatRoom(string chatRoomIdString, JsonPatchDocument<ChatRoomUpdatingDto> patchDocument)
+        {
+            if (string.IsNullOrWhiteSpace(chatRoomIdString)) throw new Exception("chatRoomIdString is needed");
+
+            // Get User
+            var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = await _userRepository.GetUser(userId);
+
+            // Get ChatRoom
+            var chatRoomId = Guid.Parse(chatRoomIdString);
+            var chatRoomFromRepo = await _chatRepository.GetChatRoom(chatRoomId);
+
+            // Get userChatRoom
+
+            var userChatRoom = await _chatRepository.GetUserChatRoom(userId, chatRoomId);
+
+            // Checking if the ChatRoom Exists
+            if (chatRoomFromRepo == null) throw new Exception("Cannot find ChatRoom");
+
+            // Checking if the user have the right to edite the chatRoom, by 3 Conditions:
+            // 1. Is the owner of the ChatRoom
+            // 2. Is the Admin in this App
+            // 3. Is the Admin in this ChatRoom
+            if (user.UserRole != User.Role.Admin && userChatRoom.Role != UserChatRoom.UserChatRoomRole.Ownder && userChatRoom.Role != UserChatRoom.UserChatRoomRole.Admin) throw new Exception("Not Authorised");
+
+            // Transform the Entity to UpdatingDto (Prepare for Patching)
+            var chatRoomToPatch = _mapper.Map<ChatRoomUpdatingDto>(chatRoomFromRepo);
+
+            // Apply the Patch to UpdatingDto (From Repo)
+            patchDocument.ApplyTo(chatRoomToPatch);
+
+            // Validate the Model
+            if (!chatRoomToPatch.IsValidModel()) throw new Exception("The updating value is not valid");
+
+            // Using the UpdatingDto to Override the ChatRoomFromRepo
+            _mapper.Map(chatRoomToPatch, chatRoomFromRepo); // Overriding
+
+            // Saving to Db
+            await _chatRepository.Save();
+
+            var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomFromRepo);
+
+            // Notify All Users that the ChatRoom has been Updated
+            Clients.Group(chatRoomIdString).SendAsync("OnChatRoomChanged", chatRoomToReturn); //TODO: Complete this in Client Side
+
+            return chatRoomToReturn;
+        }
+
+
         public async Task<ChatRoomOutputDto> AddToRoom(string chatRoomString)
         {
             if (string.IsNullOrWhiteSpace(chatRoomString)) throw new ArgumentNullException(nameof(chatRoomString));
@@ -181,22 +265,28 @@ namespace DivingApplication.Controllers
             Clients.All.SendAsync("OnMessageObject", new object[] { message });
         }
 
-        public async Task<MessageOutputDto> SendMessageToGroup(MessageForCreatingDto message)
+        public async Task<MessageOutputDto> SendMessage(MessageForCreatingDto message)
         {
-
             var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             var messageEntity = _mapper.Map<Message>(message);
 
             messageEntity.AuthorId = userId;
 
+            // Checking if the ChatRoom Exist
+
+            if (!(await _chatRepository.ChatRoomExists(message.BelongChatRoomId))) throw new Exception("Cannot find this ChatRoom");
+
             await _messageRepository.AddMessage(messageEntity);
 
             await _messageRepository.Save();
 
-            var MessageToReturn = _mapper.Map<MessageOutputDto>(messageEntity);
+            var messageToReturn = _mapper.Map<MessageOutputDto>(messageEntity);
 
-            return MessageToReturn;
+            // Sending to the Group
+            Clients.Group(messageToReturn.Id.ToString()).SendAsync("OnMessage", messageToReturn);
+
+            return messageToReturn;
         }
 
 

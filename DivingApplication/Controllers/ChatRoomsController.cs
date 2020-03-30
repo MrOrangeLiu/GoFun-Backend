@@ -112,6 +112,11 @@ namespace DivingApplication.Controllers
         }
 
 
+        //[Authorize(Policy = "VerifiedUsers")]
+        //[HttpGet("{chatRoomId}", Name = "GetInvitedUsersForChatRoom")]
+        //public  async Task<IActionResult> GetInvitedUsersForChatRoom(Guid chatRoomId, ChatRoomResourceParameters resourceParameters)
+
+
 
         private string CreatePostsUri(ChatRoomResourceParameters resourceParameters, UriType uriType, string routeName)
         {

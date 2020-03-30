@@ -91,6 +91,41 @@ namespace DivingApplication.DbContexts
                         .HasForeignKey(uf => uf.FollowingId)
                         .OnDelete(DeleteBehavior.Restrict);
 
+
+            //modelBuilder.Entity<ChatRoomInviteUser>()
+            //    .HasKey(c => new { c.UserId, c.ChatRoomId });
+
+
+            //modelBuilder.Entity<ChatRoomInviteUser>()
+            //            .HasOne(c => c.ChatRoom)
+            //            .WithMany(c => c.ChatRoomInviteUsers)
+            //            .HasForeignKey(c => c.ChatRoomId)
+            //            .OnDelete(DeleteBehavior.Restrict);
+
+            //modelBuilder.Entity<ChatRoomInviteUser>()
+            //            .HasOne(c => c.User)
+            //            .WithMany(u => u.ChatRoomInvitations)
+            //            .HasForeignKey(c => c.UserId)
+            //            .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            //modelBuilder.Entity<ChatRoomAdminUser>()
+            //    .HasKey(c => new { c.UserId, c.ChatRoomId });
+
+
+            //modelBuilder.Entity<ChatRoomAdminUser>()
+            //            .HasOne(c => c.ChatRoom)
+            //            .WithMany(c => c.ChatRoomAdminUsers)
+            //            .HasForeignKey(c => c.ChatRoomId)
+            //            .OnDelete(DeleteBehavior.Restrict);
+
+            //modelBuilder.Entity<ChatRoomAdminUser>()
+            //            .HasOne(c => c.User)
+            //            .WithMany(u => u.AdminChatRooms)
+            //            .HasForeignKey(c => c.UserId)
+            //            .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<UserChatRoom>()
                 .HasKey(uc => new { uc.UserId, uc.ChatRoomId });
 
@@ -199,9 +234,10 @@ namespace DivingApplication.DbContexts
 
             // If the user is deleted, then the comments and posts will not be affected
             modelBuilder.Entity<User>().HasMany(u => u.OwningPosts).WithOne(p => p.Author).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<User>().HasMany(u => u.OwingComments).WithOne(c => c.Author).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Post>().HasMany(p => p.Comments).WithOne(c => c.BelongPost).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>().HasMany(u => u.OwningComments).WithOne(c => c.Author).OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<User>().HasMany(u => u.OwningChatRoom).WithOne(c => c.Owner).OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Post>().HasMany(p => p.Comments).WithOne(c => c.BelongPost).OnDelete(DeleteBehavior.Restrict);
             base.OnModelCreating(modelBuilder);
 
         }

@@ -46,14 +46,21 @@ namespace DivingApplication.Repositories.ChatRooms
                 .SingleOrDefaultAsync(c => c.Id == chatRoomId);
         }
 
-        public async Task<UserChatRoom> GetUserChatRoom(Guid userId, Guid chatRoomId)
-        {
-            return (UserChatRoom)await _context.FindAsync(typeof(UserChatRoom), userId, chatRoomId);
-        }
+
 
         public async void RemoveUserChatRoom(UserChatRoom userChatRoom)
         {
             _context.Remove(userChatRoom);
+        }
+
+
+
+        public async Task<UserChatRoom> GetUserChatRoom(Guid userId, Guid chatRoomId)
+        {
+            if (chatRoomId == Guid.Empty) throw new ArgumentNullException(nameof(chatRoomId));
+            if (userId == Guid.Empty) throw new ArgumentNullException(nameof(userId));
+
+            return (UserChatRoom)await _context.FindAsync(typeof(UserChatRoom), userId, chatRoomId);
         }
 
         public async Task<PageList<ChatRoom>> GetChatRooms(ChatRoomResourceParameters resourceParameters)

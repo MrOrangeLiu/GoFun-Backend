@@ -14,6 +14,9 @@ namespace DivingApplication.Models.ChatRoom
 
         public List<UserBriefOutputDto> Users { get; set; } = new List<UserBriefOutputDto>();
         public List<MessageOutputDto> Messages { get; set; } = new List<MessageOutputDto>();
+        public List<Guid> Admins { get; set; } = new List<Guid>(); // Admin Must the the memebers
+        public List<Guid> Pendings { get; set; } = new List<Guid>();
+        public Guid OwnerId { get; set; }
         public DateTime CreatedAt { get; set; }
         public byte[] GroupProfileImage { get; set; }
         #region GroupNeededFields

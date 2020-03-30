@@ -63,14 +63,16 @@ namespace DivingApplication.Entities
         public List<UserFollow> Followers { get; set; } = new List<UserFollow>();
         public List<UserFollow> Following { get; set; } = new List<UserFollow>();
         public List<Post> OwningPosts { get; set; } = new List<Post>();
-        public List<Comment> OwingComments { get; set; } = new List<Comment>();
+        public List<Comment> OwningComments { get; set; } = new List<Comment>();
         public List<UserChatRoom> UserChatRooms { get; set; } = new List<UserChatRoom>();
+        public List<ChatRoom> OwningChatRoom { get; set; } = new List<ChatRoom>();
         public List<UserPostLike> LikePosts { get; set; } = new List<UserPostLike>();
         public List<UserPostSave> SavePosts { get; set; } = new List<UserPostSave>();
         public List<UserMessageLike> LikeMessages { get; set; } = new List<UserMessageLike>();
         public List<UserMessageRead> ReadMessages { get; set; } = new List<UserMessageRead>();
         public List<ServiceInfo> OwningServiceInfos { get; set; } = new List<ServiceInfo>();
         public List<UserPostTag> PostsTaggedMe { get; set; } = new List<UserPostTag>();
-
+        //public List<ChatRoomInviteUser> ChatRoomInvitations { get; set; } = new List<ChatRoomInviteUser>();
+        //public List<ChatRoomAdminUser> AdminChatRooms { get; set; } = new List<ChatRoomAdminUser>();
     }
 }
