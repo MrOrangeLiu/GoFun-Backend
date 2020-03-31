@@ -109,3 +109,14 @@ https://blog.yowko.com/iis-express-allow-external-access/
 
 Solution: Delete the Database using "context.Database.EnsureDeleted();" then remove the old migraiton and migrate again in Package Manager
 
+
+### (When using MainKit to Sending Email) mx.google.com gave this error:
+[40.92.254.58 14] Messages missing a valid address in From: header, or having no From: header, are not accepted. cq16si1609741pjb.130 - gsmtp
+
+Solution: 
+
+Adding this in the Sending:
+
+```c#
+sendingMessage.From.Add(new MailboxAddress("GoFun", "diving_app_2020@outlook.com"));
+```
