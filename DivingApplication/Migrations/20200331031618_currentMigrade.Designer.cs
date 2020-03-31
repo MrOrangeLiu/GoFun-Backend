@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DivingApplication.Migrations
 {
     [DbContext(typeof(DivingAPIContext))]
-    [Migration("20200330162817_addingAttributesToChatRoom")]
-    partial class addingAttributesToChatRoom
+    [Migration("20200331031618_currentMigrade")]
+    partial class currentMigrade
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,19 +47,20 @@ namespace DivingApplication.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("LocationAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("nvarchar(1024)")
+                        .HasMaxLength(1024);
 
                     b.Property<Guid?>("PlaceId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
-
                     b.HasIndex("PlaceId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ChatRooms");
                 });
@@ -145,36 +146,6 @@ namespace DivingApplication.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.ChatRoomAdminUser", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ChatRoomId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "ChatRoomId");
-
-                    b.HasIndex("ChatRoomId");
-
-                    b.ToTable("ChatRoomAdminUser");
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.ChatRoomInviteUser", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ChatRoomId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "ChatRoomId");
-
-                    b.HasIndex("ChatRoomId");
-
-                    b.ToTable("ChatRoomInviteUser");
-                });
-
             modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.PostTopic", b =>
                 {
                     b.Property<Guid>("PostId")
@@ -197,6 +168,9 @@ namespace DivingApplication.Migrations
 
                     b.Property<Guid>("ChatRoomId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId", "ChatRoomId");
 
@@ -591,15 +565,13 @@ namespace DivingApplication.Migrations
 
             modelBuilder.Entity("DivingApplication.Entities.ChatRoom", b =>
                 {
-                    b.HasOne("DivingApplication.Entities.User", "Owner")
-                        .WithMany("OwningChatRoom")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("DivingApplication.Entities.Place", "Place")
                         .WithMany()
                         .HasForeignKey("PlaceId");
+
+                    b.HasOne("DivingApplication.Entities.User", null)
+                        .WithMany("OwningChatRoom")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("DivingApplication.Entities.CoachInfo", b =>
@@ -626,36 +598,6 @@ namespace DivingApplication.Migrations
                     b.HasOne("DivingApplication.Entities.Post", "BelongPost")
                         .WithMany("Comments")
                         .HasForeignKey("BelongPostId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.ChatRoomAdminUser", b =>
-                {
-                    b.HasOne("DivingApplication.Entities.ChatRoom", "ChatRoom")
-                        .WithMany("ChatRoomAdminUsers")
-                        .HasForeignKey("ChatRoomId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DivingApplication.Entities.User", "User")
-                        .WithMany("AdminChatRooms")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DivingApplication.Entities.ManyToManyEntities.ChatRoomInviteUser", b =>
-                {
-                    b.HasOne("DivingApplication.Entities.ChatRoom", "ChatRoom")
-                        .WithMany("ChatRoomInviteUsers")
-                        .HasForeignKey("ChatRoomId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DivingApplication.Entities.User", "User")
-                        .WithMany("ChatRoomInvitations")
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

@@ -1,5 +1,5 @@
 ﻿using DivingApplication.Entities;
-using DivingApplication.Models.ChatRoom;
+using DivingApplication.Models.ChatRooms;
 using DivingApplication.Models.CoachInfo;
 using DivingApplication.Models.Comments;
 using DivingApplication.Models.Messages;

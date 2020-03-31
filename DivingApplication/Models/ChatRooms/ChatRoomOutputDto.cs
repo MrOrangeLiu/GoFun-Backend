@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DivingApplication.Models.ChatRoom
+namespace DivingApplication.Models.ChatRooms
 {
     public class ChatRoomOutputDto
     {

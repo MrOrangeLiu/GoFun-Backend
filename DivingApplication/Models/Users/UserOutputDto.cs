@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DivingApplication.Models.CoachInfo;
 using System.Linq;
 using System.Threading.Tasks;
-using DivingApplication.Models.ChatRoom;
+using DivingApplication.Models.ChatRooms;
 
 namespace DivingApplication.Models.Users
 {
@@ -18,8 +18,6 @@ namespace DivingApplication.Models.Users
         public byte[] ProfileImage { set; get; }
 
         public string Intro { get; set; }
-
-
         public string UserRole { get; set; }
         public string UserGender { get; set; }
         public DateTime CreatedAt { get; set; }

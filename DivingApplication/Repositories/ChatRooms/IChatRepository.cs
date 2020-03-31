@@ -17,6 +17,7 @@ namespace DivingApplication.Repositories.ChatRooms
         Task<PageList<ChatRoom>> GetSelfChatRooms(ChatRoomResourceParameters resourceParameters);
         Task<ChatRoom> GetTwoMembersPrivateRoom(Guid userAId, Guid userBId);
         Task<UserChatRoom> GetUserChatRoom(Guid userId, Guid chatRoomId);
+        void RemoveChatRoom(ChatRoom chatRoom);
         void RemoveUserChatRoom(UserChatRoom userChatRoom);
         Task<bool> Save();
     }

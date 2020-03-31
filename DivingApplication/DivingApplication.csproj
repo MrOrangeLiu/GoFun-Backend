@@ -31,6 +31,16 @@
     <Compile Remove="Migrations\20200313150725_test.Designer.cs" />
     <Compile Remove="Migrations\20200313151708_removeProfileIamge.cs" />
     <Compile Remove="Migrations\20200313151708_removeProfileIamge.Designer.cs" />
+    <Compile Remove="Migrations\20200316132711_addIntroToUser.cs" />
+    <Compile Remove="Migrations\20200316132711_addIntroToUser.Designer.cs" />
+    <Compile Remove="Migrations\20200322150413_addMessageAndChatRoom.cs" />
+    <Compile Remove="Migrations\20200322150413_addMessageAndChatRoom.Designer.cs" />
+    <Compile Remove="Migrations\20200330162817_addingAttributesToChatRoom.cs" />
+    <Compile Remove="Migrations\20200330162817_addingAttributesToChatRoom.Designer.cs" />
+    <Compile Remove="Migrations\20200331025730_current.cs" />
+    <Compile Remove="Migrations\20200331025730_current.Designer.cs" />
+    <Compile Remove="Migrations\20200331030637_current.cs" />
+    <Compile Remove="Migrations\20200331030637_current.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,7 +49,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="MailKit" Version="2.5.1" />
+    <PackageReference Include="MailKit" Version="2.5.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.1.2" />

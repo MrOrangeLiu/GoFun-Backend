@@ -4,7 +4,7 @@ using DivingApplication.Entities.ManyToManyEntities;
 using DivingApplication.Helpers;
 using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
-using DivingApplication.Models.ChatRoom;
+using DivingApplication.Models.ChatRooms;
 using DivingApplication.Services.PropertyServices;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -48,9 +48,14 @@ namespace DivingApplication.Repositories.ChatRooms
 
 
 
-        public async void RemoveUserChatRoom(UserChatRoom userChatRoom)
+        public void RemoveUserChatRoom(UserChatRoom userChatRoom)
         {
             _context.Remove(userChatRoom);
+        }
+
+        public void RemoveChatRoom(ChatRoom chatRoom)
+        {
+            _context.ChatRooms.Remove(chatRoom);
         }
 
 

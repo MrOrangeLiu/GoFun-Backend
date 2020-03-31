@@ -12,7 +12,7 @@ namespace DivingApplication.Entities.ManyToManyEntities
             Pending,
             Normal,
             Admin,
-            Ownder
+            Owner
         }
 
         public Guid UserId { get; set; }

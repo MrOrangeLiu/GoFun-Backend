@@ -245,14 +245,17 @@ namespace DivingApplication.Repositories.Users
 
             var sendingMessage = new MimeMessage
             {
-                Sender = new MailboxAddress("DivingApp", "diving_app_2020@outlook.com"),
-                Subject = "Diving App 驗證信",
+                Sender = new MailboxAddress("GoFun", "diving_app_2020@outlook.com"),
+                Subject = "GoFun 驗證碼",
             };
+
+            // Setting the From
+            sendingMessage.From.Add(new MailboxAddress("GoFun", "diving_app_2020@outlook.com"));
 
 
             sendingMessage.Body = new TextPart(TextFormat.Html)
             {
-                Text = $"</br></br><center><h1> 使用者 { user.Name } 您好 </h1></center></br><center><h3> 您的身分驗證碼為: {user.EmailVerificationCode} </ h3></center></br></br><center><p> Diving App 團隊 </p><p> 敬上<p> </center> "
+                Text = $"</br></br><center><h1> { user.Name }, 您好 </h1></center></br><center><p>請用此驗證碼來驗證您的<strong> GoFun </strong>帳戶: </p><h3>您的驗證碼為: <strong>{user.EmailVerificationCode}</strong></h3><p>若您未註冊過 GoFun 的會員, 請忽略此信</p><p>若您需要更多的協助, 歡迎發送 E-Mail 至:</p><h5>diving_app_2020@outlook.com</h5><p>我們將盡快與您聯絡</p></center></br></br><center><h4>GoFun團隊</h4><p>敬上<p></center>"
             };
 
             sendingMessage.To.Add(new MailboxAddress(user.Email));

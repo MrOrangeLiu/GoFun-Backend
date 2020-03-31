@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DivingApplication.Migrations
 {
-    public partial class addMessageAndChatRoom : Migration
+    public partial class currentMigrade : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -43,14 +43,17 @@ namespace DivingApplication.Migrations
                 name: "GroupPhoto",
                 table: "ChatRooms");
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.AddColumn<string>(
                 name: "Intro",
                 table: "Users",
                 maxLength: 150,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "Role",
+                table: "UserChatRoom",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.AddColumn<double>(
                 name: "Lat",
@@ -109,6 +112,15 @@ namespace DivingApplication.Migrations
                 table: "CoachInfos",
                 nullable: true);
 
+            migrationBuilder.AlterColumn<string>(
+                name: "GroupName",
+                table: "ChatRooms",
+                maxLength: 128,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
+                oldNullable: true);
+
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
                 table: "ChatRooms",
@@ -141,10 +153,16 @@ namespace DivingApplication.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "LocationAddress",
                 table: "ChatRooms",
+                maxLength: 1024,
                 nullable: true);
 
             migrationBuilder.AddColumn<Guid>(
                 name: "PlaceId",
+                table: "ChatRooms",
+                nullable: true);
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "UserId",
                 table: "ChatRooms",
                 nullable: true);
 
@@ -194,11 +212,24 @@ namespace DivingApplication.Migrations
                 table: "ChatRooms",
                 column: "PlaceId");
 
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatRooms_UserId",
+                table: "ChatRooms",
+                column: "UserId");
+
             migrationBuilder.AddForeignKey(
                 name: "FK_ChatRooms_Places_PlaceId",
                 table: "ChatRooms",
                 column: "PlaceId",
                 principalTable: "Places",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ChatRooms_Users_UserId",
+                table: "ChatRooms",
+                column: "UserId",
+                principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
@@ -258,6 +289,10 @@ namespace DivingApplication.Migrations
                 table: "ChatRooms");
 
             migrationBuilder.DropForeignKey(
+                name: "FK_ChatRooms_Users_UserId",
+                table: "ChatRooms");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_CoachInfos_Places_PlaceId",
                 table: "CoachInfos");
 
@@ -303,6 +338,18 @@ namespace DivingApplication.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_ChatRooms_PlaceId",
                 table: "ChatRooms");
+
+            migrationBuilder.DropIndex(
+                name: "IX_ChatRooms_UserId",
+                table: "ChatRooms");
+
+            migrationBuilder.DropColumn(
+                name: "Intro",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "Role",
+                table: "UserChatRoom");
 
             migrationBuilder.DropColumn(
                 name: "Lat",
@@ -372,14 +419,9 @@ namespace DivingApplication.Migrations
                 name: "PlaceId",
                 table: "ChatRooms");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Intro",
-                table: "Users",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldMaxLength: 150,
-                oldNullable: true);
+            migrationBuilder.DropColumn(
+                name: "UserId",
+                table: "ChatRooms");
 
             migrationBuilder.AddColumn<string>(
                 name: "DetailedAddress",
@@ -399,6 +441,15 @@ namespace DivingApplication.Migrations
                 table: "Messages",
                 type: "uniqueidentifier",
                 nullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "GroupName",
+                table: "ChatRooms",
+                type: "nvarchar(max)",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldMaxLength: 128,
+                oldNullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "Discriminator",

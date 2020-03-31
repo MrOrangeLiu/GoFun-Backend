@@ -53,7 +53,8 @@ namespace DivingApplication.Profiles
               .ForMember(dest => dest.FollowersCount, opt => opt.MapFrom(src => src.Followers.Count))
               .ForMember(dest => dest.FollowingCount, opt => opt.MapFrom(src => src.Following.Count))
               .ForMember(dest => dest.OwningPostsCount, opt => opt.MapFrom(src => src.OwningPosts.Count))
-              .ForMember(dest => dest.OwningServiceInfosCount, opt => opt.MapFrom(src => src.OwningServiceInfos.Count));
+              .ForMember(dest => dest.OwningServiceInfosCount, opt => opt.MapFrom(src => src.OwningServiceInfos.Count))
+              ;
 
 
         }

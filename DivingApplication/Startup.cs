@@ -46,12 +46,21 @@ namespace DivingApplication
             var appSettings = appSettingsSection.Get<AppSettingsService>();
 
             services.Configure<AppSettingsService>(appSettingsSection);
-            services.AddSignalR().AddNewtonsoftJsonProtocol(
+            services.AddSignalR(
+                    hubOptions =>
+                    {
+                        hubOptions.EnableDetailedErrors = true;
+                        //hubOptions.StreamBufferCapacity = 1024;
+                        hubOptions.MaximumReceiveMessageSize = 1024 * 1024;
+                    }
+
+                ).AddNewtonsoftJsonProtocol(
                 options => // The first one will be default (XML)
                 {
                     options.PayloadSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                     options.PayloadSerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;
                     options.PayloadSerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+
                 }
                 );
 
@@ -127,6 +136,7 @@ namespace DivingApplication
 
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("ExceptBanned", policy => policy.RequireRole(Role.Admin.ToString(), Role.Coach.ToString(), Role.Normal.ToString(), Role.EmailNotVerified.ToString()));
                 options.AddPolicy("VerifiedUsers", policy => policy.RequireRole(Role.Admin.ToString(), Role.Coach.ToString(), Role.Normal.ToString()));
                 options.AddPolicy("CoachAndAdmin", policy => policy.RequireRole(Role.Admin.ToString(), Role.Coach.ToString()));
             });
