@@ -103,3 +103,9 @@ Modify the <Sites>
 Then, should be able to connect to (http://192.168.1.135:65000/api/users/test)
 
 https://blog.yowko.com/iis-express-allow-external-access/
+
+
+### There is already an object named 'XXXX' in the database.
+
+Solution: Delete the Database using "context.Database.EnsureDeleted();" then remove the old migraiton and migrate again in Package Manager
+
