@@ -4,6 +4,7 @@ using DivingApplication.Entities.ManyToManyEntities;
 using DivingApplication.Helpers.Extensions;
 using DivingApplication.Models.ChatRooms;
 using DivingApplication.Models.Messages;
+using DivingApplication.Models.Users;
 using DivingApplication.Repositories.ChatRooms;
 using DivingApplication.Repositories.Messages;
 using DivingApplication.Repositories.Users;
@@ -17,6 +18,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using static DivingApplication.Entities.ManyToManyEntities.UserChatRoom;
+using static DivingApplication.Entities.Message;
 
 namespace DivingApplication.Controllers
 {
@@ -49,7 +51,8 @@ namespace DivingApplication.Controllers
 
             if (user == null) throw new Exception("Can't find this user in the Database");
 
-            List<Guid> chatRoomIds = user.UserChatRooms.Select(c => c.ChatRoomId).ToList();
+            // Only Connect ot the Rooms that are not Pending.
+            List<Guid> chatRoomIds = user.UserChatRooms.Where(ucr => ucr.Role != UserChatRoomRole.Pending).Select(c => c.ChatRoomId).ToList();
 
             if (chatRoomIds != null && chatRoomIds.Count != 0)
             {
@@ -59,7 +62,6 @@ namespace DivingApplication.Controllers
                         await Groups.AddToGroupAsync(Context.ConnectionId, chatRoomId.ToString());
                 }
             }
-
 
             UserIdToConnectionIdDict.Add(userId, Context.ConnectionId);
 
@@ -75,84 +77,84 @@ namespace DivingApplication.Controllers
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task<ChatRoomOutputDto> CreatePrivateChatRoom(string anotherUserIdString)
-        {
+        //public async Task<ChatRoomOutputDto> CreatePrivateChatRoom(string anotherUserIdString)
+        //{
 
-            var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var anotherUserId = Guid.Parse(anotherUserIdString);
+        //    var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //    var anotherUserId = Guid.Parse(anotherUserIdString);
 
-            // Create ChatRoom
+        //    // Create ChatRoom
 
-            var newChatRoom = new ChatRoom()
-            {
-                IsGroup = false,
-            };
+        //    var newChatRoom = new ChatRoom()
+        //    {
+        //        IsGroup = false,
+        //    };
 
-            await _chatRepository.AddChatRoom(newChatRoom);
+        //    await _chatRepository.AddChatRoom(newChatRoom);
 
-            // Add two members in 
+        //    // Add two members in 
 
-            newChatRoom.UserChatRooms.AddRange(
-                new List<UserChatRoom> {
-                    new UserChatRoom()
-                        {
-                            ChatRoomId = newChatRoom.Id,
-                            UserId = userId,
-                        },
-                    new UserChatRoom()
-                        {
-                            ChatRoomId = newChatRoom.Id,
-                            UserId = anotherUserId,
-                        },
-                }
-            );
+        //    newChatRoom.UserChatRooms.AddRange(
+        //        new List<UserChatRoom> {
+        //            new UserChatRoom()
+        //                {
+        //                    ChatRoomId = newChatRoom.Id,
+        //                    UserId = userId,
+        //                },
+        //            new UserChatRoom()
+        //                {
+        //                    ChatRoomId = newChatRoom.Id,
+        //                    UserId = anotherUserId,
+        //                },
+        //        }
+        //    );
 
-            await _chatRepository.Save();
+        //    await _chatRepository.Save();
 
-            var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(newChatRoom);
+        //    var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(newChatRoom);
 
-            if (UserIdToConnectionIdDict.ContainsKey(anotherUserId))
-            {
-                // Telling another user
-                await NotifyNewChatRoom(UserIdToConnectionIdDict[anotherUserId], chatRoomToReturn);
-            }
+        //    if (UserIdToConnectionIdDict.ContainsKey(anotherUserId))
+        //    {
+        //        // Telling another user
+        //        await NotifyNewChatRoom(UserIdToConnectionIdDict[anotherUserId], chatRoomToReturn);
+        //    }
 
-            return chatRoomToReturn;
-        }
+        //    return chatRoomToReturn;
+        //}
 
-        //ChatRoomForCreatingDto chatRoom
-        public async Task<ChatRoomOutputDto> CreateGroupChatRoom(ChatRoomForCreatingDto chatRoom)
-        {
-            // Get CurrentUser Id
-            var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        ////ChatRoomForCreatingDto chatRoom
+        //public async Task<ChatRoomOutputDto> CreateGroupChatRoom(ChatRoomForCreatingDto chatRoom)
+        //{
+        //    // Get CurrentUser Id
+        //    var userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            // Transform to Entity
-            var chatRoomEntity = _mapper.Map<ChatRoom>(chatRoom);
+        //    // Transform to Entity
+        //    var chatRoomEntity = _mapper.Map<ChatRoom>(chatRoom);
 
-            // Adding this ChatRoom to Db for Id
-            await _chatRepository.AddChatRoom(chatRoomEntity);
+        //    // Adding this ChatRoom to Db for Id
+        //    await _chatRepository.AddChatRoom(chatRoomEntity);
 
-            // Modify the Required Fields
-            chatRoomEntity.IsGroup = true;
-            chatRoomEntity.CreatedAt = DateTime.Now;
-            chatRoomEntity.UserChatRooms.Add(
-                    new UserChatRoom()
-                    {
-                        ChatRoomId = chatRoomEntity.Id,
-                        UserId = userId,
-                        Role = UserChatRoom.UserChatRoomRole.Owner,
-                    }
-                );
+        //    // Modify the Required Fields
+        //    chatRoomEntity.IsGroup = true;
+        //    chatRoomEntity.CreatedAt = DateTime.Now;
+        //    chatRoomEntity.UserChatRooms.Add(
+        //            new UserChatRoom()
+        //            {
+        //                ChatRoomId = chatRoomEntity.Id,
+        //                UserId = userId,
+        //                Role = UserChatRoom.UserChatRoomRole.Owner,
+        //            }
+        //        );
 
-            // Save to Db
-            await _chatRepository.Save();
+        //    // Save to Db
+        //    await _chatRepository.Save();
 
-            // Tranform to ReturnType
-            var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomEntity);
+        //    // Tranform to ReturnType
+        //    var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomEntity);
 
-            // Return the ChatRoom
-            return chatRoomToReturn;
-        }
+        //    // Return the ChatRoom
+        //    return chatRoomToReturn;
+        //}
 
         public async Task<ChatRoomOutputDto> UpdateGroupChatRoom(string chatRoomIdString, JsonPatchDocument<ChatRoomUpdatingDto> patchDocument)
         {
@@ -199,6 +201,8 @@ namespace DivingApplication.Controllers
             // Notify All Users that the ChatRoom has been Updated
             await Clients.Group(chatRoomIdString).SendAsync("OnChatRoomChanged", chatRoomToReturn); //TODO: Complete this in Client Side
 
+
+
             return chatRoomToReturn;
         }
 
@@ -211,6 +215,10 @@ namespace DivingApplication.Controllers
             // Checking the ChatRoom exists
             var chatRoomToJoin = await _chatRepository.GetChatRoom(roomId);
             if (chatRoomToJoin == null) throw new Exception("Cannot find the ChatRoom to join");
+
+            // Checking the Connection doesn't exist
+            var currentConnection = await _chatRepository.GetUserChatRoom(userId, roomId);
+            if (currentConnection != null) throw new Exception("User already in this ChatRoom");
 
 
             // Checking the LoginUser has the right to Adding members
@@ -239,10 +247,19 @@ namespace DivingApplication.Controllers
             // Save to Db
             await _chatRepository.Save();
 
-            // Changing the ChatRoom in Clients
 
-            var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomToJoin);
-            await Clients.Group(chatRoomToJoin.Id.ToString()).SendAsync("OnChatRoomChanged", chatRoomToReturn); //TODO: Complete this in Client Side
+            // Invoke the Client listener 
+            var userToReturn = _mapper.Map<UserBriefOutputDto>(invitedUser);
+            await Clients.Group(chatRoomToJoin.Id.ToString()).SendAsync("OnNewMemberJoin", chatRoomToJoin.Id, userToReturn);
+
+
+            await SendMessage(new MessageForCreatingDto()
+            {
+                BelongChatRoomId = chatRoomToJoin.Id,
+                Content = $"{loginUser.Name} 邀請了 ${invitedUser.Name}",
+                MessageType = MessageContentType.System.ToString(),
+            }
+            );
         }
 
         /// <summary>
@@ -257,7 +274,7 @@ namespace DivingApplication.Controllers
         /// <returns>
         /// Nothing will return, but the OnChatRoomChanged will be called in the Client
         /// </returns>
-        public async Task RemoveUserFromGroupChatRoom(Guid userId, Guid roomId)
+        public async Task RemoveMemberFromChatRoom(Guid userId, Guid roomId)
         {
             // Check the user exists
             var userToRemove = await _userRepository.GetUser(userId);
@@ -267,14 +284,25 @@ namespace DivingApplication.Controllers
             var removeUserChatRoom = await _chatRepository.GetUserChatRoom(userToRemove.Id, roomId);
             if (removeUserChatRoom == null) throw new Exception("User not in this ChatRoom");
 
+            // Checking the ChatRoom exists 
+            var chatRoom = await _chatRepository.GetChatRoom(roomId);
+            if (chatRoom == null) throw new Exception("Cannot find the ChatRoom");
+
             // Checking the LoginUser has the right to remove this member
             var loginUserId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
             var loginUser = await _userRepository.GetUser(loginUserId);
             if (loginUser.UserRole != User.Role.Admin)
             {
-                // Checking if the loginUser has the right to remove this User
-                var loginUserChatRoom = await _chatRepository.GetUserChatRoom(loginUserId, roomId);
-                if (loginUserChatRoom.Role.HasHigherRole(removeUserChatRoom.Role) <= 0) throw new Exception("User not allowed to invite new members");
+                // Checking if the loginUser want to remove itself.
+                if (loginUserId != userId)
+                {
+
+                    if (chatRoom.IsGroup != true) throw new Exception("Removing another user in Private ChatRoom is not allowed");
+                    // Checking if the loginUser has the right to remove this User
+                    var loginUserChatRoom = await _chatRepository.GetUserChatRoom(loginUserId, roomId);
+                    if (loginUserChatRoom.Role.HasHigherRole(removeUserChatRoom.Role) <= 0) throw new Exception("User not allowed to remove the member");
+                }
+
             }
 
             // Remove the Connection
@@ -283,9 +311,6 @@ namespace DivingApplication.Controllers
             // Save to Db
             await _chatRepository.Save();
 
-            // Checking the ChatRoom exists (Checking here since we want to retrieve the changed data)
-            var chatRoom = await _chatRepository.GetChatRoom(roomId);
-            if (chatRoom == null) throw new Exception("Cannot find the ChatRoom");
 
             // Checking how many members in the ChatRoom, if is 0 => Delete the ChatRoom
             if (chatRoom.UserChatRooms.Count <= 0)
@@ -296,15 +321,34 @@ namespace DivingApplication.Controllers
             }
 
             // Changing the ChatRoom in Clients
-            var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoom);
-            await Clients.Group(chatRoomToReturn.Id.ToString()).SendAsync("OnChatRoomChanged", chatRoomToReturn);
+            await Clients.Group(chatRoom.Id.ToString()).SendAsync("OnMemberRemoved", chatRoom.Id, userToRemove.Id);
+
+
+            string systemMessageContent;
+            if (userToRemove.Id == loginUser.Id)
+            {
+                systemMessageContent = $"${loginUser.Name} 離開了群組";
+            }
+            else
+            {
+                systemMessageContent = $"${loginUser.Name} 踢除了 ${userToRemove.Name}";
+            }
+
+
+            // Sending System Message to ChatRoom
+            await SendMessage(new MessageForCreatingDto()
+            {
+                BelongChatRoomId = chatRoom.Id,
+                Content = systemMessageContent,
+                MessageType = MessageContentType.System.ToString(),
+            });
+
 
             // Then remove the member connection from the Group
             if (UserIdToConnectionIdDict.ContainsKey(userToRemove.Id))
             {
-                Groups.RemoveFromGroupAsync(UserIdToConnectionIdDict[userToRemove.Id], chatRoomToReturn.Id.ToString());
+                Groups.RemoveFromGroupAsync(UserIdToConnectionIdDict[userToRemove.Id], chatRoom.Id.ToString());
             }
-
 
         }
 
@@ -329,6 +373,9 @@ namespace DivingApplication.Controllers
             // Checking if the user has the Connection to the ChatRoom
             var RoleChangedUserChatRoom = await _chatRepository.GetUserChatRoom(userToChangeRole.Id, roomId);
             if (RoleChangedUserChatRoom == null) throw new Exception("User not in this ChatRoom");
+
+            // Checking the destination role is not the same as current role
+            if (RoleChangedUserChatRoom.Role == changeToRole) throw new Exception($"The user already own this role: {changeToRole.ToString()}");
 
             // Checking the LoginUser has the right to change anotherUser Role
             var loginUserId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -356,6 +403,7 @@ namespace DivingApplication.Controllers
             }
 
             // Change the Role
+            var previousRole = RoleChangedUserChatRoom.Role;
             RoleChangedUserChatRoom.Role = changeToRole;
 
             // Save to Db
@@ -367,7 +415,43 @@ namespace DivingApplication.Controllers
 
             // Changing the ChatRoom in Clients
             var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomEntity);
-            await Clients.Group(chatRoomToReturn.Id.ToString()).SendAsync("OnChatRoomChanged", chatRoomToReturn);
+            await Clients.Group(chatRoomToReturn.Id.ToString()).SendAsync("OnChatRoomUserRoleChanged", chatRoomToReturn);
+
+            // If the user was having the Pending Role, send a Join Notification
+
+            string systemMessageContent;
+
+            switch (changeToRole)
+            {
+                case UserChatRoomRole.Normal:
+                    systemMessageContent = $"{userToChangeRole.Name} 成為了會員";
+                    break;
+                case UserChatRoomRole.Admin:
+                    systemMessageContent = $"{userToChangeRole.Name} 成為了管理員";
+                    break;
+                case UserChatRoomRole.Owner:
+                    systemMessageContent = $"{userToChangeRole.Name} 成為了組長";
+                    break;
+                default:
+                    throw new Exception("Not supporting Role");
+            }
+
+            if (previousRole == UserChatRoomRole.Pending)
+            {
+                await SendMessage(new MessageForCreatingDto()
+                {
+                    BelongChatRoomId = chatRoomToReturn.Id,
+                    Content = systemMessageContent,
+                    MessageType = MessageContentType.System.ToString(),
+                }
+                );
+            }
+
+            // If the destination Role is Pending, then remove the connection
+            if (changeToRole == UserChatRoomRole.Pending && UserIdToConnectionIdDict.ContainsKey(userToChangeRole.Id))
+            {
+                Groups.RemoveFromGroupAsync(UserIdToConnectionIdDict[userToChangeRole.Id], chatRoomEntity.Id.ToString());
+            }
         }
 
 

@@ -1,6 +1,4 @@
 ﻿using DivingApplication.Entities;
-using DivingApplication.Models.Messages;
-using DivingApplication.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,16 +7,12 @@ using System.Threading.Tasks;
 
 namespace DivingApplication.Models.ChatRooms
 {
-    public class ChatRoomOutputDto
+    /// <summary>
+    /// This one shouldn't have the list field, only for updating the basic ChatRoom info
+    /// </summary>
+    public class ChatRoomSingalROutputDto
     {
         public Guid Id { get; set; }
-        public List<UserBriefOutputDto> Users { get; set; } = new List<UserBriefOutputDto>();
-        public List<MessageOutputDto> Messages { get; set; } = new List<MessageOutputDto>();
-        public List<Guid> Admins { get; set; } = new List<Guid>(); // Admin Must the the memebers
-        public List<Guid> Pendings { get; set; } = new List<Guid>();
-        public bool IsGroup { get; set; }
-        public Guid OwnerId { get; set; }
-        public DateTime CreatedAt { get; set; }
         public byte[] GroupProfileImage { get; set; }
         [MaxLength(128)]
         public string GroupName { get; set; }

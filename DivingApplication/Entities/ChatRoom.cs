@@ -12,6 +12,7 @@ namespace DivingApplication.Entities
     {
         [Key]
         public Guid Id { get; set; }
+
         [Required]
         public List<UserChatRoom> UserChatRooms { get; set; } = new List<UserChatRoom>();
 

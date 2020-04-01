@@ -160,7 +160,7 @@ namespace DivingApplication.Controllers
         [Authorize(Policy = "VerifiedUsers")]
         [HttpPost("group", Name = "CreateGroupChatRoom")]
         //ChatRoomForCreatingDto chatRoom
-        public async Task<IActionResult> CreateGroupChatRoom([FromQuery] ChatRoomForCreatingDto chatRoom)
+        public async Task<IActionResult> CreateGroupChatRoom([FromBody] ChatRoomForCreatingDto chatRoom)
         {
             // Get CurrentUser Id
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
