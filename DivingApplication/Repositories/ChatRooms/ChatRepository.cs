@@ -38,12 +38,20 @@ namespace DivingApplication.Repositories.ChatRooms
         {
             if (chatRoomId == Guid.Empty) throw new ArgumentNullException(nameof(chatRoomId));
 
-            return await _context.ChatRooms
+            var retrieveChatRoom = await _context.ChatRooms
                 .OrderByDescending(c => c.CreatedAt)
                 .Include(c => c.UserChatRooms)
                 .Include(c => c.Place)
                 .Include(c => c.Messages)
                 .SingleOrDefaultAsync(c => c.Id == chatRoomId);
+
+
+            // Only get the lastest 15 Messages
+            retrieveChatRoom.Messages = retrieveChatRoom.Messages.OrderByDescending(m => m.CreatedAt).Take(
+                15
+                ).ToList();
+
+            return retrieveChatRoom;
         }
 
 

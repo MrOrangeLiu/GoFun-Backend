@@ -25,8 +25,8 @@ namespace DivingApplication.Models.ChatRooms
         public bool IsValidModel()
         {
             if (string.IsNullOrWhiteSpace(GroupName) || GroupName.Length > 128) return false;
-            if (LocationAddress != null || LocationAddress.Length > 1024) return false;
-            
+            if (LocationAddress != null && LocationAddress.Length > 1024) return false;
+
             return true;
         }
 
