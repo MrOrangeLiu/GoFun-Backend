@@ -393,7 +393,11 @@ namespace DivingApplication.Controllers
             if (loginUser.UserRole != User.Role.Admin)
             {
                 var loginUserChatRoom = await _chatRepository.GetUserChatRoom(loginUserId, roomId);
-                if (loginUserChatRoom.Role.HasHigherRole(RoleChangedUserChatRoom.Role) <= 0) throw new Exception("User not allowed to invite new members");
+
+                // Only owner can change the role
+                if (loginUserChatRoom.Role != UserChatRoomRole.Owner) throw new Exception("Only Owner can change others Role");
+
+                //if (loginUserChatRoom.Role.HasHigherRole(RoleChangedUserChatRoom.Role) <= 0) throw new Exception("User not allowed to invite new members");
             }
 
 
@@ -420,12 +424,11 @@ namespace DivingApplication.Controllers
             await _chatRepository.Save();
 
             // Checking the ChatRoom exists (Checking here since we want to retrieve the changed data)
-            var chatRoomEntity = await _chatRepository.GetChatRoom(roomId);
-            if (chatRoomEntity == null) throw new Exception("Cannot find the ChatRoom");
+            //var chatRoomEntity = await _chatRepository.GetChatRoom(roomId);
+            //if (chatRoomEntity == null) throw new Exception("Cannot find the ChatRoom");
 
             // Changing the ChatRoom in Clients
-            var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomEntity);
-            await Clients.Group(chatRoomToReturn.Id.ToString()).SendAsync("OnChatRoomUserRoleChanged", chatRoomToReturn.Id, userToChangeRole.Id, changeToRole.ToString());
+            await Clients.Group(roomId.ToString()).SendAsync("OnChatRoomUserRoleChanged", roomId, userToChangeRole.Id, changeToRole.ToString());
 
             // If the user was having the Pending Role, send a Join Notification
 
@@ -450,7 +453,7 @@ namespace DivingApplication.Controllers
             {
                 await SendMessage(new MessageForCreatingDto()
                 {
-                    BelongChatRoomId = chatRoomToReturn.Id,
+                    BelongChatRoomId = roomId,
                     Content = systemMessageContent,
                     MessageType = MessageContentType.System.ToString(),
                 }
@@ -460,7 +463,7 @@ namespace DivingApplication.Controllers
             // If the destination Role is Pending, then remove the connection
             if (changeToRole == UserChatRoomRole.Pending && UserIdToConnectionIdDict.ContainsKey(userToChangeRole.Id))
             {
-                Groups.RemoveFromGroupAsync(UserIdToConnectionIdDict[userToChangeRole.Id], chatRoomEntity.Id.ToString());
+                Groups.RemoveFromGroupAsync(UserIdToConnectionIdDict[userToChangeRole.Id], roomId.ToString());
             }
         }
 
@@ -579,6 +582,8 @@ namespace DivingApplication.Controllers
 
             var messageEntity = _mapper.Map<Message>(message);
 
+            messageEntity.CreatedAt = DateTime.Now;
+
             messageEntity.AuthorId = userId;
 
             // Checking if the ChatRoom Exist
@@ -592,7 +597,7 @@ namespace DivingApplication.Controllers
             var messageToReturn = _mapper.Map<MessageOutputDto>(messageEntity);
 
             // Sending to the Group
-            await Clients.Group(messageToReturn.Id.ToString()).SendAsync("OnMessage", messageToReturn);
+            await Clients.Group(messageToReturn.BelongChatRoomId.ToString()).SendAsync("OnMessage", messageToReturn);
 
             return messageToReturn;
         }
