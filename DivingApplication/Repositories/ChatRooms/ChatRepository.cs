@@ -41,6 +41,7 @@ namespace DivingApplication.Repositories.ChatRooms
             var retrieveChatRoom = await _context.ChatRooms
                 .OrderByDescending(c => c.CreatedAt)
                 .Include(c => c.UserChatRooms)
+                .ThenInclude(ucr => ucr.User)
                 .Include(c => c.Place)
                 .Include(c => c.Messages)
                 .SingleOrDefaultAsync(c => c.Id == chatRoomId);

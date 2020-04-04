@@ -12,6 +12,7 @@ using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
 using DivingApplication.Models.ChatRooms;
 using DivingApplication.Repositories.ChatRooms;
+using DivingApplication.Repositories.Users;
 using DivingApplication.Services.PropertyServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,14 +26,16 @@ namespace DivingApplication.Controllers
     public class ChatRoomsController : ControllerBase
     {
         private readonly IChatRepository _chatRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IPropertyMappingService _propertyMapping;
         private readonly IPropertyValidationService _propertyValidation;
         private readonly IHubContext<ChatHub> _hubContext;
 
-        public ChatRoomsController(IChatRepository chatRepository, IMapper mapper, IPropertyMappingService propertyMapping, IPropertyValidationService propertyValidation, IHubContext<ChatHub> hubContext)
+        public ChatRoomsController(IChatRepository chatRepository, IMapper mapper, IPropertyMappingService propertyMapping, IPropertyValidationService propertyValidation, IHubContext<ChatHub> hubContext, IUserRepository userRepository)
         {
             _chatRepository = chatRepository ?? throw new ArgumentNullException(nameof(chatRepository));
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _propertyMapping = propertyMapping ?? throw new ArgumentNullException(nameof(propertyMapping));
             _propertyValidation = propertyValidation ?? throw new ArgumentNullException(nameof(propertyValidation));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -152,6 +155,16 @@ namespace DivingApplication.Controllers
 
             await _chatRepository.Save();
 
+            // Adding the Connection to these two memebr
+            if (ChatHub.UserIdToConnectionIdDict.ContainsKey(userId))
+            {
+                await _hubContext.Groups.AddToGroupAsync(ChatHub.UserIdToConnectionIdDict[userId], newChatRoom.Id.ToString());
+            }
+
+            if (ChatHub.UserIdToConnectionIdDict.ContainsKey(anotherUserId))
+            {
+                await _hubContext.Groups.AddToGroupAsync(ChatHub.UserIdToConnectionIdDict[anotherUserId], newChatRoom.Id.ToString());
+            }
             var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(newChatRoom);
 
             return Ok(chatRoomToReturn);
@@ -163,7 +176,9 @@ namespace DivingApplication.Controllers
         public async Task<IActionResult> CreateGroupChatRoom([FromBody] ChatRoomForCreatingDto chatRoom)
         {
             // Get CurrentUser Id
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var loginUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var loginUser = await _userRepository.GetUser(loginUserId);
+            if (loginUser == null) throw new Exception("Cannot find the login User");
 
             // Transform to Entity
             var chatRoomEntity = _mapper.Map<ChatRoom>(chatRoom);
@@ -178,7 +193,7 @@ namespace DivingApplication.Controllers
                     new UserChatRoom()
                     {
                         ChatRoomId = chatRoomEntity.Id,
-                        UserId = userId,
+                        UserId = loginUserId,
                         Role = UserChatRoom.UserChatRoomRole.Owner,
                     }
                 );
@@ -186,8 +201,18 @@ namespace DivingApplication.Controllers
             // Save to Db
             await _chatRepository.Save();
 
+            // Adding the Connection to  owner memebr
+            if (ChatHub.UserIdToConnectionIdDict.ContainsKey(loginUserId))
+            {
+                await _hubContext.Groups.AddToGroupAsync(ChatHub.UserIdToConnectionIdDict[loginUserId], chatRoomEntity.Id.ToString());
+            }
+
+            chatRoomEntity.UserChatRooms[0].User = loginUser;
+
             // Tranform to ReturnType
             var chatRoomToReturn = _mapper.Map<ChatRoomOutputDto>(chatRoomEntity);
+
+
 
             // Return the ChatRoom
             return Ok(chatRoomToReturn);

@@ -24,7 +24,7 @@ namespace DivingApplication.Models.ChatRooms
         public string GroupName { get; set; }
         [MaxLength(1024)]
         public string LocationAddress { get; set; }
-        public Place Place { get; set; }
+        //public Place Place { get; set; }
         public double Lat { get; set; }
         public double Lng { get; set; }
     }
