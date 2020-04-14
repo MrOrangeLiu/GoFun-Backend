@@ -161,6 +161,7 @@ namespace DivingApplication.Services.PropertyServices
             {"AuthorId", new PropertyMappingValue(new List<string>(){"AuthorId"})},
             {"Author", new PropertyMappingValue(new List<string>(){"Author"})},
             {"ReportContent", new PropertyMappingValue(new List<string>(){"ReportContent"})},
+            {"ReportContentType", new PropertyMappingValue(new List<string>(){"ReportContentType"})},
             {"ReportReason", new PropertyMappingValue(new List<string>(){"ReportReason"})},
             {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
             {"SolvedAt", new PropertyMappingValue(new List<string>(){"SolvedAt"}, true)},

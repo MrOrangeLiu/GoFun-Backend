@@ -16,6 +16,7 @@ namespace DivingApplication.Models.Reports
         public bool Solved { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime SolvedAt { get; set; }
+        public string ReportContentType { get; set; }
         public string SolvedById { get; set; }
         public string Note { get; set; }
 

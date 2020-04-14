@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static DivingApplication.Entities.Message;
 using static DivingApplication.Entities.Post;
+using static DivingApplication.Entities.Report;
 using static DivingApplication.Entities.ServiceInfo;
 using static DivingApplication.Entities.User;
 
@@ -70,6 +71,11 @@ namespace DivingApplication.DbContexts
             modelBuilder.Entity<ServiceInfo>().Property(s => s.ServiceCenterType).HasConversion(
                     v => v.ToString(),
                     v => ((CenterType)Enum.Parse(typeof(CenterType), v))
+                );
+
+            modelBuilder.Entity<Report>().Property(r => r.ReportContentType).HasConversion(
+                    v => v.ToString(),
+                    v => ((EReportContentType)Enum.Parse(typeof(EReportContentType), v))
                 );
 
             // Dealing with Many-to-Many Relationship

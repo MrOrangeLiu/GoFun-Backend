@@ -9,6 +9,15 @@ namespace DivingApplication.Entities
 {
     public class Report
     {
+        // Reportable Content
+        public enum EReportContentType
+        {
+            Post,
+            Service,
+            Coach,
+            Message,
+        }
+
         [Key]
         public Guid Id { get; set; }
         [ForeignKey("AuthorId")]
@@ -21,6 +30,7 @@ namespace DivingApplication.Entities
         public DateTime SolvedAt { get; set; }
         public string SolvedById { get; set; }
         public string Note { get; set; } // Note for Admin
+        public EReportContentType ReportContentType { get; set; }
 
     }
 }
