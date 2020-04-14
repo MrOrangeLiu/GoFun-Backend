@@ -31,6 +31,8 @@ namespace DivingApplication.DbContexts
 
         public DbSet<Place> Places { get; set; }
 
+        public DbSet<Report> Reports { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
@@ -232,11 +234,12 @@ namespace DivingApplication.DbContexts
                         .HasForeignKey(uml => uml.UserId).OnDelete(DeleteBehavior.Restrict);
 
 
+            // One to Many
             // If the user is deleted, then the comments and posts will not be affected
             modelBuilder.Entity<User>().HasMany(u => u.OwningPosts).WithOne(p => p.Author).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>().HasMany(u => u.OwningReports).WithOne(r => r.Author).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<User>().HasMany(u => u.OwningComments).WithOne(c => c.Author).OnDelete(DeleteBehavior.Restrict);
             //modelBuilder.Entity<User>().HasMany(u => u.OwningChatRoom).WithOne(c => c.Owner).OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Post>().HasMany(p => p.Comments).WithOne(c => c.BelongPost).OnDelete(DeleteBehavior.Restrict);
             base.OnModelCreating(modelBuilder);
 

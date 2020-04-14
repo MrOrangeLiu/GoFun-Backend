@@ -11,6 +11,7 @@ using DivingApplication.Repositories.CoachInfos;
 using DivingApplication.Repositories.Comments;
 using DivingApplication.Repositories.Messages;
 using DivingApplication.Repositories.Posts;
+using DivingApplication.Repositories.Reports;
 using DivingApplication.Repositories.ServiceInfos;
 using DivingApplication.Repositories.Topics;
 using DivingApplication.Repositories.Users;
@@ -154,6 +155,7 @@ namespace DivingApplication
             services.AddScoped<ITopicsRepository, TopicsRepository>();
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IReportRepository, ReportRepository>();
 
             services.AddScoped<IPropertyMappingService, PropertyMappingService>();
             services.AddScoped<IPropertyValidationService, PropertyValidationService>();

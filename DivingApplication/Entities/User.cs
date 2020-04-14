@@ -72,6 +72,9 @@ namespace DivingApplication.Entities
         public List<UserMessageRead> ReadMessages { get; set; } = new List<UserMessageRead>();
         public List<ServiceInfo> OwningServiceInfos { get; set; } = new List<ServiceInfo>();
         public List<UserPostTag> PostsTaggedMe { get; set; } = new List<UserPostTag>();
+        public List<Report> OwningReports { get; set; } = new List<Report>();
+
+
         //public List<ChatRoomInviteUser> ChatRoomInvitations { get; set; } = new List<ChatRoomInviteUser>();
         //public List<ChatRoomAdminUser> AdminChatRooms { get; set; } = new List<ChatRoomAdminUser>();
     }

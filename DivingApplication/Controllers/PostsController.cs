@@ -120,7 +120,7 @@ namespace DivingApplication.Controllers
             return Ok(_mapper.Map<IEnumerable<PostOutputDto>>(postsFromRepo).ShapeData(postResourceParameters.Fields));
         }
 
-        [Authorize(Policy = "c")]
+        [Authorize(Policy = "VerifiedUsers")]
         [HttpGet("following", Name = "GetFollowingPosts")]
         public async Task<IActionResult> GetAllFollowingPosts([FromQuery] PostResourceParametersWithOrderBy postResourceParameters)
         {

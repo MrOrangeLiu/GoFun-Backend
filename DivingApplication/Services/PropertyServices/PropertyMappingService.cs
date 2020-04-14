@@ -4,6 +4,7 @@ using DivingApplication.Models.CoachInfo;
 using DivingApplication.Models.Comments;
 using DivingApplication.Models.Messages;
 using DivingApplication.Models.Posts;
+using DivingApplication.Models.Reports;
 using DivingApplication.Models.ServiceInfo;
 using DivingApplication.Models.Topic;
 using DivingApplication.Models.Users;
@@ -153,6 +154,22 @@ namespace DivingApplication.Services.PropertyServices
 
         };
 
+
+        private Dictionary<string, PropertyMappingValue> _ReportPropertyMapping = new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Id", new PropertyMappingValue(new List<string>(){"Id"})},
+            {"AuthorId", new PropertyMappingValue(new List<string>(){"AuthorId"})},
+            {"Author", new PropertyMappingValue(new List<string>(){"Author"})},
+            {"ReportContent", new PropertyMappingValue(new List<string>(){"ReportContent"})},
+            {"ReportReason", new PropertyMappingValue(new List<string>(){"ReportReason"})},
+            {"CreatedAt", new PropertyMappingValue(new List<string>(){"CreatedAt"}, true)},
+            {"SolvedAt", new PropertyMappingValue(new List<string>(){"SolvedAt"}, true)},
+            {"SolvedById", new PropertyMappingValue(new List<string>(){"SolvedById"})},
+            {"Solved", new PropertyMappingValue(new List<string>(){"Solved"})},
+
+        };
+
+
         private IList<IPropertyMappingMarker> _propertyMappings = new List<IPropertyMappingMarker>();
 
 
@@ -166,6 +183,7 @@ namespace DivingApplication.Services.PropertyServices
             _propertyMappings.Add(new PropertyMapping<UserBriefOutputDto, User>(_userPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<ChatRoomOutputDto, ChatRoom>(_ChatRoomPropertyMapping));
             _propertyMappings.Add(new PropertyMapping<MessageOutputDto, Message>(_MessagePropertyMapping));
+            _propertyMappings.Add(new PropertyMapping<ReportOutputDto, Report>(_ReportPropertyMapping));
 
         }
         public Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>()
