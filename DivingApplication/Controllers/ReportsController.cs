@@ -74,8 +74,8 @@ namespace DivingApplication.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPatch("{reportId}")]
-        public async Task<IActionResult> AdminSolveReport(Guid reportId, [FromQuery] string fields, [FromBody] string note)
+        [HttpPost("{reportId}")]
+        public async Task<IActionResult> AdminSolveReportToggle(Guid reportId, [FromQuery] string fields, [FromBody] ReportSolveDto reportSolve)
         {
 
             if (!_propertyValidation.HasValidProperties<ReportOutputDto>(fields)) return BadRequest();
@@ -90,11 +90,24 @@ namespace DivingApplication.Controllers
 
             // Get the Current Report
             var reportFromRepo = await _reportRepository.GetReport(reportId);
-
+            bool Solved;
             // Update here
-            reportFromRepo.SolvedAt = DateTime.Now;
-            reportFromRepo.SolvedById = loginUserId.ToString();
-            reportFromRepo.Note = note;
+            if (reportFromRepo.Solved)
+            {
+                Solved = false;
+                reportFromRepo.Solved = false;
+                reportFromRepo.SolvedAt = DateTime.Now;
+                reportFromRepo.SolvedById = loginUserId.ToString();
+                reportFromRepo.Note = reportSolve.Note;
+            }
+            else
+            {
+                Solved = true;
+                reportFromRepo.Solved = true;
+                reportFromRepo.SolvedAt = DateTime.Now;
+                reportFromRepo.SolvedById = loginUserId.ToString();
+                reportFromRepo.Note = reportSolve.Note;
+            }
 
             // Save to Db
             await _reportRepository.Save();
@@ -106,7 +119,7 @@ namespace DivingApplication.Controllers
             {
                 reportId = reportToReturn.Id,
                 fields
-            }, reportToReturn.ShapeData(fields));
+            }, new { Report = reportToReturn.ShapeData(fields), Solved });
         }
 
 
@@ -132,7 +145,7 @@ namespace DivingApplication.Controllers
         public async Task<IActionResult> GetReports([FromQuery] ReportResourceParameters resourceParameters)
         {
             // Checking the OrderBy and Fields
-            if (!_propertyMapping.ValidMappingExist<ReportOutputDto, Post>(resourceParameters.OrderBy)) return BadRequest();
+            if (!_propertyMapping.ValidMappingExist<ReportOutputDto, Report>(resourceParameters.OrderBy)) return BadRequest();
             if (!_propertyValidation.HasValidProperties<ReportOutputDto>(resourceParameters.Fields)) return BadRequest();
 
             // Get the Reports according to the Parameters

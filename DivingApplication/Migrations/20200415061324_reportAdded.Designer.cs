@@ -4,14 +4,16 @@ using DivingApplication.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DivingApplication.Migrations
 {
     [DbContext(typeof(DivingAPIContext))]
-    partial class DivingAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20200415061324_reportAdded")]
+    partial class reportAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

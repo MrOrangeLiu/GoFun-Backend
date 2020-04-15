@@ -1,7 +1,9 @@
 ﻿using DivingApplication.DbContexts;
 using DivingApplication.Entities;
 using DivingApplication.Helpers;
+using DivingApplication.Helpers.Extensions;
 using DivingApplication.Helpers.ResourceParameters;
+using DivingApplication.Models.Reports;
 using DivingApplication.Services.PropertyServices;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -51,6 +53,14 @@ namespace DivingApplication.Repositories.Reports
             {
                 collection = collection.Where(r => r.ReportContent.Contains(resourceParameters.SearchQuery));
             }
+
+
+            if (!string.IsNullOrWhiteSpace(resourceParameters?.OrderBy?.Replace(",", "")))
+            {
+                var postPropertyMappingDictionary = _propertyMapping.GetPropertyMapping<ReportOutputDto, Report>();
+                collection = collection.ApplySort(resourceParameters.OrderBy, postPropertyMappingDictionary);
+            }
+
 
             return PageList<Report>.Create(collection, resourceParameters.PageNumber, resourceParameters.PageSize);
         }

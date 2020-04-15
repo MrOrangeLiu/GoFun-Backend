@@ -17,7 +17,7 @@ namespace DivingApplication.Helpers.ResourceParameters
         public string OrderBy { get; set; }
 
         public Guid AuthorId { get; set; }
-        public bool Solved { get; set; }
+        public bool? Solved { get; set; }
         public int PageSize
         {
             get => _pageSize;
